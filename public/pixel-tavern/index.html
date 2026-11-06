@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d100f">
+    <meta name="description" content="像素酒馆 · Pixel Tavern — SillyTavern 风格的像素在线酒馆，角色书架、角色卡集市与沉浸式 AI 聊天 Demo。">
+    <title>像素酒馆 · Pixel Tavern — 在线酒馆聊天</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <style>
+        /* 像素中文字体：本地子集（~54KB，覆盖门户全部静态文案）优先加载；
+           动态内容（用户输入/导入卡）缺字时按 unicode-range 按需回退 CDN 完整版，再回退系统字体 */
+        @font-face {
+            font-family: 'Zpix Local';
+            src: url('/pixel-tavern/fonts/zpix-subset.woff2') format('woff2');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Zpix CDN';
+            src: url('https://cdn.jsdelivr.net/gh/SolidZORO/zpix-pixel-font/dist/Zpix.ttf') format('truetype');
+            font-display: swap;
+            unicode-range: U+4E00-9FFF, U+3400-4DBF, U+3000-303F, U+FF00-FFEF;
+        }
+    </style>
+    <link rel="preload" href="/pixel-tavern/fonts/zpix-subset.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Crect width='8' height='8' fill='%230d100f'/%3E%3Crect x='2' y='1' width='4' height='2' fill='%23e8c97a'/%3E%3Crect x='1' y='3' width='6' height='3' fill='%23d4a94e'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%23111'/%3E%3Crect x='5' y='2' width='1' height='1' fill='%23111'/%3E%3Crect x='2' y='5' width='4' height='2' fill='%23ffb545'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/pixel-tavern/style.css">
+</head>
+<body>
+
+    <!-- ===== 启动画面 ===== -->
+    <div id="boot">
+        <div class="boot-inner">
+            <canvas id="boot-logo" width="160" height="48"></canvas>
+            <div class="boot-title">像素酒馆</div>
+            <div class="boot-sub">PIXEL TAVERN</div>
+            <div class="boot-bar"><div id="boot-bar-fill"></div></div>
+            <div id="boot-tip">正在点燃炉火…</div>
+        </div>
+    </div>
+
+    <!-- ===== 顶栏 ===== -->
+    <header id="topbar">
+        <div class="tb-left">
+            <canvas id="logo-canvas" width="48" height="48" title="像素酒馆"></canvas>
+            <div class="logo-text">
+                <div class="logo-zh">像素酒馆</div>
+                <div class="logo-en">PIXEL TAVERN</div>
+            </div>
+            <span class="px-badge" id="version-badge">V1.0</span>
+        </div>
+        <div class="tb-right">
+            <div class="visit-box" title="累计访问">累计访问 <b id="visit-count">0</b></div>
+            <button class="px-btn tb-btn" id="btn-classic" title="进入经典酒馆界面（原版 SillyTavern）">经典酒馆</button>
+            <button class="px-btn tb-btn" id="btn-settings-top" title="设置">⚙ 设置</button>
+        </div>
+    </header>
+
+    <!-- ===== 酒馆播报 ===== -->
+    <div id="tavern-ticker">
+        <span class="ticker-label">酒馆播报</span>
+        <div class="ticker-view"><div class="ticker-move" id="ticker-text"></div></div>
+    </div>
+
+    <!-- ===== 主体布局 ===== -->
+    <div id="layout">
+
+        <!-- 公会柜台侧栏 -->
+        <aside id="sidebar">
+            <div class="side-label">公会柜台</div>
+            <nav id="side-nav">
+                <button class="side-item active" data-view="market"><i class="pi" data-icon="market"></i>角色卡集市</button>
+                <button class="side-item" data-view="shelf"><i class="pi" data-icon="shelf"></i>我的角色卡</button>
+                <button class="side-item" data-view="build"><i class="pi" data-icon="build"></i>Build 制作</button>
+                <button class="side-item" data-view="fav"><i class="pi" data-icon="fav"></i>收藏</button>
+                <button class="side-item" data-view="history"><i class="pi" data-icon="history"></i>我的历史对话</button>
+                <button class="side-item" data-view="news"><i class="pi" data-icon="news"></i>更新通知<span class="px-mini new">NEW</span></button>
+                <button class="side-item" data-view="guide"><i class="pi" data-icon="guide"></i>使用指引</button>
+                <button class="side-item" data-view="settings"><i class="pi" data-icon="settings"></i>设置</button>
+            </nav>
+
+            <div class="side-label">酒馆炉火</div>
+            <div id="fireplace-card">
+                <canvas id="fireplace-canvas" width="32" height="24"></canvas>
+                <div class="fire-info">
+                    <div class="fire-title">炉火正旺</div>
+                    <div class="fire-sub">在线冒险者 <b id="online-count">3</b></div>
+                </div>
+            </div>
+
+            <div class="side-label">像素点唱机</div>
+            <div id="mini-player">
+                <div id="mini-track-name">未播放</div>
+                <div class="mini-btns">
+                    <button class="px-btn sq" id="btn-mini-prev" title="上一首">◀</button>
+                    <button class="px-btn sq play" id="btn-mini-play" title="播放/暂停">▶</button>
+                    <button class="px-btn sq" id="btn-mini-next" title="下一首">▶▶</button>
+                </div>
+                <div id="mini-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main id="main">
+
+            <!-- 角色卡集市 -->
+            <section class="view" data-view="market">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">ADVENTURER REGISTRY</span>角色书架</h1>
+                    <div class="head-actions">
+                        <input type="search" id="search-input" placeholder="搜索角色名 / 标签…" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="shelf-block">
+                    <div class="shelf-title">滑卡书架 <span class="en">· SWIPE SHELF</span></div>
+                    <div id="shelf-strip"></div>
+                </div>
+
+                <div id="cat-tabs"></div>
+                <div class="grid-meta"><b id="result-count">0</b> 位角色 · 点击封面查看信息，再开始对话</div>
+                <div id="card-grid" class="card-grid"></div>
+            </section>
+
+            <!-- 我的角色卡 -->
+            <section class="view hidden" data-view="shelf">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">MY CARDS</span>我的角色卡</h1>
+                    <div class="head-actions">
+                        <button class="px-btn" id="btn-import">⬆ 导入角色卡</button>
+                        <input type="file" id="import-file" accept=".json,.png" hidden>
+                    </div>
+                </div>
+                <div class="grid-meta">书架上的角色 <b id="shelf-count">0</b> 张（含自制与导入）</div>
+                <div id="shelf-grid" class="card-grid"></div>
+            </section>
+
+            <!-- 收藏 -->
+            <section class="view hidden" data-view="fav">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">FAVORITES</span>收藏</h1>
+                </div>
+                <div id="fav-grid" class="card-grid"></div>
+            </section>
+
+            <!-- 历史对话 -->
+            <section class="view hidden" data-view="history">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">HISTORY</span>我的历史对话</h1>
+                    <div class="head-actions">
+                        <button class="px-btn danger" id="btn-clear-history">清空历史</button>
+                    </div>
+                </div>
+                <div class="grid-meta">仅保留最近 <b>30</b> 段对话，可在「设置 → 数据导出」中备份</div>
+                <div id="history-list"></div>
+            </section>
+
+            <!-- Build 角色卡制作 -->
+            <section class="view hidden" data-view="build">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">CARD BUILDER</span>Build 角色卡制作</h1>
+                </div>
+                <div id="build-wrap">
+                    <div id="build-preview-box">
+                        <canvas id="build-preview" width="96" height="96"></canvas>
+                        <button class="px-btn" id="btn-build-reroll" title="随机形象">🎲 重掷形象</button>
+                    </div>
+                    <form id="build-form">
+                        <label>角色名 <input id="build-name" maxlength="12" placeholder="例如：林间信使" required></label>
+                        <label>头衔 <input id="build-title" maxlength="12" placeholder="例如：酒馆的常客"></label>
+                        <label>分类
+                            <select id="build-cat"></select>
+                        </label>
+                        <label>开场白 <textarea id="build-greeting" rows="3" maxlength="120" placeholder="角色见到你时说的第一句话…"></textarea></label>
+                        <label>人设简介 <textarea id="build-desc" rows="4" maxlength="200" placeholder="性格、背景、说话风格…"></textarea></label>
+                        <div class="color-row">
+                            <label class="mini">发色 <input type="color" id="build-hair" value="#e8c97a"></label>
+                            <label class="mini">背景 <input type="color" id="build-bg" value="#3a5a40"></label>
+                        </div>
+                        <button type="submit" class="px-btn gold big">✚ 放入我的书架</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 更新通知 -->
+            <section class="view hidden" data-view="news">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">CHANGELOG</span>更新通知</h1>
+                </div>
+                <article class="news-panel">
+                    <div class="news-date">2026.11.05 · PIXEL TAVERN</div>
+                    <h2>V1.0 「炉火初燃」 上线</h2>
+                    <p>像素酒馆 Demo 正式点亮！本版本在原版 SillyTavern 之上改造出完整的像素酒馆门户：</p>
+                    <ul>
+                        <li><b>像素酒馆门户</b> — 公会柜台、角色书架、滑卡书架与角色卡集市全部上线，像素风 UI 全面重绘。</li>
+                        <li><b>内置对话引擎</b> — 每位角色内置专属剧本，无需 API Key 即可开聊；支持打字机效果与浏览器 TTS 朗读。</li>
+                        <li><b>沉浸互动 BETA</b> — 完整剧情后给出三组行动选项、角色状态与剧情追踪，可随时切回传统聊天。</li>
+                        <li><b>Build 角色卡制作</b> — 在浏览器里捏一个专属像素角色，立刻入书架、立刻开聊。</li>
+                        <li><b>像素点唱机</b> — 四首 8-bit 酒馆小曲由 WebAudio 实时合成，收起面板音乐不中断。</li>
+                        <li><b>经典酒馆直通</b> — 顶栏「经典酒馆」一键回到原版 SillyTavern 界面，角色卡已自动放入其中。</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- 使用指引 -->
+            <section class="view hidden" data-view="guide">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">GUIDE</span>使用指引</h1>
+                </div>
+                <article class="news-panel">
+                    <h2>三步开始聊天</h2>
+                    <div class="steps">
+                        <div class="step"><span class="step-no">01</span><b>挑选伙伴</b><p>在角色卡集市按分类或标签找到喜欢的角色卡。</p></div>
+                        <div class="step"><span class="step-no">02</span><b>查看详情</b><p>点击封面查看角色信息与开场白，可先加入收藏。</p></div>
+                        <div class="step"><span class="step-no">03</span><b>开始对话</b><p>进入对话页，输入消息即可；沉浸互动会给出行动选项。</p></div>
+                    </div>
+                    <h2>酒馆须知</h2>
+                    <ul>
+                        <li>Demo 的角色回复由<b>本地剧本引擎</b>生成，离线可玩；接入真实大模型请使用顶栏「经典酒馆」进入原版 SillyTavern 配置 API。</li>
+                        <li>角色卡、收藏与聊天记录保存在<b>浏览器本地</b>，不会上传。</li>
+                        <li>「经典酒馆」即原版 SillyTavern 界面，集市中的角色卡 PNG 已自动放入其中，可直接使用原版全部功能。</li>
+                    </ul>
+                </article>
+            </section>
+
+            <!-- 设置 -->
+            <section class="view hidden" data-view="settings">
+                <div class="view-head">
+                    <h1 class="view-title"><span class="en">SETTINGS</span>设置</h1>
+                </div>
+                <div id="settings-panel">
+                    <div class="set-row">
+                        <label>点唱机音量</label>
+                        <input type="range" id="set-volume" min="0" max="100" value="40">
+                    </div>
+                    <div class="set-row">
+                        <label>角色消息 TTS 朗读（浏览器语音）</label>
+                        <button class="px-btn toggle" id="set-tts" data-on="0">OFF</button>
+                    </div>
+                    <div class="set-row">
+                        <label>打字机效果</label>
+                        <button class="px-btn toggle" id="set-typewriter" data-on="1">ON</button>
+                    </div>
+                    <div class="set-row">
+                        <label>沉浸互动 BETA（默认开启）</label>
+                        <button class="px-btn toggle" id="set-immersive" data-on="1">ON</button>
+                    </div>
+                    <div class="set-row">
+                        <label>酒馆主题色</label>
+                        <div class="accent-row" id="accent-row">
+                            <button class="accent-swatch gold active" data-accent="gold" title="金狮"></button>
+                            <button class="accent-swatch jade" data-accent="jade" title="翡翠"></button>
+                            <button class="accent-swatch crimson" data-accent="crimson" title="绯红"></button>
+                        </div>
+                    </div>
+                    <div class="set-row">
+                        <label>数据导出 / 导入<br><span class="set-note-inline">备份收藏、历史、自制与导入卡、设置（JSON）</span></label>
+                        <div class="hist-btns">
+                            <button class="px-btn" id="btn-export-data" type="button">⬇ 导出</button>
+                            <button class="px-btn" id="btn-import-data" type="button">⬆ 导入</button>
+                            <input type="file" id="import-data-file" accept=".json" hidden>
+                        </div>
+                    </div>
+                    <div class="set-row">
+                        <label>本地数据</label>
+                        <button class="px-btn danger" id="btn-clear-data">清除全部本地数据</button>
+                    </div>
+                    <p class="set-note">隐私声明：聊天内容、角色卡与设置优先保存在浏览器本地。Demo 不收集任何个人数据。</p>
+                </div>
+            </section>
+
+            <!-- 对话页 -->
+            <section class="view hidden" data-view="chat">
+                <div id="chat-header">
+                    <button class="px-btn sq" id="btn-chat-back" title="返回">◀</button>
+                    <canvas id="chat-avatar" width="48" height="48"></canvas>
+                    <div class="chat-title">
+                        <div id="chat-char-name">—</div>
+                        <div id="chat-char-title" class="sub">—</div>
+                    </div>
+                    <span class="px-badge" id="chat-mode-badge">传统聊天</span>
+                    <div class="chat-actions">
+                        <button class="px-btn sq" id="btn-chat-mode" title="切换沉浸互动">✦</button>
+                        <button class="px-btn sq" id="btn-chat-tts" title="朗读开关">♪</button>
+                    </div>
+                </div>
+                <div id="chat-scroll">
+                    <div id="chat-log"></div>
+                    <div id="immersive-panel" class="hidden">
+                        <div class="imm-title">沉浸互动 <span class="px-mini beta">BETA</span></div>
+                        <div class="imm-row">
+                            <div class="imm-state">
+                                <div class="imm-bar"><span>心情</span><div class="bar"><i id="bar-mood"></i></div></div>
+                                <div class="imm-bar"><span>好感</span><div class="bar"><i id="bar-favor"></i></div></div>
+                            </div>
+                            <div class="imm-track"><span class="lab">剧情追踪</span><div id="imm-track-text" class="tl"><div class="tl-item now">—</div></div></div>
+                        </div>
+                        <div class="imm-title small">行动选项</div>
+                        <div id="chat-options"></div>
+                    </div>
+                    <button type="button" id="btn-chat-bottom" class="px-btn sq hidden" title="回到最新消息">▼ 回到底部</button>
+                </div>
+                <form id="chat-form">
+                    <input id="chat-input" type="text" maxlength="300" placeholder="按 Enter 发送，向角色说点什么…" autocomplete="off">
+                    <button type="submit" class="px-btn gold" id="btn-send">发送</button>
+                </form>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ===== 弹窗遮罩 ===== -->
+    <div id="overlay" class="hidden">
+        <!-- 角色详情 -->
+        <div class="modal-window hidden" id="modal-detail">
+            <button class="modal-close px-btn sq" data-close>✕</button>
+            <div class="detail-top">
+                <canvas id="detail-avatar" width="112" height="112"></canvas>
+                <div class="detail-info">
+                    <div class="detail-name" id="detail-name">—</div>
+                    <div class="detail-title" id="detail-title">—</div>
+                    <div class="detail-tags" id="detail-tags"></div>
+                    <div class="detail-stats">
+                        <div class="imm-bar"><span>人气</span><div class="bar"><i id="detail-pop"></i></div></div>
+                        <div class="imm-bar"><span>活跃</span><div class="bar"><i id="detail-act"></i></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-desc" id="detail-desc">—</div>
+            <div class="detail-greet" id="detail-greet">—</div>
+            <div class="detail-recent hidden" id="detail-recent"></div>
+            <div class="detail-btns">
+                <button class="px-btn gold big" id="btn-start-chat">▶ 开始对话</button>
+                <button class="px-btn hidden" id="btn-resume-chat" title="回到上次的对话进度">↻ 继续上次</button>
+                <button class="px-btn" id="btn-fav-toggle">♥ 收藏</button>
+                <button class="px-btn" id="btn-open-classic" title="在经典酒馆(原版 SillyTavern)中使用该角色卡">↗ 经典酒馆中打开</button>
+            </div>
+        </div>
+
+        <!-- 欢迎弹窗 -->
+        <div class="modal-window hidden" id="modal-welcome">
+            <div class="welcome-head">
+                <div class="welcome-zh">欢迎来到像素酒馆</div>
+                <div class="welcome-en">WELCOME TO PIXEL TAVERN</div>
+            </div>
+            <p class="welcome-lead">这里是像素风在线酒馆 Demo。角色卡完全免费，把角色带进一场真正的冒险。</p>
+            <div class="steps">
+                <div class="step"><span class="step-no">01</span><b>挑选伙伴</b><p>从角色卡集市挑选喜欢的角色。</p></div>
+                <div class="step"><span class="step-no">02</span><b>查看详情</b><p>点击封面查看信息与开场白。</p></div>
+                <div class="step"><span class="step-no">03</span><b>开始对话</b><p>进入对话页开始你的冒险。</p></div>
+            </div>
+            <div class="detail-btns">
+                <button class="px-btn gold big" id="btn-welcome-go">先去集市逛逛</button>
+                <button class="px-btn" id="btn-welcome-guide">查看使用指引</button>
+            </div>
+        </div>
+
+        <!-- 确认弹窗 -->
+        <div class="modal-window small hidden" id="modal-confirm">
+            <div class="confirm-text" id="confirm-text">确定吗？</div>
+            <div class="detail-btns">
+                <button class="px-btn danger" id="btn-confirm-yes">确定</button>
+                <button class="px-btn" id="btn-confirm-no">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-wrap"></div>
+
+    <script src="/pixel-tavern/data.js"></script>
+    <script src="/pixel-tavern/avatars.js"></script>
+    <script src="/pixel-tavern/jukebox.js"></script>
+    <script src="/pixel-tavern/app.js"></script>
+</body>
+</html>

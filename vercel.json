@@ -1,0 +1,8 @@
+{
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/pixel-tavern/index.html" }
+  ]
+}
