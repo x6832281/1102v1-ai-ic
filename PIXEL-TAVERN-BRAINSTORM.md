@@ -1292,3 +1292,16 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - 品牌资产：make-brand.mjs 新增 5×7 位图字体 G/M 字形，OG 横幅重绘为 GAME TAVERN（图标无文字不变）。
 - 保留（基础设施，访客不可见）：/pixel-tavern/ 路径与目录、/api/pixel/* 路由、PT_* 与 pt_* 标识符、PIXEL_LLM_* 环境变量、[pixel-lite] 日志前缀 —— 改动会断 URL/缓存/书签且无可见收益。
 - 资源指纹 v=1303；冒烟 103/103；ESLint 0；本地+线上（ai-ic.top）HTML 中旧名 0 处；浏览器截图确认。预览站同步重部署并改名为「游戏酒馆 Game Tavern」。
+
+---
+
+## 追加记录 · /web 发现页上线（去风险化复刻版，2026.11.07，用户指令：部署上线 + 能改的都改）
+
+- 背景：用户提出侵权顾虑后要求部署上线并替换全部可替换内容。复刻页（ai-website-cloner-template 模板）完成"三换"：
+  1. **换图** — 21 位原创角色的像素海报封面（浏览器端用主项目 PTAvatar 算法 + 角色调色板合成 384×528）；自绘像素温室场景背景（scripts/make-scene.mjs 纯 Node 生成器：拱窗/吊灯/药草架/垂藤/石板地，240×135 → ×6 放大，58KB）；品牌图标用主项目自有资产。
+  2. **换名** — 品牌 游戏酒馆 GAME TAVERN；4 个与原站重合的分类名改为自创变体（霓虹特案司/药灯深宫/雨巷灯语/暮色魔女行），并同步修改主站门户 data.js（id 不变，显示名替换，角色描述引用同步）；根类名 .xstavern → .gametavern。
+  3. **换文** — 公告弹窗改为自有 V1.3「明炉真火」文案；侧栏导航对齐主项目结构；卡片/CTA 链接指向 /pixel-tavern/ 门户（发现页 → 酒馆应用的产品漏斗）。
+- 部署：Next 静态导出（output export + basePath /web）→ out/ 拷入主仓库 public/web/ → Vercel 自动部署 → **https://ai-ic.top/web/** 上线。
+- 修复：Next 16 dev 跨域 HMR 阻断（allowedDevOrigins）；visit 计数 CSRF 握手（先 GET /csrf-token 再 POST，Serverless/ST 两种后端通吃）；根级资产路径需同时存在于主仓库 public/sites/。
+- 验证：npm run check 全绿；主站冒烟 103/103；线上 21/21 封面加载、visit 计数递增、场景背景渲染、无任何原站资产/品牌残留（innerHTML 检测）。
+- 位置关系：ai-ic.top/ = 原门户（功能完整可聊天）→ ai-ic.top/web/ = 新发现页（静态展示+漏斗入口）→ /?classic=1 = 经典酒馆。若要将 /web/ 设为主页：vercel.json 把 / 重定向目标改为 /web 即可（一行）。
