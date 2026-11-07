@@ -151,6 +151,24 @@ try {
     /* 数据版本 */
     const dataSrc = fs.readFileSync(path.join(PT, 'data.js'), 'utf8');
     check('PT_NEWS 版本 V1.3', dataSrc.includes("version: 'V1.3'"));
+    /* Vercel Serverless 版像素 API（ai-ic.top 自动部署路径） */
+    const apiDir = path.join(ROOT, 'api', 'pixel');
+    const apiFiles = ['_lib.js', 'chat.js', 'status.js', 'probe.js', 'visit.js', 'stats.js', 'seo.js'];
+    apiFiles.forEach(f => check(`Vercel 函数存在 api/pixel/${f}`, fs.existsSync(path.join(apiDir, f))));
+    apiFiles.forEach(f => {
+        try {
+            execFileSync(process.execPath, ['--check', path.join(apiDir, f)], { stdio: 'pipe' });
+            check(`语法 api/pixel/${f}`, true);
+        } catch (e) {
+            check(`语法 api/pixel/${f}`, false, (e.stderr ? e.stderr.toString() : e.message).split('\n')[0]);
+        }
+    });
+    const vjson = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+    const before = (vjson.rewrites && (vjson.rewrites.beforeFiles || vjson.rewrites)) || [];
+    check('vercel.json / 重写到像素门户', JSON.stringify(before).includes('/pixel-tavern/index.html'));
+    check('vercel.json robots/sitemap 路由', JSON.stringify(before).includes('/robots.txt') && JSON.stringify(before).includes('/sitemap.xml'));
+    const chatFn = fs.readFileSync(path.join(apiDir, 'chat.js'), 'utf8');
+    check('chat 函数限时长（maxDuration）', chatFn.includes('maxDuration'));
 } catch (e) {
     check('上线能力检查可执行', false, e.message);
 }
