@@ -843,6 +843,7 @@ body[data-chatfont="l"] .msg .msg-body { font-size: 17px; }
  * ============================================================ */
 body[data-skin="clean"] {
     --font-pixel: 'PingFang SC', 'HarmonyOS Sans SC', 'MiSans', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    --font-en: 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
     --radius: 12px;
     --radius-s: 9px;
     -webkit-font-smoothing: antialiased;
@@ -851,6 +852,14 @@ body[data-skin="clean"] {
     background-size: auto;
 }
 body[data-skin="clean"] .view-title { letter-spacing: 1px; }
+body[data-skin="clean"] .view-title .en,
+body[data-skin="clean"] .en,
+body[data-skin="clean"] .logo-en,
+body[data-skin="clean"] .boot-sub,
+body[data-skin="clean"] .card-badge,
+body[data-skin="clean"] .step-no,
+body[data-skin="clean"] .news-date,
+body[data-skin="clean"] .welcome-en { letter-spacing: 1.5px; font-size: 11px; }
 body[data-skin="clean"] .side-label { letter-spacing: 2px; }
 
 /* 按钮：圆角描边 + 平滑过渡 */

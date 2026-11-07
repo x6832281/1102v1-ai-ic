@@ -72,7 +72,7 @@ try {
     const refs = [...html.matchAll(/(?:src|href)="(\/pixel-tavern\/[^"]+)"/g)].map(m => m[1]);
     check(`存在站内资源引用（${refs.length} 个）`, refs.length >= 5);
     refs.forEach(r => {
-        const rel = r.replace('/pixel-tavern/', '');
+        const rel = r.replace('/pixel-tavern/', '').split('?')[0];
         check(`引用存在 ${r}`, fs.existsSync(path.join(PT, rel)));
     });
     const cleaned = html.replace(/(?:src|href)="(?:https?:|\/|#|data:)[^"]*"/g, '');
