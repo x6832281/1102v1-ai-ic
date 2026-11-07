@@ -8,7 +8,7 @@ import { serverDirectory } from '../server-directory.js';
 import { getConfigValue } from '../util.js';
 
 /**
- * 像素酒馆 (Pixel Tavern) public API:
+ * 游戏酒馆 (Game Tavern) public API:
  *   GET  /api/pixel/status  – shared AI model availability (no secrets)
  *   POST /api/pixel/chat    – OpenAI-compatible streaming chat proxy
  *   POST /api/pixel/probe   – tiny non-streamed request to test BYOK credentials

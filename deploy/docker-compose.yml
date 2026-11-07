@@ -1,10 +1,10 @@
-# 像素酒馆 · 生产部署（Docker Compose + Caddy 自动 HTTPS）
+# 游戏酒馆 · 生产部署（Docker Compose + Caddy 自动 HTTPS）
 #
 # 结构：
 #   caddy   —— 唯一暴露 80/443 的入口，自动申请/续期 Let's Encrypt 证书，
 #              反向代理到 tavern；像素门户与 /api/pixel/* 公开，
 #              其余路径（原版 SillyTavern 界面与 API）需基础认证保护。
-#   tavern  —— 本仓库构建的 SillyTavern（含像素酒馆门户与 /api/pixel 代理），
+#   tavern  —— 本仓库构建的 SillyTavern（含游戏酒馆门户与 /api/pixel 代理），
 #              不对宿主机暴露端口，仅在内网供 caddy 访问。
 #
 # 使用：复制 .env.example 为 .env 并填写后，执行  docker compose up -d --build

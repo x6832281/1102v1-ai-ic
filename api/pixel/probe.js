@@ -1,4 +1,4 @@
-/* 像素酒馆 · POST /api/pixel/probe —— BYOK 接入点连通性测试 */
+/* 游戏酒馆 · POST /api/pixel/probe —— BYOK 接入点连通性测试 */
 'use strict';
 
 import { applySecurityHeaders, sameOrigin, rateLimit, clientIp, resolveUpstream, readJSONBody, sendJSON } from './_lib.js';

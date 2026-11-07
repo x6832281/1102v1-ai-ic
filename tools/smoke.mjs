@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ============================================================
- * 像素酒馆 · 冒烟测试
+ * 游戏酒馆 · 冒烟测试
  * 用法：node tools/smoke.mjs
  * 覆盖：文件完整性 / JS 语法 / 角色数据不变量 / HTML 资源引用 /
  *       CSS 结构 / 服务器路由与角色卡 API（服务器未启动时自动跳过）
@@ -96,9 +96,9 @@ try {
 /* ---------- 5.5 经典酒馆主题 ---------- */
 section('经典酒馆主题');
 try {
-    const themePath = path.join(ROOT, 'data', 'default-user', 'themes', 'Pixel Tavern.json');
+    const themePath = path.join(ROOT, 'data', 'default-user', 'themes', 'Game Tavern.json');
     const theme = JSON.parse(fs.readFileSync(themePath, 'utf8'));
-    check('主题文件合法且含 custom_css', theme.name === 'Pixel Tavern' && typeof theme.custom_css === 'string' && theme.custom_css.length > 50);
+    check('主题文件合法且含 custom_css', theme.name === 'Game Tavern' && typeof theme.custom_css === 'string' && theme.custom_css.length > 50);
 } catch (e) {
     check('主题文件合法且含 custom_css', false, e.message);
 }
@@ -115,7 +115,7 @@ try {
     }
     /* webmanifest */
     const man = JSON.parse(fs.readFileSync(path.join(PT, 'site.webmanifest'), 'utf8'));
-    check('site.webmanifest 合法且含图标', man.name?.includes('像素酒馆') && Array.isArray(man.icons) && man.icons.length >= 2);
+    check('site.webmanifest 合法且含图标', man.name?.includes('游戏酒馆') && Array.isArray(man.icons) && man.icons.length >= 2);
     /* HTML：SEO 与新 UI */
     const html = fs.readFileSync(path.join(PT, 'index.html'), 'utf8');
     ['og:title', 'og:image', 'twitter:card', 'site.webmanifest', 'pt-canonical'].forEach(k => check(`HTML 含 ${k}`, html.includes(k)));
@@ -190,7 +190,7 @@ async function main() {
         check('GET / 可访问', res.ok);
         if (res.ok) {
             const text = await res.text();
-            check('首页为像素酒馆门户', text.includes('/pixel-tavern/index.html') || text.includes('像素酒馆'));
+            check('首页为游戏酒馆门户', text.includes('/pixel-tavern/index.html') || text.includes('游戏酒馆'));
         }
     } catch {
         check('GET / 可访问', false, '服务器未运行——跳过其余服务器检查');

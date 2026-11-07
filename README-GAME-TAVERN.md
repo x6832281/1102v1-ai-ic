@@ -1,6 +1,6 @@
-# 像素酒馆 · Pixel Tavern
+# 游戏酒馆 · Game Tavern
 
-参考 [chat.xstavern.com](https://chat.xstavern.com) 的「像素酒馆」网站，对本项目（SillyTavern 原始代码）改造出的**像素风在线酒馆**：角色卡集市、沉浸互动、真实大模型 AI 聊天，开箱即可用自己的域名上线。
+参考 [chat.xstavern.com](https://chat.xstavern.com) 的「游戏酒馆」网站，对本项目（SillyTavern 原始代码）改造出的**像素风在线酒馆**：角色卡集市、沉浸互动、真实大模型 AI 聊天，开箱即可用自己的域名上线。
 
 **当前版本 V1.3「明炉真火」**
 
@@ -14,7 +14,7 @@ npm install        # 首次运行需要
 npm start          # 启动后自动打开 http://127.0.0.1:8000/
 ```
 
-- **http://127.0.0.1:8000/** — 像素酒馆门户（默认首页）
+- **http://127.0.0.1:8000/** — 游戏酒馆门户（默认首页）
 - **http://127.0.0.1:8000/?classic=1** — 经典酒馆（原版 SillyTavern 界面，功能完整保留）
 
 ## 真实大模型（V1.3 新增）

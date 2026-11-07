@@ -1,4 +1,4 @@
-/* 像素酒馆 · GET /api/pixel/status —— 共享模型状态（不含任何密钥） */
+/* 游戏酒馆 · GET /api/pixel/status —— 共享模型状态（不含任何密钥） */
 'use strict';
 
 import { applySecurityHeaders, sharedModelReady, sendJSON } from './_lib.js';

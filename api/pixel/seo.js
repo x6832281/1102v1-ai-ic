@@ -1,4 +1,4 @@
-/* 像素酒馆 · GET /api/pixel/seo?type=robots|sitemap —— 动态 SEO 文件（按请求主机名生成） */
+/* 游戏酒馆 · GET /api/pixel/seo?type=robots|sitemap —— 动态 SEO 文件（按请求主机名生成） */
 'use strict';
 
 import { applySecurityHeaders, sendRobots, sendSitemap, sendJSON } from './_lib.js';

@@ -210,7 +210,7 @@ if (!cliArgs.disableCsrf) {
     });
 }
 
-// 像素酒馆 SEO：robots.txt 与 sitemap.xml 动态生成（按请求主机名），优先于静态中间件，
+// 游戏酒馆 SEO：robots.txt 与 sitemap.xml 动态生成（按请求主机名），优先于静态中间件，
 // 使门户可被搜索引擎收录（原版 SillyTavern 的 public/robots.txt 为全站 Disallow，保持原样不动）。
 app.get(['/robots.txt', '/sitemap.xml'], (req, res) => {
     const proto = String(req.get('X-Forwarded-Proto') || req.protocol || 'https').split(',')[0].trim();
@@ -220,7 +220,7 @@ app.get(['/robots.txt', '/sitemap.xml'], (req, res) => {
     if (req.path === '/robots.txt') {
         res.type('text/plain');
         const lines = [
-            '# Pixel Tavern (像素酒馆)',
+            '# Game Tavern (游戏酒馆)',
             'User-agent: *',
             'Allow: /',
             'Disallow: /api/',
@@ -238,7 +238,7 @@ app.get(['/robots.txt', '/sitemap.xml'], (req, res) => {
 
 // Static files
 // Host index page
-// 像素酒馆 (Pixel Tavern): the default landing page is the pixel-tavern portal.
+// 游戏酒馆 (Game Tavern): the default landing page is the pixel-tavern portal.
 // The classic SillyTavern UI remains available at /?classic=1 (and /index.html).
 app.get('/', cacheBuster.middleware, (request, response) => {
     if (shouldRedirectToLogin(request)) {
@@ -277,7 +277,7 @@ app.use(express.static(path.join(serverDirectory, 'public'), {}));
 // Public API
 app.use('/api/users', usersPublicRouter);
 
-// 像素酒馆 (Pixel Tavern) public API: AI proxy, stats. Still behind CSRF; see src/endpoints/pixel.js
+// 游戏酒馆 (Game Tavern) public API: AI proxy, stats. Still behind CSRF; see src/endpoints/pixel.js
 app.use('/api/pixel', pixelRouter);
 
 // Everything below this line requires authentication

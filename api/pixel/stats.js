@@ -1,4 +1,4 @@
-/* 像素酒馆 · GET /api/pixel/stats —— 全站访问计数查询 */
+/* 游戏酒馆 · GET /api/pixel/stats —— 全站访问计数查询 */
 'use strict';
 
 import { applySecurityHeaders, getStats, sendJSON } from './_lib.js';

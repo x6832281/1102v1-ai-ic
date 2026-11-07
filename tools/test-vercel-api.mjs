@@ -1,4 +1,4 @@
-/* 像素酒馆 · Vercel Serverless 函数本地 harness 测试
+/* 游戏酒馆 · Vercel Serverless 函数本地 harness 测试
  * 用普通 http server 承载 api/pixel/* 的 handler（签名与 Vercel 一致），
  * 联通 mock-llm 验证：流式 / BYOK / 限流 / SSRF / 同源 / SEO / 计数。
  * 用法：node tools/test-vercel-api.mjs   （自动拉起/复用 mock-llm :9990）

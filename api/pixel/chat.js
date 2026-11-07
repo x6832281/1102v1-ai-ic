@@ -1,4 +1,4 @@
-/* 像素酒馆 · POST /api/pixel/chat —— 流式聊天代理（共享模型或 BYOK） */
+/* 游戏酒馆 · POST /api/pixel/chat —— 流式聊天代理（共享模型或 BYOK） */
 'use strict';
 
 import {

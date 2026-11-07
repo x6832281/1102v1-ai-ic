@@ -1,5 +1,5 @@
 /* ============================================================
- * 像素酒馆 · 主逻辑
+ * 游戏酒馆 · 主逻辑
  * 视图路由 / 角色卡集市 / 书架 / 收藏 / 历史 / Build / 对话引擎
  * 沉浸互动 BETA / TTS / 导入导出 / 设置
  * ============================================================ */
@@ -217,7 +217,7 @@ function initExportImport() {
         if (!file) return;
         try {
             const data = JSON.parse(await file.text());
-            if (data.app !== 'pixel-tavern') { toast('不是像素酒馆的备份文件'); return; }
+            if (data.app !== 'pixel-tavern') { toast('不是游戏酒馆的备份文件'); return; }
             if (Array.isArray(data.favs)) { state.favs = data.favs; saveFavs(); }
             if (Array.isArray(data.history)) { state.history = data.history.slice(0, 30); saveHistory(); }
             if (Array.isArray(data.custom)) { state.custom = data.custom; saveCustom(); }

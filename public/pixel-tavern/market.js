@@ -1,5 +1,5 @@
 /* ============================================================
- * 像素酒馆 · 卡片市场模块
+ * 游戏酒馆 · 卡片市场模块
  * 卡片渲染/集市/详情弹窗/Build/导入导出/PNG 角色卡构建
  * （依赖 app.js 的 state/store/$/esc 等全局，均为运行时引用）
  * ============================================================ */
@@ -255,7 +255,7 @@ function initBuild() {
             card.title = $('#build-title').value.trim() || '酒馆的常客';
             card.category = $('#build-cat').value;
             card.greeting = $('#build-greeting').value.trim() || '你好呀，我是' + name + '。很高兴认识你！';
-            card.desc = $('#build-desc').value.trim() || '由像素酒馆 Build 功能亲手制作的角色。';
+            card.desc = $('#build-desc').value.trim() || '由游戏酒馆 Build 功能亲手制作的角色。';
             card.palette = { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' };
             saveCustom();
             resetBuildForm();
@@ -271,7 +271,7 @@ function initBuild() {
             category: $('#build-cat').value,
             seed: Math.floor(Math.random() * 100000),
             tags: ['自制'],
-            desc: $('#build-desc').value.trim() || '由像素酒馆 Build 功能亲手制作的角色。',
+            desc: $('#build-desc').value.trim() || '由游戏酒馆 Build 功能亲手制作的角色。',
             greeting: $('#build-greeting').value.trim() || '你好呀，我是' + name + '。很高兴认识你！',
             origin: 'custom',
             palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
@@ -450,7 +450,7 @@ async function buildCardPng(char, cardJson) {
     g.fillText(char.name, 128, 230);
     g.font = '11px "Zpix Local", "SimSun", monospace';
     g.fillStyle = '#9aa08e';
-    g.fillText(char.title || 'PIXEL TAVERN', 128, 246);
+    g.fillText(char.title || 'GAME TAVERN', 128, 246);
     /* 双层金框 */
     g.strokeStyle = '#d4a94e';
     g.lineWidth = 4;
@@ -493,13 +493,13 @@ function buildCardPayload(c) {
             name: c.name,
             description: c.desc || '',
             personality: '',
-            scenario: '像素酒馆 · Pixel Tavern',
+            scenario: '游戏酒馆 · Game Tavern',
             first_mes: c.greeting || '',
             alternate_greetings: c.alts || [],
             mes_example: '',
-            creator_notes: '由像素酒馆门户导出，可在门户「导入角色卡」还原',
+            creator_notes: '由游戏酒馆门户导出，可在门户「导入角色卡」还原',
             tags: c.tags || [],
-            creator: 'Pixel Tavern',
+            creator: 'Game Tavern',
             character_version: '1.0',
             extensions: {
                 pixel_tavern: {

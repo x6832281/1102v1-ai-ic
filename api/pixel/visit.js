@@ -1,4 +1,4 @@
-/* 像素酒馆 · POST /api/pixel/visit —— 全站访问计数 +1 */
+/* 游戏酒馆 · POST /api/pixel/visit —— 全站访问计数 +1 */
 'use strict';
 
 import { applySecurityHeaders, rateLimit, clientIp, bumpVisits, getStats, sendJSON } from './_lib.js';

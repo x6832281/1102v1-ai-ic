@@ -1,5 +1,5 @@
 /* ============================================================
- * 像素酒馆 · Vercel Serverless 共享库
+ * 游戏酒馆 · Vercel Serverless 共享库
  * 与 src/endpoints/pixel.js、deploy/lite/server.mjs 同源的像素 API：
  *   共享模型走环境变量 PIXEL_LLM_*（密钥零下发）；
  *   访客 BYOK 走 x-pt-* 请求头（HTTPS-only 公网地址，防 SSRF）。
@@ -234,7 +234,7 @@ export function sendRobots(req, res) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.end([
-        '# Pixel Tavern (像素酒馆)',
+        '# Game Tavern (游戏酒馆)',
         'User-agent: *',
         'Allow: /',
         'Disallow: /api/',

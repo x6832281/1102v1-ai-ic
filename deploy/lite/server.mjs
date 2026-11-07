@@ -1,5 +1,5 @@
 /* ============================================================
- * 像素酒馆 · Lite 独立服务器（零依赖，Node 18+）
+ * 游戏酒馆 · Lite 独立服务器（零依赖，Node 18+）
  *
  * 用途：
  *   1) ZCode Sites / 任意 PaaS 的极速上线（只需 portal 静态文件 + 本文件）
@@ -315,7 +315,7 @@ const server = http.createServer(async (req, res) => {
             if (pathname === '/robots.txt') {
                 res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
                 return res.end([
-                    '# Pixel Tavern (像素酒馆)',
+                    '# Game Tavern (游戏酒馆)',
                     'User-agent: *', 'Allow: /', 'Disallow: /api/', 'Disallow: /login', '',
                     'Sitemap: ' + base + '/sitemap.xml', '',
                 ].join('\n'));
@@ -349,7 +349,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-    console.log(`[pixel-lite] 像素酒馆 Lite 已启动: http://${HOST}:${PORT}`);
+    console.log(`[pixel-lite] 游戏酒馆 Lite 已启动: http://${HOST}:${PORT}`);
     console.log(`[pixel-lite] 静态目录: ${STATIC_ROOT}`);
     console.log(`[pixel-lite] 共享模型: ${SHARED_BASE_URL && SHARED_API_KEY && SHARED_MODEL ? SHARED_MODEL : '未配置（访客可用自带接入点）'}`);
 });

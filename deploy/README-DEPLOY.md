@@ -1,6 +1,6 @@
-# 像素酒馆 · 用你自己的域名上线手册
+# 游戏酒馆 · 用你自己的域名上线手册
 
-> 目标：让任何人打开 `https://你的域名` 就能看到像素酒馆门户，聊天走真实大模型；
+> 目标：让任何人打开 `https://你的域名` 就能看到游戏酒馆门户，聊天走真实大模型；
 > 原版 SillyTavern「经典酒馆」藏在基础认证之后，只属于你。
 
 **当前状态：`ai-ic.top` 已经由方案 C（Vercel，零服务器）上线。** 三条路径任选，随时可以升级迁移。
@@ -49,7 +49,7 @@ Environment Variables 添加 `PIXEL_LLM_BASE_URL` / `PIXEL_LLM_API_KEY` / `PIXEL
 
 ```
 访客 ──HTTPS──▶ Caddy（自动申请/续期 TLS 证书）
-                  │  公开：/            → 像素酒馆门户
+                  │  公开：/            → 游戏酒馆门户
                   │  公开：/pixel-tavern/*  → 门户静态资源
                   │  公开：/api/pixel/*     → 聊天代理（限流）+ 访问统计 + SEO 文件
                   └  认证：其余一切      → 原版 SillyTavern（经典酒馆）
@@ -149,8 +149,8 @@ docker compose logs -f caddy      # 看到 certificate obtained successfully 即
 
 | 地址 | 预期 |
 | --- | --- |
-| `https://你的域名` | 像素酒馆门户（启动画面 → 集市） |
-| `https://你的域名/robots.txt` | 像素酒馆 robots，含 Sitemap 行 |
+| `https://你的域名` | 游戏酒馆门户（启动画面 → 集市） |
+| `https://你的域名/robots.txt` | 游戏酒馆 robots，含 Sitemap 行 |
 | `https://你的域名/sitemap.xml` | 指向你域名的站点地图 |
 | `https://你的域名/?classic=1` | 弹出基础认证 → 输入 `BASICAUTH_USER` + 你设的密码 → 经典酒馆 |
 | `https://你的域名/api/pixel/status` | `{"ai":true/false,...}` |
