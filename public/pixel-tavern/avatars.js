@@ -1,10 +1,10 @@
 /* ============================================================
- * 游戏酒馆 · 程序化像素头像 / 图标 / 炉火 / Logo 绘制
- * 全部在浏览器本地生成，无外部图片依赖。
+ * 幻境回声 · EchoCraft — 程序化艺术肖像 / 氛围徽记 / 视效引擎
+ * 纯原生 Canvas 绘制，现代几何艺术风格，零外部素材与图片依赖
  * ============================================================ */
 'use strict';
 
-/* ---------- 确定性随机 ---------- */
+/* ---------- 确定性随机数生成器 ---------- */
 function mulberry32(seed) {
     let a = seed >>> 0;
     return function () {
@@ -14,6 +14,7 @@ function mulberry32(seed) {
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 }
+
 function hashString(str) {
     let h = 2166136261;
     for (let i = 0; i < str.length; i++) {
@@ -23,357 +24,334 @@ function hashString(str) {
     return h >>> 0;
 }
 
-/* ---------- 像素头像（16x16 逻辑网格） ---------- */
+/* ---------- 角色肖像引擎：现代几何微光人像 ---------- */
 const PTAvatar = (() => {
-    const GRID = 16;
+    const dataUrlCache = new Map();
 
-    /* 发型模板：'.'空 'H'头发 'S'皮肤 'E'眼睛 'M'嘴 'B'腮红 'C'刘海高光 */
-    const HAIRSTYLES = [
-        // 平刘海
-        [
-            '....HHHHHHHH....',
-            '..HHHHHHHHHHHH..',
-            '.HHHHHHHHHHHHHH.',
-            '.HHHHHHHHHHHHHH.',
-            '.HHHSSSSSSSSHHH.',
-            '.HHSSESSESSESHH.',
-            '..SSSSSSSSSSSS..',
-        ],
-        // 双马尾
-        [
-            '....HHHHHHHH....',
-            '..HHHHHHHHHHHH..',
-            'HHHHHHHHHHHHHHHH',
-            'HHHHHHHHHHHHHHHH',
-            'HHSSSSSSSSSSSHHH',
-            'HHSSESSESSESSHHH',
-            'H.SSSSSSSSSSS.HH',
-        ],
-        // 侧分短发
-        [
-            '....HHHHHHHH....',
-            '..HHHHHHHHHHH...',
-            '.HHHHHHHHHHHHH..',
-            '.HHHHHHHHHHHHHH.',
-            '.HHSSSSSSSSHHHH.',
-            '.HSSESSESSESHHH.',
-            '..SSSSSSSSSSSH..',
-        ],
-        // 蓬松卷发
-        [
-            '...HH.HHHH.HH...',
-            '..HHHHHHHHHHHH..',
-            '.HHHHHHHHHHHHHH.',
-            'HHHHHHHHHHHHHHHH',
-            'HHSSSSSSSSSSSHHH',
-            'HHSSESSESSESSHHH',
-            '.SSSSSSSSSSSSHH.',
-        ],
-        // 高马尾
-        [
-            '.HH...HHHH...HH.',
-            '.HHHHHHHHHHHHHH.',
-            '..HHHHHHHHHHHH..',
-            '.HHHHHHHHHHHHHH.',
-            '.HHSSSSSSSSHHHH.',
-            '.HSSESSESSESHHH.',
-            '..SSSSSSSSSSSH..',
-        ],
-    ];
-
-    const EYES = [
-        ['E..E', 'E..E', 'E..E'],
-        ['EE.E', 'E..E', 'E..E'],
-        ['E..E', 'EE.E', 'E..E'],
-        ['E..E', 'E..E', '....'],
-        ['EEE.', '.E.E', '.E.E'],
-    ];
-    const MOUTHS = [
-        ['.M.', '.M.', '.M.'],
-        ['...', '.M.', '...'],
-        ['.M.', '.M.', '...'],
-        ['...', 'MM.', '...'],
-    ];
-
-    function shade(hex, amt) {
-        const n = parseInt(hex.slice(1), 16);
-        const r = Math.max(0, Math.min(255, (n >> 16) + amt));
-        const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amt));
-        const b = Math.max(0, Math.min(255, (n & 0xff) + amt));
-        return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-    }
-
-    /**
-     * 绘制像素头像。
-     * @param {HTMLCanvasElement} canvas 目标画布
-     * @param {object} char 角色（palette + seed + name）
-     * @param {object} opts { bg1, bg2, accessory }
-     */
-    function draw(canvas, char, opts = {}) {
+    function drawToCanvas(canvas, char, options = {}) {
         const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
-        const size = canvas.width;
-        const px = size / GRID;
-        const rand = mulberry32((char.seed || 1) * 7919 + hashString(char.name || ''));
-        const pal = Object.assign({ hair: '#e8c97a', skin: '#f2d3b3', bg1: '#3a5a40', bg2: '#22331f' }, char.palette || {}, opts);
-        const hairDark = shade(pal.hair, -60);
-        const hairLite = shade(pal.hair, 40);
-        const style = HAIRSTYLES[Math.floor(rand() * HAIRSTYLES.length)];
-        const eyeStyle = EYES[Math.floor(rand() * EYES.length)];
-        const mouthStyle = MOUTHS[Math.floor(rand() * MOUTHS.length)];
-        const hasBlush = rand() > 0.4;
-        const eyeColor = rand() > 0.5 ? '#2a2a35' : '#7a3a2a';
-        const accessory = opts.accessory !== undefined ? opts.accessory : Math.floor(rand() * 4); // 0无 1发夹 2缎带 3帽
+        const W = canvas.width;
+        const H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+        ctx.imageSmoothingEnabled = true;
 
-        /* 背景两色纵带 + 顶部光晕 */
-        for (let y = 0; y < GRID; y++) {
-            for (let x = 0; x < GRID; x++) {
-                ctx.fillStyle = y < 3 ? shade(pal.bg1, 25) : (x % 2 === 0 ? pal.bg1 : pal.bg2);
-                ctx.fillRect(Math.floor(x * px), Math.floor(y * px), Math.ceil(px), Math.ceil(px));
-            }
-        }
-        /* 背景像素星点 */
-        ctx.fillStyle = 'rgba(255,235,180,0.35)';
-        for (let i = 0; i < 6; i++) {
-            const sx = Math.floor(rand() * GRID), sy = Math.floor(rand() * 5);
-            ctx.fillRect(sx * px, sy * px, px, px);
-        }
+        const seed = options.seed ?? char.seed ?? hashString(char.name || char.id || 'echo');
+        const rand = mulberry32(seed);
 
-        /* 脸部：头部区域 y=4..11，宽 x=3..12 */
-        const faceRows = style.length;
-        const faceTop = GRID - 6 - faceRows + 1;
-        /* 画头发模板行（含脸） */
-        for (let r = 0; r < faceRows; r++) {
-            const row = style[r];
-            for (let c = 0; c < row.length; c++) {
-                const ch = row[c];
-                if (ch === '.') continue;
-                const x = c * px, y = (faceTop + r) * px;
-                let color = pal.hair;
-                if (ch === 'S') color = pal.skin;
-                if (ch === 'H') color = (r < 2 ? hairLite : (c % 5 === 0 ? hairDark : pal.hair));
-                ctx.fillStyle = color;
-                ctx.fillRect(Math.floor(x), Math.floor(y), Math.ceil(px), Math.ceil(px));
-            }
-        }
-        /* 眼睛（放在头发模板之下两行） */
-        const eyeTop = faceTop + faceRows - 2;
-        for (let r = 0; r < 3; r++) {
-            const row = eyeStyle[r];
-            for (let c = 0; c < 4; c++) {
-                if (row[c] === 'E') {
-                    ctx.fillStyle = eyeColor;
-                    /* 左眼 x=5+col映射: 4格映射到 5,7 与 9,11 */
-                    const map = [5, 6, 9, 10];
-                    ctx.fillRect(map[c] * px, (eyeTop + r) * px, px, px);
-                }
-            }
-        }
-        /* 眼睛高光 */
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.fillRect(5 * px + px / 3, eyeTop * px, Math.max(1, px / 3), Math.max(1, px / 3));
-        ctx.fillRect(9 * px + px / 3, eyeTop * px, Math.max(1, px / 3), Math.max(1, px / 3));
+        const pal = char.palette || {};
+        const bg1 = pal.bg1 || '#161b24';
+        const bg2 = pal.bg2 || '#0e1117';
+        const hairCol = pal.hair || '#4a6572';
+        const skinCol = pal.skin || '#e2e8f0';
 
-        /* 嘴 */
-        const mouthTop = eyeTop + 4;
-        for (let r = 0; r < 3; r++) {
-            for (let c = 0; c < 3; c++) {
-                if (mouthStyle[r][c] === 'M') {
-                    ctx.fillStyle = shade('#b06a5a', -20);
-                    ctx.fillRect((7 + c - 1) * px, (mouthTop + r) * px, px, px);
-                }
-            }
-        }
-        /* 腮红 */
-        if (hasBlush) {
-            ctx.fillStyle = 'rgba(240,130,130,0.55)';
-            ctx.fillRect(4 * px, (mouthTop - 1) * px, px, px);
-            ctx.fillRect(11 * px, (mouthTop - 1) * px, px, px);
-        }
+        // 1. 背景流光与几何虚境
+        const grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, bg1);
+        grad.addColorStop(1, bg2);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
 
-        /* 配饰 */
-        if (accessory === 1) { /* 发夹 */
-            ctx.fillStyle = '#ffb545';
-            ctx.fillRect(11 * px, (faceTop) * px, px, px);
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(12 * px, (faceTop) * px, px, px);
-        } else if (accessory === 2) { /* 缎带 */
-            ctx.fillStyle = '#e5484d';
-            ctx.fillRect(2 * px, (faceTop - 1) * px, px * 2, px);
-            ctx.fillRect(3 * px, (faceTop - 2) * px, px, px * 2);
-        } else if (accessory === 3) { /* 兜帽 */
-            ctx.fillStyle = shade(pal.bg1, -35);
-            ctx.fillRect(2 * px, (faceTop - 2) * px, 12 * px, px);
-            ctx.fillRect(px, (faceTop - 1) * px, px, px * 3);
-            ctx.fillRect(14 * px, (faceTop - 1) * px, px, px * 3);
-        }
+        // 2. 背景微光圆弧 / 星轨光环
+        ctx.save();
+        ctx.beginPath();
+        const haloX = W * (0.35 + rand() * 0.3);
+        const haloY = H * (0.3 + rand() * 0.25);
+        const haloR = W * 0.45;
+        const haloGrad = ctx.createRadialGradient(haloX, haloY, haloR * 0.2, haloX, haloY, haloR);
+        haloGrad.addColorStop(0, hexToRgba(hairCol, 0.28));
+        haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = haloGrad;
+        ctx.arc(haloX, haloY, haloR, 0, Math.PI * 2);
+        ctx.fill();
 
-        /* 底部像素签名条 */
-        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-        ctx.fillRect(0, size - px, size, px);
-        return canvas;
+        // 细微星轨线
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(W * 0.5, H * 0.52, W * 0.38, 0.2, Math.PI * 1.8);
+        ctx.stroke();
+        ctx.restore();
+
+        // 3. 角色半身剪影架构
+        const cx = W * 0.5;
+        const headY = H * 0.38;
+        const headR = W * 0.22;
+
+        // 衣服/肩部剪影
+        ctx.save();
+        ctx.fillStyle = hexToRgba(bg1, 0.95);
+        ctx.beginPath();
+        ctx.moveTo(cx - W * 0.42, H);
+        ctx.quadraticCurveTo(cx - W * 0.35, H * 0.72, cx - W * 0.16, H * 0.62);
+        ctx.lineTo(cx + W * 0.16, H * 0.62);
+        ctx.quadraticCurveTo(cx + W * 0.35, H * 0.72, cx + W * 0.42, H);
+        ctx.closePath();
+        ctx.fill();
+
+        // 衣领线条
+        ctx.strokeStyle = hexToRgba(hairCol, 0.6);
+        ctx.lineWidth = Math.max(1.5, W * 0.02);
+        ctx.beginPath();
+        ctx.moveTo(cx - W * 0.12, H * 0.62);
+        ctx.lineTo(cx, H * 0.74);
+        ctx.lineTo(cx + W * 0.12, H * 0.62);
+        ctx.stroke();
+        ctx.restore();
+
+        // 颈部
+        ctx.fillStyle = skinCol;
+        ctx.beginPath();
+        ctx.rect(cx - W * 0.07, headY + headR * 0.5, W * 0.14, H * 0.2);
+        ctx.fill();
+
+        // 头部/面部基底
+        ctx.save();
+        ctx.fillStyle = skinCol;
+        ctx.beginPath();
+        ctx.arc(cx, headY, headR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 面颊微红
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.15)';
+        ctx.beginPath();
+        ctx.arc(cx - headR * 0.5, headY + headR * 0.2, headR * 0.2, 0, Math.PI * 2);
+        ctx.arc(cx + headR * 0.5, headY + headR * 0.2, headR * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. 眼睛（精致极简现代风格）
+        const eyeY = headY + headR * 0.05;
+        const eyeDist = headR * 0.42;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(cx - eyeDist, eyeY, headR * 0.09, 0, Math.PI * 2);
+        ctx.arc(cx + eyeDist, eyeY, headR * 0.09, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 眼神光
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(cx - eyeDist + 1, eyeY - 1, headR * 0.035, 0, Math.PI * 2);
+        ctx.arc(cx + eyeDist + 1, eyeY - 1, headR * 0.035, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 嘴部微抿
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(cx - headR * 0.12, headY + headR * 0.45);
+        ctx.lineTo(cx + headR * 0.12, headY + headR * 0.45);
+        ctx.stroke();
+
+        // 5. 发型轮廓与前额刘海
+        ctx.fillStyle = hairCol;
+        ctx.beginPath();
+        // 发顶
+        ctx.arc(cx, headY - headR * 0.15, headR * 1.08, Math.PI * 0.85, Math.PI * 0.15, false);
+        // 刘海曲线
+        const hairStyleVariant = Math.floor(rand() * 3);
+        if (hairStyleVariant === 0) {
+            // 斜分流线
+            ctx.quadraticCurveTo(cx + headR * 0.3, headY - headR * 0.2, cx + headR * 0.8, headY + headR * 0.4);
+            ctx.lineTo(cx - headR * 0.8, headY + headR * 0.4);
+        } else if (hairStyleVariant === 1) {
+            // 齐平微拱
+            ctx.quadraticCurveTo(cx, headY - headR * 0.05, cx + headR * 0.85, headY + headR * 0.35);
+            ctx.lineTo(cx - headR * 0.85, headY + headR * 0.35);
+        } else {
+            // 层次发丝
+            ctx.lineTo(cx + headR * 0.9, headY + headR * 0.5);
+            ctx.lineTo(cx + headR * 0.3, headY + headR * 0.05);
+            ctx.lineTo(cx, headY + headR * 0.15);
+            ctx.lineTo(cx - headR * 0.4, headY + headR * 0.02);
+            ctx.lineTo(cx - headR * 0.9, headY + headR * 0.5);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        // 鬓角自然垂发
+        ctx.beginPath();
+        ctx.rect(cx - headR * 1.05, headY - headR * 0.1, headR * 0.28, headR * 1.1);
+        ctx.rect(cx + headR * 0.77, headY - headR * 0.1, headR * 0.28, headR * 1.1);
+        ctx.fill();
+
+        // 6. 发丝高光细线
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = Math.max(1, W * 0.015);
+        ctx.beginPath();
+        ctx.arc(cx, headY - headR * 0.15, headR * 0.92, Math.PI * 1.15, Math.PI * 1.45);
+        ctx.stroke();
+
+        ctx.restore();
+
+        // 7. 外层精致发光极细边框
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
     }
 
-    /* 生成 dataURL 缓存 */
-    const cache = new Map();
-    function toDataURL(char, size = 96) {
-        const key = char.id + ':' + size + ':' + (char.seed || 0) + JSON.stringify(char.palette || {});
-        if (cache.has(key)) return cache.get(key);
-        const c = document.createElement('canvas');
-        c.width = size; c.height = size;
-        draw(c, char);
-        const url = c.toDataURL();
-        cache.set(key, url);
+    function toDataURL(char, size = 64) {
+        const key = `${char.id || char.name || 'custom'}_${size}_${char.seed || 0}`;
+        if (dataUrlCache.has(key)) return dataUrlCache.get(key);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        drawToCanvas(canvas, char);
+        const url = canvas.toDataURL('image/png');
+        dataUrlCache.set(key, url);
         return url;
     }
-    return { draw, toDataURL, GRID };
-})();
 
-/* ---------- 8x8 像素图标（box-shadow 绘制） ---------- */
-const PT_ICONS = {
-    market: ['........', '...11...', '..1111..', '.111111.', '.111111.', '..1111..', '...11...', '........'],
-    shelf: ['.111111.', '.1....1.', '.1.11.1.', '.1.11.1.', '.1....1.', '.111111.', '.1....1.', '.111111.'],
-    build: ['...1....', '...1....', '.111111.', '.1...1..', '.11.11..', '.1...1..', '.111111.', '........'],
-    fav: ['.11.11..', '1111111.', '1111111.', '.11111..', '..111...', '...1....', '........', '........'],
-    history: ['..1111..', '.1....1.', '.1..11..', '.1....1.', '.1.1..1.', '..1111..', '........', '...11...'],
-    news: ['...11...', '..1111..', '.111111.', '.11..11.', '.111111.', '..1111..', '...11...', '...11...'],
-    guide: ['..1111..', '.1....1.', '.1.11.1.', '.1.11.1.', '.1....1.', '.1..1.1.', '.1....1.', '..1111..'],
-    settings: ['...1.1..', '..1.1...', '.11.11..', '...1...1', '.1.11...', '..1.1...', '.1.1.1..', '........'],
-};
-function renderPixelIcons(root) {
-    (root || document).querySelectorAll('i.pi[data-icon]').forEach(el => {
-        const m = PT_ICONS[el.dataset.icon];
-        if (!m) return;
-        const shadows = [];
-        for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
-            if (m[y][x] === '1') shadows.push(`${x + 1}px ${y + 1}px 0 0 currentColor`);
-        }
-        el.style.width = '1px'; el.style.height = '1px';
-        el.style.boxShadow = shadows.join(',');
-    });
-}
-
-/* ---------- 炉火动画 ---------- */
-const PTFire = (() => {
-    let raf = 0, last = 0;
-    function frame(ts, canvas) {
-        raf = requestAnimationFrame(t => frame(t, canvas));
-        if (ts - last < 90) return; /* ~11fps 像素感 */
-        last = ts;
-        const ctx = canvas.getContext('2d');
-        const W = canvas.width, H = canvas.height;
-        ctx.imageSmoothingEnabled = false;
-        ctx.fillStyle = '#14100c';
-        ctx.fillRect(0, 0, W, H);
-        /* 石壁 */
-        ctx.fillStyle = '#241c14';
-        for (let x = 0; x < W; x += 4) ctx.fillRect(x, 0, 1, H);
-        /* 底座石台 */
-        for (let x = 0; x < W; x++) {
-            const n = Math.sin(x * 2.3) * 0.5 + 0.5;
-            ctx.fillStyle = n > 0.6 ? '#3a332a' : (n > 0.3 ? '#2e2822' : '#241f1a');
-            ctx.fillRect(x, H - 2, 1, 2);
-        }
-        /* 柴 */
-        ctx.fillStyle = '#5a3a22';
-        ctx.fillRect(6, H - 4, 20, 3);
-        ctx.fillStyle = '#7a4a2a';
-        ctx.fillRect(4, H - 3, 24, 2);
-        /* 火焰（伪随机跳动的像素柱） */
-        const t = ts / 120;
-        for (let x = 6; x < 26; x++) {
-            const n = Math.sin(x * 1.7 + t) * 0.5 + Math.sin(x * 0.9 - t * 1.3) * 0.5;
-            const h = Math.max(1, Math.round((10 - Math.abs(x - 16) * 0.55) + n * 3));
-            for (let y = 0; y < h; y++) {
-                const yy = H - 4 - y;
-                let col;
-                if (y > h - 3) col = '#e5484d';
-                else if (y > h - 6) col = '#ff8c42';
-                else if (y > h - 9) col = '#ffb545';
-                else col = '#ffe97a';
-                ctx.fillStyle = col;
-                ctx.fillRect(x, yy, 1, 1);
-            }
-        }
-        /* 火星 */
-        ctx.fillStyle = 'rgba(255,220,120,0.8)';
-        for (let i = 0; i < 3; i++) {
-            const mx = 12 + ((t * 7 + i * 9) % 12);
-            const my = (H - 6 - ((t * 5 + i * 7) % 14));
-            ctx.fillRect(Math.floor(mx), Math.floor(my), 1, 1);
-        }
+    function hexToRgba(hex, alpha = 1) {
+        if (!hex || hex[0] !== '#') return `rgba(100, 116, 139, ${alpha})`;
+        let c = hex.slice(1);
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        const num = parseInt(c, 16);
+        const r = (num >> 16) & 255;
+        const g = (num >> 8) & 255;
+        const b = num & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
+
+    function clearCache() {
+        dataUrlCache.clear();
+    }
+
     return {
-        start(canvas) { if (!raf) raf = requestAnimationFrame(t => frame(t, canvas)); },
-        stop() { if (raf) cancelAnimationFrame(raf); raf = 0; },
+        draw: drawToCanvas,
+        drawToCanvas,
+        toDataURL,
+        clearCache,
     };
 })();
 
-/* ---------- 空状态像素灯笼 ---------- */
-function drawLantern(canvas) {
-    const M = [
-        '......GGGG......',
-        '.....G....G.....',
-        '....G......G....',
-        '.GGGGGGGGGGGGGG.',
-        '.GRRRRRRRRRRRRG.',
-        'GRRWRRRRRRRRWRRG',
-        'GRRRRRRRRRRRRRRG',
-        'GRRWRRRRRRRRWRRG',
-        'GRRRRRRRRRRRRRRG',
-        '.GRRRRRRRRRRRRG.',
-        '.GGGGGGGGGGGGGG.',
-        '....G.GGGG.G....',
-        '......G..G......',
-        '.....GG..GG.....',
-    ];
-    const COLS = { G: '#d4a94e', R: '#c0392b', W: '#ffb545' };
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const px = Math.min(canvas.width / 16, canvas.height / 14);
-    const ox = (canvas.width - 16 * px) / 2, oy = (canvas.height - 14 * px) / 2;
-    for (let y = 0; y < 14; y++) for (let x = 0; x < 16; x++) {
-        const c = M[y][x];
-        if (c !== '.') { ctx.fillStyle = COLS[c]; ctx.fillRect(ox + x * px, oy + y * px, px, px); }
-    }
-}
+/* ---------- 氛围共鸣波形仪 (原酒馆炉火升级为现代流体声波仪) ---------- */
+const PTFire = (() => {
+    let raf = 0;
+    let t = 0;
 
-/* ---------- 酒馆 Logo（像素小酒杯） ---------- */
+    function frame(ts, canvas) {
+        raf = requestAnimationFrame(timestamp => frame(timestamp, canvas));
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width;
+        const H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        // 深邃渐变底色
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#0c111a');
+        bgGrad.addColorStop(1, '#080c12');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        t += 0.04;
+
+        // 绘制三道微光交织的平滑正弦共鸣波
+        const waves = [
+            { col: 'rgba(0, 209, 178, 0.45)', speed: 1.0, freq: 0.08, amp: 5, yOffset: H * 0.5 },
+            { col: 'rgba(243, 168, 71, 0.45)', speed: 1.4, freq: 0.11, amp: 4, yOffset: H * 0.52 },
+            { col: 'rgba(147, 197, 253, 0.35)', speed: 0.7, freq: 0.06, amp: 6, yOffset: H * 0.48 },
+        ];
+
+        waves.forEach(w => {
+            ctx.beginPath();
+            ctx.strokeStyle = w.col;
+            ctx.lineWidth = 1.5;
+            for (let x = 0; x <= W; x += 2) {
+                const y = w.yOffset + Math.sin(x * w.freq + t * w.speed) * w.amp;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        });
+
+        // 灵动微尘粒子
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        for (let i = 0; i < 4; i++) {
+            const px = (W * 0.2 + (t * 12 + i * 18)) % W;
+            const py = H * 0.5 + Math.sin(t * 1.5 + i * 2) * 5;
+            ctx.beginPath();
+            ctx.arc(px, py, 0.9, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    return {
+        start(canvas) {
+            if (!raf && canvas) raf = requestAnimationFrame(ts => frame(ts, canvas));
+        },
+        stop() {
+            if (raf) cancelAnimationFrame(raf);
+            raf = 0;
+        },
+    };
+})();
+
+/* ---------- 品牌 Logo 绘制（现代几何星轨图腾） ---------- */
 function drawTavernLogo(canvas) {
-    const M = [
-        '................',
-        '..1111111111....',
-        '..1........1....',
-        '..1..2222..1.33.',
-        '..1..2222..1333.',
-        '..1..2222..1.33.',
-        '..1..2222..1....',
-        '..1........1....',
-        '..1..4444..1....',
-        '..1.444444.1....',
-        '..1.444444.1....',
-        '..1..4444..1....',
-        '...1......1.....',
-        '....111111......',
-        '................',
-        '................',
-    ];
-    const COLS = { 1: '#e8c97a', 2: '#d4a94e', 3: '#7fd57f', 4: '#b5772a' };
     const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const px = Math.min(canvas.width / 16, canvas.height / 16);
-    for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-        const c = M[y][x];
-        if (c !== '.') { ctx.fillStyle = COLS[c]; ctx.fillRect(x * px, y * px, px, px); }
-    }
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.imageSmoothingEnabled = true;
+
+    const cx = W / 2;
+    const cy = H / 2;
+    const r = Math.min(W, H) * 0.38;
+
+    // 1. 发光外轨
+    ctx.strokeStyle = 'rgba(0, 209, 178, 0.85)';
+    ctx.lineWidth = Math.max(1.5, W * 0.05);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI * 0.25, Math.PI * 1.45);
+    ctx.stroke();
+
+    // 2. 内部交错棱镜
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = Math.max(1.2, W * 0.04);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r * 0.85);
+    ctx.lineTo(cx + r * 0.7, cy + r * 0.6);
+    ctx.lineTo(cx - r * 0.7, cy + r * 0.6);
+    ctx.closePath();
+    ctx.stroke();
+
+    // 3. 中心微光核心
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.18, 0, Math.PI * 2);
+    ctx.fill();
 }
 
-/* 导出为全局供 app.js 使用 */
+/* ---------- 极简空白状态图标 ---------- */
+function drawLantern(canvas) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.imageSmoothingEnabled = true;
+
+    const cx = W / 2;
+    const cy = H / 2;
+
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, W * 0.32, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#00d1b2';
+    ctx.beginPath();
+    ctx.moveTo(cx - W * 0.18, cy);
+    ctx.lineTo(cx + W * 0.18, cy);
+    ctx.moveTo(cx, cy - H * 0.18);
+    ctx.lineTo(cx, cy + H * 0.18);
+    ctx.stroke();
+}
+
+/* 导出为全局变量 */
 window.PTAvatar = PTAvatar;
-window.renderPixelIcons = renderPixelIcons;
 window.PTFire = PTFire;
 window.drawTavernLogo = drawTavernLogo;
-window.mulberry32 = mulberry32;
 window.drawLantern = drawLantern;
+window.mulberry32 = mulberry32;

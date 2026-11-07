@@ -252,10 +252,10 @@ function initBuild() {
             const card = state.custom.find(c => c.id === state._editingCardId);
             if (!card) { toast('卡片已不存在'); resetBuildForm(); return; }
             card.name = name;
-            card.title = $('#build-title').value.trim() || '酒馆的常客';
+            card.title = $('#build-title').value.trim() || '漫游协作者';
             card.category = $('#build-cat').value;
-            card.greeting = $('#build-greeting').value.trim() || '你好呀，我是' + name + '。很高兴认识你！';
-            card.desc = $('#build-desc').value.trim() || '由游戏酒馆 Build 功能亲手制作的角色。';
+            card.greeting = $('#build-greeting').value.trim() || '你好，我是' + name + '。很高兴与你连线。';
+            card.desc = $('#build-desc').value.trim() || '由幻境回声创作者工坊构建的个性化档案。';
             card.palette = { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' };
             saveCustom();
             resetBuildForm();
@@ -267,22 +267,22 @@ function initBuild() {
         const card = {
             id: 'custom_' + Date.now(),
             name,
-            title: $('#build-title').value.trim() || '酒馆的常客',
+            title: $('#build-title').value.trim() || '漫游协作者',
             category: $('#build-cat').value,
             seed: Math.floor(Math.random() * 100000),
             tags: ['自制'],
-            desc: $('#build-desc').value.trim() || '由游戏酒馆 Build 功能亲手制作的角色。',
-            greeting: $('#build-greeting').value.trim() || '你好呀，我是' + name + '。很高兴认识你！',
+            desc: $('#build-desc').value.trim() || '由幻境回声创作者工坊构建的个性化档案。',
+            greeting: $('#build-greeting').value.trim() || '你好，我是' + name + '。很高兴与你连线。',
             origin: 'custom',
             palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
             script: {
                 keywords: [
-                    [/你好|嗨|hi|hello/i, '嘿！你来了，正想着你呢。今天过得怎么样？'],
-                    [/名字|你是谁/, '我叫' + name + '。' + ($('#build-desc').value.trim() ? '简单说，就是：' + $('#build-desc').value.trim().slice(0, 40) : '一个刚被造出来的新角色。')],
-                    [/再见|拜/, '要走啦？记得常来酒馆看我哦！'],
+                    [/你好|嗨|hi|hello/i, '很高兴收到你的信号。今天一切还顺遂吗？'],
+                    [/名字|你是谁/, '我是' + name + '。' + ($('#build-desc').value.trim() ? '简而言之：' + $('#build-desc').value.trim().slice(0, 40) : '一位刚刚载入档案库的同伴。')],
+                    [/再见|别/, '期待下一次与你建立共鸣。'],
                 ],
                 fallbacks: [
-                    '唔……让我想想。你说的这个，好像挺有意思的！',
+                    '让我想想……你提到的这个视角很有意思。',
                     '（' + name + '歪着头看你）……再说多点嘛，我在听。',
                     '嘿，作为一张新卡，我的知识还不多，但陪你聊天没问题！',
                 ],
@@ -493,14 +493,14 @@ function buildCardPayload(c) {
             name: c.name,
             description: c.desc || '',
             personality: '',
-            scenario: '游戏酒馆 · Game Tavern',
+            scenario: '幻境回声 · EchoCraft Studio',
             first_mes: c.greeting || '',
             alternate_greetings: c.alts || [],
             mes_example: '',
-            creator_notes: '由游戏酒馆门户导出，可在门户「导入角色卡」还原',
+            creator_notes: '由幻境回声叙事工坊导出，可在门户「导入档案」还原',
             tags: c.tags || [],
-            creator: 'Game Tavern',
-            character_version: '1.0',
+            creator: 'EchoCraft Studio',
+            character_version: '2.0',
             extensions: {
                 pixel_tavern: {
                     id: c.id,

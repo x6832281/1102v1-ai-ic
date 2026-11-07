@@ -198,14 +198,14 @@ function initExportImport() {
     if (!exportBtn || !importBtn || !fileInput) return;
     exportBtn.addEventListener('click', () => {
         const payload = {
-            app: 'pixel-tavern', version: 1, exportedAt: Date.now(),
+            app: 'echocraft', version: 2, exportedAt: Date.now(),
             favs: state.favs, history: state.history,
             custom: state.custom, imported: state.imported, settings: state.settings,
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'pixel-tavern-data-' + new Date().toISOString().slice(0, 10) + '.json';
+        a.download = 'echocraft-data-' + new Date().toISOString().slice(0, 10) + '.json';
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 3000);
         toast('已导出本地数据（' + state.history.length + ' 段对话）');
@@ -217,7 +217,7 @@ function initExportImport() {
         if (!file) return;
         try {
             const data = JSON.parse(await file.text());
-            if (data.app !== 'pixel-tavern') { toast('不是游戏酒馆的备份文件'); return; }
+            if (data.app !== 'echocraft' && data.app !== 'pixel-tavern') { toast('请选择有效的备份文件'); return; }
             if (Array.isArray(data.favs)) { state.favs = data.favs; saveFavs(); }
             if (Array.isArray(data.history)) { state.history = data.history.slice(0, 30); saveHistory(); }
             if (Array.isArray(data.custom)) { state.custom = data.custom; saveCustom(); }
@@ -539,7 +539,7 @@ function bindEvents() {
     $('#btn-start-chat').addEventListener('click', () => openChat(state.currentDetail, state._greetList ? state._greetList[state._greetIdx] : undefined));
     $('#btn-open-classic').addEventListener('click', () => {
         window.open('/?classic=1#character_list', '_blank');
-        toast('已在新窗口打开经典酒馆，角色卡在左侧列表中');
+        toast('已在新窗口打开经典核心，可在角色列表中查阅');
     });
     /* 聊天：多行输入（Enter 发送 / Shift+Enter 换行 + 自适应增高） */
     const chatInput = $('#chat-input');
@@ -639,17 +639,17 @@ function bindEvents() {
     $('#btn-welcome-guide').addEventListener('click', () => { closeModal(); switchView('guide'); });
 }
 
-/* 酒馆播报滚动条 */
+/* 纪事简讯滚动条 */
 function initTicker() {
     const el = $('#ticker-text');
     if (!el || !window.PT_NEWS) return;
     const items = [
-        PT_NEWS.version + '「' + PT_NEWS.codename + '」现已上线',
-        '真实大模型已入伙：设置 → 模型接入，即刻真聊',
-        '沉浸互动 BETA：用行动选项自然推进剧情',
-        '像素点唱机：收起面板，音乐不中断',
-        'Build 工坊：亲手捏一张专属角色卡',
-        '经典酒馆：顶栏一键回到原版 SillyTavern',
+        PT_NEWS.version + '「' + PT_NEWS.codename + '」全新蜕变上线',
+        '真实大模型接入：偏好设置 → 模型接入，即刻流式生成',
+        '沉浸分支交互：通过决策选项自然推进剧情走向',
+        '环境音律舱：纯净背景白噪音，专注更深层次叙事',
+        '创作者工坊：捏制并录入属于你的专属角色档案',
+        '底层核心：顶栏一键直通原生 SillyTavern 引擎',
     ];
     const half = items.join('　◆　') + '　◆　';
     el.innerHTML = esc(half + half); /* 双份内容实现无缝循环 */
@@ -701,7 +701,7 @@ function boot() {
     if (canon) canon.href = location.origin + '/';
 
     /* 启动画面进度 */
-    const tips = ['正在点燃炉火…', '正在擦拭酒杯…', '正在翻阅冒险者名册…', '酒馆开门迎客！'];
+    const tips = ['正在连接共鸣波谱…', '正在校准星轨频率…', '正在载入角色档案…', '幻境回声准备就绪！'];
     let tipIdx = 0;
     const tipTimer = setInterval(() => { tipIdx = (tipIdx + 1) % tips.length; $('#boot-tip').textContent = tips[tipIdx]; }, 420);
     const fill = $('#boot-bar-fill');

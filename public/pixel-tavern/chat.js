@@ -42,7 +42,7 @@ function aiReady() {
 
 function buildAIMessages(char) {
     const sys = [
-        '你是「' + char.name + '」——游戏酒馆在线角色扮演中的角色。',
+        '你是「' + char.name + '」——幻境回声 (EchoCraft) 沉浸式叙事互动中的角色。',
         char.title ? '角色定位：' + char.title + '。' : '',
         char.desc ? '角色设定：' + char.desc : '',
         '风格要求：全程用中文；保持角色扮演不出戏，不要提及你是 AI 或模型；动作用（…）表示，台词用「…」，偶尔用*轻动作*；每次回复控制在 50~200 字；根据用户的输入自然推进剧情，可以主动制造小事件或提问。',
@@ -461,14 +461,14 @@ function renderChatCanvas() {
     cv.height = Math.min(y + (truncated ? 50 : 40), 16000);
 
     /* 背景 */
-    ctx.fillStyle = '#0d100f';
+    ctx.fillStyle = '#0c0f14';
     ctx.fillRect(0, 0, W, cv.height);
     ctx.textBaseline = 'top';
-    ctx.font = '22px "Zpix Local", "SimSun", monospace';
-    ctx.fillStyle = '#e8c97a';
-    ctx.fillText(`游戏酒馆 · 与「${c.name}」的对话`, PAD, 24);
-    ctx.font = '13px "Zpix Local", "SimSun", monospace';
-    ctx.fillStyle = '#9aa08e';
+    ctx.font = '20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillStyle = '#00d1b2';
+    ctx.fillText(`幻境回声 · 与「${c.name}」的会话纪要`, PAD, 24);
+    ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillStyle = '#8c9ba8';
     ctx.fillText(`导出于 ${new Date().toLocaleString('zh-CN')}`, PAD, 58);
 
     /* 同步绘制头像画布 */
@@ -528,9 +528,9 @@ function renderChatCanvas() {
         ctx.fillText(`……仅含最近 ${msgs.length} 条，完整记录请用文本导出……`, PAD, cv.height - 30);
     }
     /* 水印 */
-    ctx.font = '10px "Press Start 2P", "Zpix Local", monospace';
-    ctx.fillStyle = 'rgba(212, 169, 78, 0.45)';
-    ctx.fillText('GAME TAVERN', W - PAD - 130, cv.height - 26);
+    ctx.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillStyle = 'rgba(0, 209, 178, 0.45)';
+    ctx.fillText('ECHOCRAFT STUDIO', W - PAD - 130, cv.height - 26);
     return cv;
 }
 
@@ -540,14 +540,14 @@ function doExportChat(fmt) {
     if (!c || !state.chat.session || !state.chat.session.messages.length) { toast('还没有可导出的消息'); return; }
     const lines = [];
     if (fmt === 'md') {
-        lines.push(`# 游戏酒馆 · 与「${c.name}」的对话`, '', `> 导出时间：${new Date().toLocaleString('zh-CN')}`, '', '---', '');
+        lines.push(`# 幻境回声 · 与「${c.name}」的会话纪要`, '', `> 导出时间：${new Date().toLocaleString('zh-CN')}`, '', '---', '');
         state.chat.session.messages.forEach(m => {
             const who = m.role === 'user' ? '**你**' : `**${c.name}**`;
             const t = new Date(m.t).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             lines.push(`${who} *${t}*`, '', m.text, '');
         });
     } else {
-        lines.push(`游戏酒馆 · 与「${c.name}」的对话`, `导出时间：${new Date().toLocaleString('zh-CN')}`, '='.repeat(30), '');
+        lines.push(`幻境回声 · 与「${c.name}」的会话纪要`, `导出时间：${new Date().toLocaleString('zh-CN')}`, '='.repeat(30), '');
         state.chat.session.messages.forEach(m => {
             const who = m.role === 'user' ? '你' : c.name;
             const t = new Date(m.t).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });

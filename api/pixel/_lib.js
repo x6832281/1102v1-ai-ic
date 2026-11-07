@@ -234,7 +234,7 @@ export function sendRobots(req, res) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.end([
-        '# Game Tavern (游戏酒馆)',
+        '# EchoCraft (幻境回声)',
         'User-agent: *',
         'Allow: /',
         'Disallow: /api/',
