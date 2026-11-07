@@ -2,10 +2,20 @@
   "buildCommand": null,
   "outputDirectory": "public",
   "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/pixel-tavern/index.html"
-    }
-  ]
+  "rewrites": {
+    "beforeFiles": [
+      {
+        "source": "/",
+        "destination": "/pixel-tavern"
+      },
+      {
+        "source": "/robots.txt",
+        "destination": "/api/pixel/seo?type=robots"
+      },
+      {
+        "source": "/sitemap.xml",
+        "destination": "/api/pixel/seo?type=sitemap"
+      }
+    ]
+  }
 }
