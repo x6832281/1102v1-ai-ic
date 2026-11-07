@@ -1250,3 +1250,27 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - 大项：模型 TTS（浏览器语音已有，专属模型 TTS 需后端配额）、角色卡远程清单、AI 图文 galgame —— 均可沿 `/api/pixel/*` 模式扩展。
 - 运营：VPS 购置与域名备案由用户完成；`deploy/README-DEPLOY.md` 第 4 步填三项即可上线。
 - 维持冒烟 + ESLint 护栏。
+
+---
+
+## 上线记录 · ai-ic.top 域名接入（2026.11.07，用户指令：我有域名 ai-ic.top，但没有服务器）
+
+### 现场侦察
+- ai-ic.top DNS 托管于阿里云 hichina，A 记录早已指向 Vercel（216.198.79.1），且线上服务着本仓库 public/ 的静态产物 → 证明该项目连接着本 GitHub 仓库、push 自动部署。
+- vercel.json（初版）含 `/ → /pixel-tavern/index.html` 重写但从未生效：flat 数组重写属 afterFiles，filesystem 先命中 public/index.html（SillyTavern 壳）。
+- ZCode Sites 不支持自定义域名；本机无任何部署 CLI。
+
+### 实施（Vercel Serverless 版）
+1. `api/pixel/*`（_lib + chat/status/probe/visit/stats/seo/robots/sitemap）：与 ST/lite 同源的像素 API 移植为 Serverless 函数；chat 带 maxDuration 60（Hobby 上限）+ SSE 流式；同源校验替代 CSRF；BYOK 校验/限流/计数逻辑保留（计数为实例内存 + /tmp，冷启动重置，免费层折衷）。
+2. vercel.json 三次迭代：beforeFiles 对象格式两次构建失败（旧部署保持在线，无损坏）→ 回退 flat 数组 + **redirects**（先于 filesystem，保证生效）：`/ → /pixel-tavern`（307）+ robots/sitemap → 专用函数。门户加载后 history.replaceState 把地址栏美化回 `/`。
+3. 途中修复：chat.js 引用未导出常量（SHARED_*）、harness 测试断言（x-forwarded-* 模拟、端口子串）。
+
+### 验证（全绿）
+- 本地 harness（tools/test-vercel-api.mjs，模拟 Vercel req/res + mock LLM）：permissive 11/11 + strict 6/6（流式、BYOK、probe、跨站拒绝、计数、robots/sitemap、SSRF 三连、405、503 提示）。
+- 冒烟扩至 94 断言（+12 Vercel 项）全过；ESLint 0。
+- **线上 ai-ic.top 实测**：/ → 307 → /pixel-tavern 门户（地址栏 replaceState 回 /）；/api/pixel/status JSON；robots/sitemap 动态生成（Sitemap: https://ai-ic.top/）；浏览器实测：V1.3、21 角色、服务器计数、manifest、canonical=https://ai-ic.top/、AI 状态行正确。
+
+### 限制与建议
+- Vercel Hobby：函数 60s 上限、计数/限流冷启动重置、经典酒馆不可用（无常驻后端）。
+- 共享模型：Vercel 控制台加 PIXEL_LLM_* 环境变量后重新部署即可开启；否则访客 BYOK / 剧本引擎。
+- 升级路径：买 VPS 后按 deploy/README-DEPLOY.md 方案 A 部署，DNS 一改即迁移，代码零改动。

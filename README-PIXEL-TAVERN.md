@@ -2,7 +2,10 @@
 
 参考 [chat.xstavern.com](https://chat.xstavern.com) 的「像素酒馆」网站，对本项目（SillyTavern 原始代码）改造出的**像素风在线酒馆**：角色卡集市、沉浸互动、真实大模型 AI 聊天，开箱即可用自己的域名上线。
 
-**当前版本 V1.3「明炉真火」** — 已上线预览站：<https://pixel-tavern-fgcq.zai-ai.site>
+**当前版本 V1.3「明炉真火」**
+
+- **正式站点（自有域名，已上线）**：<https://ai-ic.top>（Vercel 零服务器方案：门户 + Serverless 像素 API，`git push` 即自动部署）
+- **预览站**：<https://pixel-tavern-fgcq.zai-ai.site>（ZCode Sites，lite 服务器）
 
 ## 快速开始
 
@@ -46,6 +49,7 @@ npm start          # 启动后自动打开 http://127.0.0.1:8000/
 | `.env.example` | 域名 / 证书邮箱 / 认证哈希 / 共享模型密钥模板 |
 | `config/config.yaml` | 公网安全预设（关白名单、保持 CSRF、关插件与浏览器自启） |
 | `lite/server.mjs` | 零依赖 Node 独立服务器（无 Docker 极简部署 / 静态托管平台用，含同一套像素 API） |
+| `../api/pixel/*.js` | Vercel Serverless 函数版像素 API（**ai-ic.top 当前在用**，`git push` 自动部署） |
 
 三条上线路径任选：**VPS + Docker + Caddy**（推荐，全自动 HTTPS）、**Cloudflare Tunnel**（无公网 IP 的家宽/NAS）、**lite 独立服务器**（任意能跑 Node 的平台）。
 

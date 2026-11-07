@@ -3,6 +3,50 @@
 > 目标：让任何人打开 `https://你的域名` 就能看到像素酒馆门户，聊天走真实大模型；
 > 原版 SillyTavern「经典酒馆」藏在基础认证之后，只属于你。
 
+**当前状态：`ai-ic.top` 已经由方案 C（Vercel，零服务器）上线。** 三条路径任选，随时可以升级迁移。
+
+## 三条路径速查
+
+| 路径 | 成本 | 经典酒馆 | 适合 |
+| --- | --- | --- | --- |
+| **C · Vercel（当前在用）** | **免费** | ❌ 无后端不可用 | 有域名、没服务器；推送 GitHub 自动上线 |
+| **A · VPS + Docker** | ¥20~40/月 | ✅ 完整（认证保护） | 要全功能、稳定 7×24 |
+| **B · Cloudflare Tunnel** | 免费 | ✅ 完整 | 用家里电脑/NAS 当服务器 |
+
+---
+
+## 方案 C · Vercel（零服务器，已打通）
+
+本项目已连接 Vercel（`ai-ic.top` 即此方案），**只要 `git push`，2 分钟内自动上线**。
+
+原理与组成：
+
+- **门户**：`public/pixel-tavern/` 全套静态文件由 Vercel CDN 直发；`vercel.json` 的
+  `redirects` 把 `/` 307 到 `/pixel-tavern`（redirects 先于 filesystem 生效；
+  门户加载后用 `history.replaceState` 把地址栏美化回 `/`，访客无感）。
+- **后端 API**：`api/pixel/*.js` 为 Vercel Serverless Functions（Node），与 ST/lite
+  版同一套逻辑：`status` / `chat`（SSE 流式，maxDuration 60s）/ `probe` / `visit` /
+  `stats` / `robots` / `sitemap`。同源校验 + BYOK 防护（HTTPS-only、禁内网）+ 每 IP 限流。
+- **经典酒馆**：Serverless 无法运行 SillyTavern 常驻后端，此路径下不可用（顶栏按钮
+  无效属预期）。需要时升级到方案 A/B 即可获得。
+
+启用共享模型（游客免配置真聊）：Vercel 控制台 → 你的项目 → Settings →
+Environment Variables 添加 `PIXEL_LLM_BASE_URL` / `PIXEL_LLM_API_KEY` / `PIXEL_LLM_MODEL`，
+添加后任意触发一次重新部署生效。
+
+免费版（Hobby）限制须知：
+
+- 函数单次最长 60s（回复超长可能被截断，随后端提示回退剧本引擎）
+- 访问计数与限流存在实例内存/`/tmp`，冷启动会重置（展示用途足够）
+- 无共享模型时访客走 BYOK 或本地剧本引擎，站点依然完整可玩
+
+迁移到 VPS：按下方方案 A 部署后，把域名 DNS 的 A 记录指向新服务器即可，代码零改动
+（`api/` 目录与 `vercel.json` 只在 Vercel 环境生效，不影响 ST/lite 运行）。
+
+---
+
+## 方案 A · VPS + Docker（全功能，推荐长期）
+
 ```
 访客 ──HTTPS──▶ Caddy（自动申请/续期 TLS 证书）
                   │  公开：/            → 像素酒馆门户
