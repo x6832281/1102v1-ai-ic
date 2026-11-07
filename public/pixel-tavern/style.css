@@ -834,3 +834,126 @@ body[data-chatfont="l"] .msg .msg-body { font-size: 17px; }
     .visit-box { display: none; }
     .msg .bubble { max-width: 88%; }
 }
+
+/* ============================================================
+ * 清晰风格皮肤（body[data-skin="clean"]）—— 默认
+ * 界面走向现代清晰：系统中文字体、圆角、柔和阴影、平滑过渡；
+ * 保留像素画元素（头像/炉火/Logo/灯笼）与像素品牌点缀（.en 小标签）。
+ * 像素复古风可随时在「设置 → 界面风格」切回。
+ * ============================================================ */
+body[data-skin="clean"] {
+    --font-pixel: 'PingFang SC', 'HarmonyOS Sans SC', 'MiSans', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    --radius: 12px;
+    --radius-s: 9px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 181, 69, 0.05), transparent);
+    background-size: auto;
+}
+body[data-skin="clean"] .view-title { letter-spacing: 1px; }
+body[data-skin="clean"] .side-label { letter-spacing: 2px; }
+
+/* 按钮：圆角描边 + 平滑过渡 */
+body[data-skin="clean"] .px-btn {
+    border-radius: var(--radius-s);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+body[data-skin="clean"] .px-btn:hover { box-shadow: inset 0 0 0 1px var(--border); }
+body[data-skin="clean"] .px-btn.gold { box-shadow: inset 0 0 0 1px var(--accent); }
+body[data-skin="clean"] .px-btn.danger { box-shadow: inset 0 0 0 1px var(--red); }
+body[data-skin="clean"] .px-btn:active { transform: translateY(1px); }
+body[data-skin="clean"] .toggle { border-radius: var(--radius-s); }
+body[data-skin="clean"] .accent-swatch { border-radius: 8px; }
+body[data-skin="clean"] .font-btn.active { box-shadow: 0 -1px 0 0 var(--accent), 0 1px 0 0 var(--accent), -1px 0 0 0 var(--accent), 1px 0 0 0 var(--accent); border-radius: var(--radius-s); }
+
+/* 面板与输入：2px 硬描边 → 1px 圆角 */
+body[data-skin="clean"] #search-input,
+body[data-skin="clean"] #chat-input,
+body[data-skin="clean"] .ai-box input {
+    border-radius: var(--radius-s);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: box-shadow 0.15s;
+}
+body[data-skin="clean"] #search-input:focus,
+body[data-skin="clean"] #chat-input:focus,
+body[data-skin="clean"] .ai-box input:focus {
+    box-shadow: inset 0 0 0 1px var(--border), 0 0 0 3px rgba(255, 181, 69, 0.12);
+}
+body[data-skin="clean"] .shelf-block,
+body[data-skin="clean"] #mini-player,
+body[data-skin="clean"] #fireplace-card,
+body[data-skin="clean"] .news-panel,
+body[data-skin="clean"] .empty-tip,
+body[data-skin="clean"] #immersive-panel,
+body[data-skin="clean"] #export-menu,
+body[data-skin="clean"] .about-block,
+body[data-skin="clean"] .longimage-scroll {
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--line);
+}
+body[data-skin="clean"] #chat-header { box-shadow: 0 1px 0 0 var(--line); }
+body[data-skin="clean"] #fireplace-canvas { border-radius: var(--radius-s); border-width: 1px; }
+body[data-skin="clean"] #sidebar { border-right-width: 1px; }
+body[data-skin="clean"] #tavern-ticker { border-bottom-width: 1px; }
+
+/* 侧栏项 / 分类 tabs */
+body[data-skin="clean"] .side-item { border-radius: var(--radius-s); transition: background 0.15s, color 0.15s; }
+body[data-skin="clean"] .side-item.active { box-shadow: inset 3px 0 0 0 var(--accent); }
+body[data-skin="clean"] .cat-tab { border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); transition: color 0.15s, box-shadow 0.15s, background 0.15s; }
+body[data-skin="clean"] .cat-tab:hover { box-shadow: inset 0 0 0 1px var(--border); }
+body[data-skin="clean"] .cat-tab.active { box-shadow: inset 0 0 0 1px var(--border-lt); }
+
+/* 角色卡：圆角 + 柔和投影 */
+body[data-skin="clean"] .card {
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--line), 0 2px 10px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+body[data-skin="clean"] .card:hover {
+    transform: translateY(-3px);
+    box-shadow: inset 0 0 0 1px var(--border), 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+body[data-skin="clean"] .card-cover { border-radius: var(--radius) var(--radius) 0 0; }
+body[data-skin="clean"] .card-badge { border-radius: 999px; padding: 2px 8px; }
+body[data-skin="clean"] .card .hl { border-radius: 4px; box-shadow: none; }
+
+/* 对话气泡 */
+body[data-skin="clean"] .msg .bubble {
+    border-radius: 4px 14px 14px 14px;
+    box-shadow: inset 0 0 0 1px var(--line);
+}
+body[data-skin="clean"] .msg.char .bubble { box-shadow: inset 0 0 0 1px var(--border); }
+body[data-skin="clean"] .msg.user .bubble { border-radius: 14px 4px 14px 14px; }
+body[data-skin="clean"] .msg-avatar { border-radius: 8px; }
+body[data-skin="clean"] .option-chip {
+    border-radius: var(--radius-s);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition: color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+body[data-skin="clean"] .option-chip:hover { box-shadow: inset 0 0 0 1px var(--border); }
+body[data-skin="clean"] .option-chip.chosen { box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* 沉浸状态条 / 时间线 */
+body[data-skin="clean"] .imm-bar .bar { border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+body[data-skin="clean"] .imm-bar .bar i { border-radius: 999px; background: linear-gradient(90deg, var(--green), #5ab05a); }
+body[data-skin="clean"] #bar-favor { background: linear-gradient(90deg, var(--accent), var(--accent-2)) !important; }
+body[data-skin="clean"] .tl-item::before { border-radius: 2px; }
+body[data-skin="clean"] .tl-item.now::before { box-shadow: 0 0 0 3px rgba(255, 181, 69, 0.18); }
+
+/* 弹窗与启动画面 */
+body[data-skin="clean"] .modal-window {
+    border-radius: 16px;
+    box-shadow: 0 0 0 1px var(--line), 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+body[data-skin="clean"] #boot .boot-bar { border-radius: 999px; overflow: hidden; }
+body[data-skin="clean"] #boot-bar-fill { border-radius: 999px; }
+
+/* 滚动条更现代 */
+body[data-skin="clean"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+body[data-skin="clean"] ::-webkit-scrollbar-thumb { background: var(--panel-3); border-radius: 999px; border: 2px solid var(--bg); }
+body[data-skin="clean"] ::-webkit-scrollbar-thumb:hover { background: var(--line); }
+body[data-skin="clean"] #shelf-strip::-webkit-scrollbar-thumb { border-radius: 999px; }
+
+/* 减少动效偏好者保持既有规则（prefers-reduced-motion 已全局覆盖） */

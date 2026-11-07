@@ -47,7 +47,7 @@
     <link rel="apple-touch-icon" href="/pixel-tavern/brand/icon-192.png">
     <link rel="stylesheet" href="/pixel-tavern/style.css">
 </head>
-<body>
+<body data-skin="clean">
 
     <!-- ===== 启动画面 ===== -->
     <div id="boot">
@@ -220,6 +220,7 @@
                     <h2>V1.3 「明炉真火」 上线版</h2>
                     <p>炉膛里烧起了真的火——酒馆接入真实大模型，并为公网部署做好了全部准备：</p>
                     <ul>
+                        <li><b>界面风格</b> — 全新「清晰」皮肤默认启用：系统字体、圆角卡片、柔和阴影、平滑过渡；复古像素风可在设置中随时切回，头像与炉火等像素画元素两种风格都保留。</li>
                         <li><b>真实大模型对话</b> — 角色回复改由大模型流式生成：优先站点共享模型，也可在「设置 → 模型接入」填入你自己的 OpenAI 兼容接口（Key 仅存于本机）；未接入或连接失败时自动回退本地剧本引擎。</li>
                         <li><b>连接测试</b> — 接入点支持一键「测试连接」，保存后立即对全站 21 位角色生效。</li>
                         <li><b>全站访问计数</b> — 顶栏累计访问改为服务器端真实统计。</li>
@@ -309,6 +310,13 @@
                     <div class="set-row">
                         <label>沉浸互动 BETA（默认开启）</label>
                         <button class="px-btn toggle" id="set-immersive" data-on="1">ON</button>
+                    </div>
+                    <div class="set-row">
+                        <label>界面风格</label>
+                        <div class="font-row" id="skin-row">
+                            <button class="px-btn tiny font-btn" data-skin="clean">清晰</button>
+                            <button class="px-btn tiny font-btn" data-skin="pixel">复古像素</button>
+                        </div>
                     </div>
                     <div class="set-row">
                         <label>对话字号</label>

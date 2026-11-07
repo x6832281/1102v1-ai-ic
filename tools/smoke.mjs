@@ -122,6 +122,13 @@ try {
     ['ai-base', 'ai-key', 'ai-model', 'btn-ai-test', 'set-ai', 'ai-status'].forEach(id => check(`HTML 含设置元素 #${id}`, html.includes(`id="${id}"`)));
     check('HTML 版本徽标 V1.3', html.includes('V1.3'));
     check('HTML 含合规声明（隐私/版权/年龄）', html.includes('隐私声明') && html.includes('版权声明') && html.includes('18 周岁'));
+    /* 界面风格（清晰 / 像素） */
+    check('HTML 默认 data-skin=clean', html.includes('<body data-skin="clean">'));
+    check('HTML 含界面风格切换 #skin-row', html.includes('id="skin-row"'));
+    const css2 = fs.readFileSync(path.join(PT, 'style.css'), 'utf8');
+    check('CSS 含清晰皮肤覆盖层', css2.includes('body[data-skin="clean"]') && css2.includes('清晰风格皮肤'));
+    const appSrc2 = fs.readFileSync(path.join(PT, 'app.js'), 'utf8');
+    check('app.js 皮肤默认 clean 并可切换', appSrc2.includes("skin: 'clean'") && appSrc2.includes('dataset.skin'));
     /* chat.js / app.js AI 管线 */
     const chatSrc = fs.readFileSync(path.join(PT, 'chat.js'), 'utf8');
     check('chat.js 含流式 AI 回复管线', chatSrc.includes('aiStreamReply') && chatSrc.includes('/api/pixel/chat'));

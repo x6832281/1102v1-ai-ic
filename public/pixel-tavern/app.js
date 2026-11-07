@@ -21,7 +21,7 @@ const store = {
 
 const state = {
     view: 'market',
-    settings: Object.assign({ volume: 40, tts: false, typewriter: true, immersive: true, accent: 'gold', chatFont: 'm', aiEnabled: true, aiApi: { base: '', key: '', model: '' } }, store.get('settings', {})),
+    settings: Object.assign({ volume: 40, tts: false, typewriter: true, immersive: true, accent: 'gold', chatFont: 'm', skin: 'clean', aiEnabled: true, aiApi: { base: '', key: '', model: '' } }, store.get('settings', {})),
     favs: store.get('favs', []),
     history: store.get('history', []),
     custom: store.get('custom_cards', []),
@@ -187,6 +187,8 @@ function reopenHistory(id) {
 function applyAccent() {
     document.body.dataset.accent = state.settings.accent;
     document.body.dataset.chatfont = state.settings.chatFont || 'm';
+    /* 界面风格：clean（默认，现代清晰）/ pixel（复古像素） */
+    document.body.dataset.skin = state.settings.skin === 'pixel' ? 'pixel' : 'clean';
 }
 /* 数据导出 / 导入（JSON 备份） */
 function initExportImport() {
@@ -245,12 +247,18 @@ function initSettings() {
     syncToggle('#set-typewriter', state.settings.typewriter);
     syncToggle('#set-immersive', state.settings.immersive);
     /* 对话字号 */
-    const syncFontBtns = () => $$('#font-row .font-btn').forEach(fb => fb.classList.toggle('active', fb.dataset.font === state.settings.chatFont));
-    $$('#font-row .font-btn').forEach(fb => fb.addEventListener('click', () => {
+    const syncFontBtns = () => $$('#font-row .font-btn').forEach(fb => fb.classList.toggle('active', fb.dataset.font === state.settings.chatFont));    $$('#font-row .font-btn').forEach(fb => fb.addEventListener('click', () => {
         state.settings.chatFont = fb.dataset.font;
         saveSettings(); applyAccent(); syncFontBtns();
     }));
     syncFontBtns();
+    /* 界面风格切换（清晰 / 复古像素） */
+    const syncSkinBtns = () => $$('#skin-row .font-btn').forEach(sb => sb.classList.toggle('active', sb.dataset.skin === (state.settings.skin === 'pixel' ? 'pixel' : 'clean')));
+    $$('#skin-row .font-btn').forEach(sb => sb.addEventListener('click', () => {
+        state.settings.skin = sb.dataset.skin;
+        saveSettings(); applyAccent(); syncSkinBtns();
+    }));
+    syncSkinBtns();
     $$('#accent-row .accent-swatch').forEach(sw => {
         sw.classList.toggle('active', sw.dataset.accent === state.settings.accent);
         sw.addEventListener('click', () => {
