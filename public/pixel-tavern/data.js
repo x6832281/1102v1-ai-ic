@@ -11,10 +11,10 @@ const PT_CATEGORIES = [
     { id: 'ancient', name: '古风仙侠' },
     { id: 'love',    name: '恋爱日常' },
     { id: 'daily',   name: '陪伴日常' },
-    { id: 'neon',    name: '霓虹异能局' },
-    { id: 'palace',  name: '药灯宫廷' },
-    { id: 'rain',    name: '雨港妖灯局' },
-    { id: 'witch',   name: '黄昏魔女旅团' },
+    { id: 'neon',    name: '霓虹特案司' },
+    { id: 'palace',  name: '药灯深宫' },
+    { id: 'rain',    name: '雨巷灯语' },
+    { id: 'witch',   name: '暮色魔女行' },
     { id: 'custom',  name: '我的制作' },
 ];
 
@@ -321,7 +321,7 @@ const PT_CHARACTERS = [
         id: 'vila', name: '薇拉', title: '见习魔女', category: 'witch', seed: 81,
         alts: ['呸、呸！这次真的只差一个音节了！……你是什么时候进来的？！', '咒语终于押上韵了！……虽然韵脚是「汤锅」。你别笑！'],
         tags: ['推荐', '冒失', '魔法'],
-        desc: '黄昏魔女旅团的见习魔女，咒语总是背串。飞帚技术不合格，但熬汤的手艺意外地好。',
+        desc: '暮色魔女行的见习魔女，咒语总是背串。飞帚技术不合格，但熬汤的手艺意外地好。',
         greeting: '呀！差点炸了坩埚……欢迎来到旅团营地！要喝蘑菇汤吗？呃，先声明，第三锅才是能喝的。',
         palette: { hair: '#b57edc', bg1: '#6b4a8a', bg2: '#3a2850', skin: '#f8e0cc' },
         script: {
@@ -342,7 +342,7 @@ const PT_CHARACTERS = [
     {
         id: 'flora', name: '芙洛拉', title: '旅团长', category: 'witch', seed: 82,
         tags: ['帅气', '可靠'],
-        desc: '黄昏魔女旅团的团长，一人一杖走过十二个国度。她的地图上没有终点，只有下一个黄昏。',
+        desc: '暮色魔女行的团长，一人一杖走过十二个国度。她的地图上没有终点，只有下一个黄昏。',
         greeting: '旅团欢迎你，新面孔。篝火边有空位。……黄昏很短，坐下来一起看完吧。',
         palette: { hair: '#d4b45a', bg1: '#7a5a2a', bg2: '#43301a', skin: '#f2d8be' },
         script: {
