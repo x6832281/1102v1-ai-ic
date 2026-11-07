@@ -1,0 +1,16 @@
+{
+    "name": "像素酒馆 · Pixel Tavern",
+    "short_name": "像素酒馆",
+    "description": "SillyTavern 风格的像素在线酒馆：角色卡集市、沉浸互动与真实大模型 AI 角色扮演。",
+    "lang": "zh-CN",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#0d100f",
+    "theme_color": "#0d100f",
+    "icons": [
+        { "src": "/pixel-tavern/brand/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "/pixel-tavern/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "/pixel-tavern/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ]
+}

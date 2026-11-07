@@ -6,7 +6,9 @@
 'use strict';
 
 /* 跨文件全局（由 data.js / avatars.js / jukebox.js 以 window.* 导出） */
-/* global PT_CATEGORIES, PT_CHARACTERS, PT_NEWS, PTAvatar, mulberry32, PTJukebox, PTFire, drawTavernLogo, renderPixelIcons */
+/* global PT_CHARACTERS, PT_NEWS, PTAvatar, PTJukebox, PTFire, drawTavernLogo, renderPixelIcons, drawLantern, catName, PTChatAI */
+/* global openChat, pushMessage, updateImmersive, updateModeBadge, sendUserMessage, persistSession, doExportChat */
+/* global renderGrid, renderMarket, renderTabs, initBuild, initImport, resetBuildForm, buildCardPng, buildCardPayload, initMarketSearch */
 
 /* ---------- 本地存储 ---------- */
 const store = {
@@ -19,7 +21,7 @@ const store = {
 
 const state = {
     view: 'market',
-    settings: Object.assign({ volume: 40, tts: false, typewriter: true, immersive: true, accent: 'gold' }, store.get('settings', {})),
+    settings: Object.assign({ volume: 40, tts: false, typewriter: true, immersive: true, accent: 'gold', chatFont: 'm', aiEnabled: true, aiApi: { base: '', key: '', model: '' } }, store.get('settings', {})),
     favs: store.get('favs', []),
     history: store.get('history', []),
     custom: store.get('custom_cards', []),
@@ -42,17 +44,29 @@ function toast(msg, ms = 2600) {
     const box = document.createElement('div');
     box.className = 'toast';
     box.textContent = msg;
-    $('#toast-wrap').appendChild(box);
+    const wrap = $('#toast-wrap');
+    while (wrap.children.length >= 3) wrap.firstElementChild.remove(); /* 队列上限 */
+    wrap.appendChild(box);
     setTimeout(() => { box.classList.add('out'); setTimeout(() => box.remove(), 400); }, ms);
 }
+let _lastFocus = null;
 function openModal(id) {
+    _lastFocus = document.activeElement;
     $('#overlay').classList.remove('hidden');
     $$('.modal-window').forEach(m => m.classList.add('hidden'));
-    if (id) $('#' + id).classList.remove('hidden');
+    if (id) {
+        $('#' + id).classList.remove('hidden');
+        /* 焦点入弹窗：优先主按钮，其次关闭钮 */
+        const w = $('#' + id);
+        const target = w.querySelector('.px-btn.gold') || w.querySelector('.px-btn') || w;
+        if (target.focus) target.focus();
+    }
 }
 function closeModal() {
     $('#overlay').classList.add('hidden');
     $$('.modal-window').forEach(m => m.classList.add('hidden'));
+    if (_lastFocus && _lastFocus.focus) { try { _lastFocus.focus(); } catch { /* ignore */ } }
+    _lastFocus = null;
 }
 function askConfirm(text, onYes) {
     $('#confirm-text').textContent = text;
@@ -94,352 +108,38 @@ function switchView(name) {
 }
 
 /* ============================================================
- * 卡片渲染
- * ============================================================ */
-let currentCat = 'all';
-let searchQ = '';
-
-function catName(id) { const c = PT_CATEGORIES.find(x => x.id === id); return c ? c.name : id; }
-
-function renderTabs() {
-    const tabs = $('#cat-tabs');
-    tabs.innerHTML = '';
-    const cats = PT_CATEGORIES.filter(c => c.id !== 'custom' || state.custom.length + state.imported.length > 0);
-    cats.forEach(c => {
-        const b = document.createElement('button');
-        b.className = 'cat-tab' + (currentCat === c.id ? ' active' : '');
-        b.textContent = c.name;
-        b.addEventListener('click', () => { currentCat = c.id; renderTabs(); renderMarket(); });
-        tabs.appendChild(b);
-    });
-}
-
-function filteredMarket() {
-    return allChars().filter(c => {
-        if (currentCat === 'all') return true;
-        if (currentCat === 'custom') return c.origin === 'custom' || c.origin === 'imported';
-        return c.category === currentCat;
-    }).filter(c => {
-        if (!searchQ) return true;
-        const q = searchQ.toLowerCase();
-        return c.name.toLowerCase().includes(q) || (c.title || '').toLowerCase().includes(q)
-            || (c.tags || []).some(t => t.toLowerCase().includes(q));
-    });
-}
-
-/* 搜索命中高亮（先转义再包裹，防注入） */
-function highlight(text, q) {
-    const safe = esc(text);
-    if (!q || !text) return safe;
-    const idx = text.toLowerCase().indexOf(q.toLowerCase());
-    if (idx < 0) return safe;
-    return esc(text.slice(0, idx))
-        + '<span class="hl">' + esc(text.slice(idx, idx + q.length)) + '</span>'
-        + esc(text.slice(idx + q.length));
-}
-
-function makeCardEl(char, opts = {}) {
-    const el = document.createElement('div');
-    el.className = 'card' + (opts.small ? ' small' : '');
-    const cover = document.createElement('div');
-    cover.className = 'card-cover';
-    const cv = document.createElement('canvas');
-    cv.width = 96; cv.height = 96;
-    PTAvatar.draw(cv, char);
-    cover.appendChild(cv);
-    /* 推荐/自制角标 */
-    if ((char.tags || []).includes('推荐')) {
-        const badge = document.createElement('span');
-        badge.className = 'card-badge rec'; badge.textContent = '推荐';
-        cover.appendChild(badge);
-    }
-    if (char.origin === 'custom') {
-        const badge = document.createElement('span');
-        badge.className = 'card-badge mine'; badge.textContent = '自制';
-        cover.appendChild(badge);
-    }
-    if (char.origin === 'imported') {
-        const badge = document.createElement('span');
-        badge.className = 'card-badge mine imp'; badge.textContent = '导入';
-        cover.appendChild(badge);
-    }
-    if (isFav(char.id)) {
-        const badge = document.createElement('span');
-        badge.className = 'card-badge fav'; badge.textContent = '♥';
-        cover.appendChild(badge);
-    }
-    const info = document.createElement('div');
-    info.className = 'card-info';
-    info.innerHTML = `<div class="card-name">${highlight(char.name, searchQ)}</div><div class="card-cat">${highlight(char.title || '', searchQ)} · ${esc(catName(char.category))}</div>`;
-    el.appendChild(cover);
-    el.appendChild(info);
-    el.addEventListener('click', () => openDetail(char.id));
-    return el;
-}
-
-function renderGrid(sel, chars, emptyText) {
-    const grid = $(sel);
-    grid.innerHTML = '';
-    if (!chars.length) {
-        grid.innerHTML = `<div class="empty-tip">${esc(emptyText || '这里空空如也。')}</div>`;
-        return;
-    }
-    chars.forEach(c => grid.appendChild(makeCardEl(c)));
-}
-
-function renderMarket() {
-    const list = filteredMarket();
-    renderGrid('#card-grid', list, '没有匹配的角色卡，换个分类或关键词试试。');
-    $('#result-count').textContent = list.length;
-    /* 滑卡书架：取前 8 张 */
-    const strip = $('#shelf-strip');
-    strip.innerHTML = '';
-    allChars().filter(c => (c.tags || []).includes('推荐')).slice(0, 8).forEach(c => {
-        strip.appendChild(makeCardEl(c, { small: true }));
-    });
-}
-
-/* ============================================================
- * 角色详情弹窗
- * ============================================================ */
-function openDetail(id) {
-    const c = findChar(id);
-    if (!c) return;
-    state.currentDetail = id;
-    PTAvatar.draw($('#detail-avatar'), c);
-    $('#detail-name').textContent = c.name;
-    $('#detail-title').textContent = `${c.title || ''} · ${catName(c.category)}`;
-    $('#detail-tags').innerHTML = (c.tags || []).map(t => `<span class="px-tag">${esc(t)}</span>`).join('');
-    $('#detail-desc').textContent = c.desc || '（暂无简介）';
-    $('#detail-greet').textContent = '「' + (c.greeting || '……') + '」';
-    const rand = mulberry32(id.length * 131 + (c.seed || 0));
-    $('#detail-pop').style.width = (55 + Math.floor(rand() * 40)) + '%';
-    $('#detail-act').style.width = (35 + Math.floor(rand() * 60)) + '%';
-    /* 最近对话摘录 */
-    const recent = $('#detail-recent');
-    const h = state.history.find(x => x.charId === id && x.messages && x.messages.length);
-    if (recent) {
-        if (h) {
-            const last = h.messages[h.messages.length - 1];
-            recent.classList.remove('hidden');
-            recent.innerHTML = `<span class="lab">最近对话 · ${esc(new Date(h.time).toLocaleDateString('zh-CN'))} · ${h.messages.length} 条</span>${esc(String(last.text).slice(0, 80))}`;
-        } else {
-            recent.classList.add('hidden');
-        }
-    }
-    /* 继续上次对话按钮 */
-    state._recentSessionId = h ? h.id : null;
-    const resumeBtn = $('#btn-resume-chat');
-    if (resumeBtn) resumeBtn.classList.toggle('hidden', !h);
-    const favBtn = $('#btn-fav-toggle');
-    favBtn.textContent = isFav(id) ? '♥ 已收藏' : '♥ 收藏';
-    favBtn.classList.toggle('gold', isFav(id));
-    openModal('modal-detail');
-}
-
-/* ============================================================
- * 对话引擎
- * ============================================================ */
-function openChat(id) {
-    const c = findChar(id);
-    if (!c) { toast('角色不存在'); return; }
-    state.chat = {
-        char: c, msgs: [], immersive: state.settings.immersive,
-        session: { id: 's_' + Date.now(), charId: c.id, charName: c.name, time: Date.now(), messages: [] },
-        fbIdx: 0, favor: 20, mood: 60, events: [],
-    };
-    $('#chat-char-name').textContent = c.name;
-    $('#chat-char-title').textContent = c.title ? c.title + ' · ' + catName(c.category) : catName(c.category);
-    PTAvatar.draw($('#chat-avatar'), c);
-    $('#chat-log').innerHTML = '';
-    $('#immersive-panel').classList.toggle('hidden', !state.chat.immersive);
-    updateModeBadge();
-    closeModal();
-    switchView('chat');
-    /* 开场白 */
-    pushMessage('char', c.greeting || '……', { save: true, tts: true, instant: false });
-    updateImmersive(c.greeting || '');
-    /* 确保页面从集市滚动位置回到顶部（输入法/焦点可能引发残留滚动） */
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-}
-
-function updateModeBadge() {
-    const b = $('#chat-mode-badge');
-    b.textContent = state.chat.immersive ? '沉浸互动' : '传统聊天';
-    $('#immersive-panel').classList.toggle('hidden', !state.chat.immersive);
-}
-
-function pushMessage(role, text, opts = {}) {
-    const log = $('#chat-log');
-    const wrap = document.createElement('div');
-    wrap.className = 'msg ' + role;
-    /* 角色消息带像素小头像 */
-    if (role === 'char' && state.chat.char) {
-        const av = document.createElement('img');
-        av.className = 'msg-avatar';
-        av.src = PTAvatar.toDataURL(state.chat.char, 48);
-        av.alt = '';
-        av.draggable = false;
-        wrap.appendChild(av);
-    }
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    const body = document.createElement('div');
-    body.className = 'msg-body';
-    bubble.appendChild(body);
-    bubble.title = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-    wrap.appendChild(bubble);
-    if (role === 'char') {
-        const tools = document.createElement('div');
-        tools.className = 'msg-tools';
-        const speak = document.createElement('button');
-        speak.className = 'px-btn sq tiny'; speak.textContent = '♪'; speak.title = '朗读这条消息';
-        speak.addEventListener('click', () => speakText(text));
-        tools.appendChild(speak);
-        bubble.appendChild(tools);
-    }
-    log.appendChild(wrap);
-    log.scrollTop = log.scrollHeight;
-
-    const finish = () => {
-        if (role === 'char' && opts.tts && state.settings.tts) speakText(text);
-    };
-
-    if (opts.instant || !state.settings.typewriter || role !== 'char') {
-        body.textContent = text;
-        finish();
-    } else {
-        /* 打字机 */
-        let i = 0;
-        const timer = setInterval(() => {
-            i += 1 + Math.floor(Math.random() * 2);
-            body.textContent = text.slice(0, i);
-            log.scrollTop = log.scrollHeight;
-            if (i >= text.length) { clearInterval(timer); finish(); }
-        }, 28);
-    }
-    if (opts.save && state.chat.session) {
-        state.chat.session.messages.push({ role, text, t: Date.now() });
-    }
-    return body;
-}
-
-/* TTS */
-function speakText(text) {
-    if (!('speechSynthesis' in window)) { toast('浏览器不支持语音'); return; }
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text.replace(/[「」（）]/g, ''));
-    u.lang = 'zh-CN';
-    u.rate = 1.05;
-    speechSynthesis.speak(u);
-}
-
-/* 剧本引擎 */
-function scriptReply(char, userText) {
-    const s = char.script || { fallbacks: ['……（角色似乎还没有剧本，去 Build 给 ta 写一段吧。）'] };
-    const kws = (s.keywords || []);
-    for (const [re, reply] of kws) {
-        try { if (re.test(userText)) return { text: reply, hit: true }; } catch { /* ignore */ }
-    }
-    const fb = s.fallbacks || [];
-    const text = fb.length ? fb[state.chat.fbIdx % fb.length] : '……';
-    state.chat.fbIdx++;
-    return { text, hit: false };
-}
-
-/* 剧情追踪时间线：当前章节 + 最近 3 条用户行动 */
-function renderTrack() {
-    const box = $('#imm-track-text');
-    if (!box) return;
-    const c = state.chat.char;
-    const main = (c && c.script && c.script.track) || '—';
-    let html = `<div class="tl-item now">${esc(main)}</div>`;
-    state.chat.events.slice(-3).reverse().forEach(ev => {
-        html += `<div class="tl-item old">${esc(ev)}</div>`;
-    });
-    box.innerHTML = html;
-}
-
-/* 沉浸互动：状态条 / 行动选项 */
-function updateImmersive(replyText) {
-    const c = state.chat.char;
-    if (!c) return;
-    const rand = mulberry32(Date.now() % 100000);
-    state.chat.mood = Math.max(5, Math.min(100, state.chat.mood + Math.floor(rand() * 14) - 5));
-    state.chat.favor = Math.max(0, Math.min(100, state.chat.favor + Math.floor(rand() * 12) + 1));
-    $('#bar-mood').style.width = state.chat.mood + '%';
-    $('#bar-favor').style.width = state.chat.favor + '%';
-    renderTrack();
-
-    /* 行动选项 */
-    const optsBox = $('#chat-options');
-    optsBox.innerHTML = '';
-    const base = ['继续和 ta 聊聊这件事', '换个轻松的话题', '告辞，改日再来'];
-    const custom = (c.script && c.script.options) || [];
-    const pool = custom.length ? custom : base;
-    shuffle(pool).slice(0, 3).forEach(op => {
-        const b = document.createElement('button');
-        b.className = 'option-chip';
-        b.textContent = '▸ ' + op;
-        b.addEventListener('click', () => {
-            /* 点击反馈：禁用全部选项并高亮所选，直到下一轮刷新 */
-            optsBox.querySelectorAll('.option-chip').forEach(x => {
-                x.disabled = true;
-                x.classList.toggle('chosen', x === b);
-            });
-            sendUserMessage(op, true);
-        });
-        optsBox.appendChild(b);
-    });
-}
-function shuffle(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-
-function sendUserMessage(text, fromOption = false) {
-    if (!state.chat.char) return;
-    if (!text.trim()) return;
-    pushMessage('user', text, { save: true });
-    $('#chat-input').value = '';
-    const c = state.chat.char;
-    /* 思考延迟 */
-    const typing = document.createElement('div');
-    typing.className = 'msg char typing';
-    const tAvatar = PTAvatar.toDataURL(state.chat.char, 48);
-    typing.innerHTML = `<img class="msg-avatar" src="${tAvatar}" alt="" draggable="false"><div class="bubble"><div class="msg-body dots"><i></i><i></i><i></i></div></div>`;
-    $('#chat-log').appendChild(typing);
-    $('#chat-log').scrollTop = $('#chat-log').scrollHeight;
-    const delay = 600 + Math.random() * 900;
-    setTimeout(() => {
-        typing.remove();
-        const { text: reply } = scriptReply(c, text);
-        pushMessage('char', reply, { save: true, tts: true });
-        state.chat.events.push(text);
-        updateImmersive(reply);
-        persistSession();
-    }, delay);
-}
-
-function persistSession() {
-    if (!state.chat.session) return;
-    state.chat.session.time = Date.now();
-    const idx = state.history.findIndex(h => h.id === state.chat.session.id);
-    if (idx >= 0) state.history[idx] = state.chat.session; else state.history.unshift(state.chat.session);
-    saveHistory();
-}
-
-/* ============================================================
  * 历史
  * ============================================================ */
 function renderHistory() {
     const box = $('#history-list');
     box.innerHTML = '';
+    /* 统计条 */
+    const stats = $('#hist-stats');
+    if (stats) {
+        const totalMsgs = state.history.reduce((s, h) => s + (h.messages ? h.messages.length : 0), 0);
+        const chars = new Set(state.history.map(h => h.charId)).size;
+        const words = state.history.reduce((s, h) => s + (h.messages || []).reduce((a, m) => a + (m.role === 'user' ? (m.text || '').length : 0), 0), 0);
+        stats.innerHTML = `共 <b>${state.history.length}</b> 段对话 · <b>${totalMsgs}</b> 条消息 · 与 <b>${chars}</b> 位角色互动 · 你输出了 <b>${words}</b> 字`;
+    }
     if (!state.history.length) {
-        box.innerHTML = '<div class="empty-tip">还没有历史对话。从集市挑一位角色开始冒险吧！</div>';
+        box.innerHTML = '<div class="empty-tip"><canvas class="empty-art" width="128" height="112"></canvas>还没有历史对话。从集市挑一位角色开始冒险吧！</div>';
+        const art = box.querySelector('.empty-art');
+        if (art) drawLantern(art);
         return;
     }
     state.history.forEach(h => {
         const row = document.createElement('div');
         row.className = 'history-row';
-        row.innerHTML = `
+        const char = findChar(h.charId);
+        if (char) {
+            const av = document.createElement('img');
+            av.className = 'hist-avatar';
+            av.src = PTAvatar.toDataURL(char, 64);
+            av.alt = '';
+            av.draggable = false;
+            row.appendChild(av);
+        }
+        row.innerHTML += `
             <div class="hist-main">
                 <div class="hist-name">${esc(h.charName)}</div>
                 <div class="hist-last">${esc((h.messages[h.messages.length - 1] || {}).text || '').slice(0, 60)}</div>
@@ -482,161 +182,11 @@ function reopenHistory(id) {
 }
 
 /* ============================================================
- * Build 角色卡制作
- * ============================================================ */
-function initBuild() {
-    const sel = $('#build-cat');
-    PT_CATEGORIES.filter(c => c.id !== 'all' && c.id !== 'custom').forEach(c => {
-        const o = document.createElement('option');
-        o.value = c.id; o.textContent = c.name;
-        sel.appendChild(o);
-    });
-    const pv = $('#build-preview');
-    function reroll() {
-        const draft = {
-            id: '_draft', name: $('#build-name').value || '新角色', seed: Math.floor(Math.random() * 100000),
-            palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
-        };
-        PTAvatar.draw(pv, draft);
-    }
-    $('#build-name').addEventListener('input', reroll);
-    $('#build-hair').addEventListener('input', reroll);
-    $('#build-bg').addEventListener('input', reroll);
-    $('#btn-build-reroll').addEventListener('click', reroll);
-    reroll();
-
-    $('#build-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = $('#build-name').value.trim();
-        if (!name) { toast('给角色起个名字吧'); return; }
-        const card = {
-            id: 'custom_' + Date.now(),
-            name,
-            title: $('#build-title').value.trim() || '酒馆的常客',
-            category: $('#build-cat').value,
-            seed: Math.floor(Math.random() * 100000),
-            tags: ['自制'],
-            desc: $('#build-desc').value.trim() || '由像素酒馆 Build 功能亲手制作的角色。',
-            greeting: $('#build-greeting').value.trim() || '你好呀，我是' + name + '。很高兴认识你！',
-            origin: 'custom',
-            palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
-            script: {
-                keywords: [
-                    [/你好|嗨|hi|hello/i, '嘿！你来了，正想着你呢。今天过得怎么样？'],
-                    [/名字|你是谁/, '我叫' + name + '。' + ($('#build-desc').value.trim() ? '简单说，就是：' + $('#build-desc').value.trim().slice(0, 40) : '一个刚被造出来的新角色。')],
-                    [/再见|拜/, '要走啦？记得常来酒馆看我哦！'],
-                ],
-                fallbacks: [
-                    '唔……让我想想。你说的这个，好像挺有意思的！',
-                    '（' + name + '歪着头看你）……再说多点嘛，我在听。',
-                    '嘿，作为一张新卡，我的知识还不多，但陪你聊天没问题！',
-                ],
-                track: '与' + name + '的故事，才刚刚开始。',
-            },
-        };
-        state.custom.unshift(card);
-        saveCustom();
-        toast('「' + name + '」已放入书架！');
-        switchView('shelf');
-        renderTabs(); renderMarket();
-        $('#build-form').reset();
-        reroll();
-    });
-}
-
-/* ============================================================
- * 导入角色卡（JSON / PNG tEXt chara）
- * ============================================================ */
-function parsePngCard(buf) {
-    const dv = new DataView(buf);
-    const sig = [0x89, 0x50, 0x4e, 0x47];
-    for (let i = 0; i < 4; i++) if (dv.getUint8(i) !== sig[i]) return null;
-    let off = 8;
-    while (off + 8 < dv.byteLength) {
-        const len = dv.getUint32(off);
-        if (off + 12 + len > dv.byteLength) break; /* 防损坏/伪造的超长块 */
-        const type = String.fromCharCode(dv.getUint8(off + 4), dv.getUint8(off + 5), dv.getUint8(off + 6), dv.getUint8(off + 7));
-        if (type === 'tEXt') {
-            const data = new Uint8Array(buf, off + 8, len);
-            const str = new TextDecoder('latin1').decode(data);
-            const nul = str.indexOf('\0');
-            if (nul > 0) {
-                const key = str.slice(0, nul);
-                if (key === 'chara' || key === 'ccv3') {
-                    try {
-                        const json = decodeURIComponent(escape(atob(str.slice(nul + 1).trim())));
-                        return JSON.parse(json);
-                    } catch { return null; }
-                }
-            }
-        }
-        off += 12 + len;
-        if (type === 'IEND') break;
-    }
-    return null;
-}
-
-function initImport() {
-    $('#btn-import').addEventListener('click', () => $('#import-file').click());
-    $('#import-file').addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        e.target.value = '';
-        if (!file) return;
-        try {
-            let card = null;
-            if (file.name.toLowerCase().endsWith('.png')) {
-                const buf = await file.arrayBuffer();
-                const data = parsePngCard(buf);
-                if (data) {
-                    const d = data.data || data;
-                    card = {
-                        id: 'imported_' + Date.now(),
-                        name: d.name || file.name.replace(/\.png$/i, ''),
-                        title: (d.metadata && d.metadata.nickname) || '导入角色',
-                        category: 'custom',
-                        seed: Math.floor(Math.random() * 100000),
-                        tags: ['导入'],
-                        desc: (d.description || '从角色卡 PNG 导入。').slice(0, 300),
-                        greeting: (d.first_mes || '……').slice(0, 300),
-                        origin: 'imported',
-                        palette: { hair: '#b8a8e8', bg1: '#4a4a6b', bg2: '#2a2a42', skin: '#f2d3b3' },
-                    };
-                }
-            } else {
-                const text = await file.text();
-                const d = JSON.parse(text);
-                const dd = d.data || d;
-                card = {
-                    id: 'imported_' + Date.now(),
-                    name: dd.name || '导入角色',
-                    title: (dd.metadata && dd.metadata.nickname) || '导入角色',
-                    category: 'custom',
-                    seed: Math.floor(Math.random() * 100000),
-                    tags: ['导入'],
-                    desc: (dd.description || '').slice(0, 300) || '从 JSON 导入的角色卡。',
-                    greeting: (dd.first_mes || '……').slice(0, 300),
-                    origin: 'imported',
-                    palette: { hair: '#b8a8e8', bg1: '#4a4a6b', bg2: '#2a2a42', skin: '#f2d3b3' },
-                };
-            }
-            if (!card) { toast('导入失败：未找到角色卡数据'); return; }
-            state.imported.unshift(card);
-            saveImported();
-            toast('已导入「' + card.name + '」');
-            renderTabs(); renderMarket();
-            openDetail(card.id);
-        } catch (err) {
-            console.error(err);
-            toast('导入失败：' + err.message);
-        }
-    });
-}
-
-/* ============================================================
  * 设置
  * ============================================================ */
 function applyAccent() {
     document.body.dataset.accent = state.settings.accent;
+    document.body.dataset.chatfont = state.settings.chatFont || 'm';
 }
 /* 数据导出 / 导入（JSON 备份） */
 function initExportImport() {
@@ -694,6 +244,13 @@ function initSettings() {
     syncToggle('#set-tts', state.settings.tts);
     syncToggle('#set-typewriter', state.settings.typewriter);
     syncToggle('#set-immersive', state.settings.immersive);
+    /* 对话字号 */
+    const syncFontBtns = () => $$('#font-row .font-btn').forEach(fb => fb.classList.toggle('active', fb.dataset.font === state.settings.chatFont));
+    $$('#font-row .font-btn').forEach(fb => fb.addEventListener('click', () => {
+        state.settings.chatFont = fb.dataset.font;
+        saveSettings(); applyAccent(); syncFontBtns();
+    }));
+    syncFontBtns();
     $$('#accent-row .accent-swatch').forEach(sw => {
         sw.classList.toggle('active', sw.dataset.accent === state.settings.accent);
         sw.addEventListener('click', () => {
@@ -719,6 +276,52 @@ function initSettings() {
         state.settings.immersive = !state.settings.immersive;
         syncToggle('#set-immersive', state.settings.immersive); saveSettings();
     });
+    /* 模型接入（真实大模型 / BYOK） */
+    syncToggle('#set-ai', state.settings.aiEnabled !== false);
+    $('#set-ai').addEventListener('click', () => {
+        const on = state.settings.aiEnabled === false;
+        state.settings.aiEnabled = on;
+        syncToggle('#set-ai', on); saveSettings(); renderAIStatus();
+    });
+    const aiCfg = () => (state.settings.aiApi = state.settings.aiApi || { base: '', key: '', model: '' });
+    $('#ai-base').value = aiCfg().base || '';
+    $('#ai-key').value = aiCfg().key || '';
+    $('#ai-model').value = aiCfg().model || '';
+    $('#btn-ai-save').addEventListener('click', () => {
+        aiCfg().base = $('#ai-base').value.trim();
+        aiCfg().key = $('#ai-key').value.trim();
+        aiCfg().model = $('#ai-model').value.trim();
+        saveSettings(); renderAIStatus();
+        toast('接入点已保存（仅存于本机）');
+    });
+    $('#btn-ai-test').addEventListener('click', async () => {
+        const base = $('#ai-base').value.trim();
+        const key = $('#ai-key').value.trim();
+        const model = $('#ai-model').value.trim();
+        if (!base || !key) { toast('请先填写 Base URL 与 API Key'); return; }
+        const btn = $('#btn-ai-test');
+        btn.disabled = true; btn.textContent = '测试中…';
+        try {
+            const headers = { 'Content-Type': 'application/json' };
+            const csrf = window.PTChatAI && PTChatAI.csrf();
+            if (csrf) headers['X-CSRF-Token'] = csrf;
+            const r = await fetch('/api/pixel/probe', {
+                method: 'POST', headers,
+                body: JSON.stringify({ base_url: base, api_key: key, model: model || 'gpt-4o-mini' }),
+            });
+            const j = await r.json().catch(() => ({}));
+            if (r.ok && j.ok) toast('✓ 连接成功'); else toast('✗ ' + (j.error || ('HTTP ' + r.status)));
+        } catch { toast('✗ 网络错误'); }
+        btn.disabled = false; btn.textContent = '测试连接';
+    });
+    $('#btn-ai-clear').addEventListener('click', () => {
+        state.settings.aiApi = { base: '', key: '', model: '' };
+        $('#ai-base').value = ''; $('#ai-key').value = ''; $('#ai-model').value = '';
+        saveSettings(); renderAIStatus();
+        toast('已清除接入点');
+    });
+    document.addEventListener('pt-ai-status', renderAIStatus);
+    renderAIStatus();
     $('#btn-clear-data').addEventListener('click', () => {
         askConfirm('清除全部本地数据（收藏/历史/自制/设置）？', () => {
             ['settings', 'favs', 'history', 'custom_cards', 'imported_cards', 'welcomed', 'visits'].forEach(k => store.del(k));
@@ -733,6 +336,29 @@ function syncToggle(sel, on) {
     const b = $(sel);
     b.dataset.on = on ? '1' : '0';
     b.textContent = on ? 'ON' : 'OFF';
+}
+
+/* 设置页「模型接入」状态行 */
+function renderAIStatus() {
+    const el = $('#ai-status');
+    if (!el) return;
+    const cfg = state.settings.aiApi || {};
+    if (cfg.base && cfg.key) {
+        el.textContent = '✓ 自用接入点：' + cfg.base.replace(/^https?:\/\//, '').slice(0, 42);
+        el.className = 'ai-status ok';
+        return;
+    }
+    if (window.PTChatAI && PTChatAI.status) {
+        if (PTChatAI.status.ai) {
+            el.textContent = '✓ 站点共享模型：' + PTChatAI.status.model;
+            el.className = 'ai-status ok';
+        } else {
+            el.textContent = '未接入模型 · 使用剧本引擎';
+            el.className = 'ai-status warn';
+        }
+        return;
+    }
+    el.textContent = '正在探测…';
 }
 
 /* ============================================================
@@ -761,20 +387,43 @@ function initChatBottomBtn() {
 }
 
 function bindEvents() {
-    /* ESC 关闭弹窗 */
+    /* ESC 关闭弹窗/抽屉；`/` 聚焦搜索（集市视图） */
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !$('#overlay').classList.contains('hidden')) closeModal();
+        if (e.key === 'Escape') {
+            if (!$('#overlay').classList.contains('hidden')) { closeModal(); return; }
+            const sb = $('#sidebar');
+            if (sb.classList.contains('open')) { closeDrawer(); return; }
+            if (state.view === 'chat') { document.querySelector('#btn-chat-back').click(); }
+        }
+        if (e.key === '/' && state.view === 'market' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
+            e.preventDefault();
+            $('#search-input').focus();
+        }
     });
-    $$('#side-nav .side-item').forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+    /* 移动端侧栏抽屉 */
+    const closeDrawer = () => {
+        $('#sidebar').classList.remove('open');
+        $('#drawer-backdrop').classList.add('hidden');
+    };
+    $('#btn-drawer').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = $('#sidebar').classList.toggle('open');
+        $('#drawer-backdrop').classList.toggle('hidden', !open);
+    });
+    $('#drawer-backdrop').addEventListener('click', closeDrawer);
+    document.addEventListener('click', (e) => {
+        const sb = $('#sidebar');
+        if (sb.classList.contains('open') && !sb.contains(e.target) && e.target !== $('#btn-drawer')) {
+            closeDrawer();
+        }
+    });
+    $$('#side-nav .side-item').forEach(b => b.addEventListener('click', () => {
+        switchView(b.dataset.view);
+        closeDrawer();
+    }));
     $('#btn-settings-top').addEventListener('click', () => switchView('settings'));
     $('#btn-classic').addEventListener('click', () => {
         window.open('/?classic=1', '_blank');
-    });
-    let searchTimer = 0;
-    $('#search-input').addEventListener('input', (e) => {
-        searchQ = e.target.value.trim();
-        clearTimeout(searchTimer);
-        searchTimer = setTimeout(renderMarket, 140); /* 防抖，避免每键重渲染 */
     });
     $('#overlay').addEventListener('click', (e) => { if (e.target === $('#overlay')) closeModal(); });
     $$('.modal-close[data-close]').forEach(b => b.addEventListener('click', closeModal));
@@ -797,14 +446,147 @@ function bindEvents() {
         closeModal();
         reopenHistory(state._recentSessionId);
     });
-    $('#btn-start-chat').addEventListener('click', () => openChat(state.currentDetail));
+    $('#btn-delete-card').addEventListener('click', () => {
+        const id = state.currentDetail;
+        if (!id) return;
+        askConfirm('删除这张角色卡？其历史对话将保留在历史页。', () => {
+            state.custom = state.custom.filter(c => c.id !== id);
+            state.imported = state.imported.filter(c => c.id !== id);
+            saveCustom(); saveImported();
+            if (state._editingCardId === id) resetBuildForm();
+            closeModal();
+            renderTabs(); renderMarket();
+            if (state.view === 'shelf') switchView('shelf');
+            if (state.view === 'fav') switchView('fav');
+            toast('角色卡已删除');
+        });
+    });
+    $('#btn-edit-card').addEventListener('click', () => {
+        const id = state.currentDetail;
+        const c = findChar(id);
+        if (!c || c.origin !== 'custom') return;
+        closeModal();
+        switchView('build');
+        state._editingCardId = id;
+        $('#build-name').value = c.name;
+        $('#build-title').value = c.title || '';
+        $('#build-cat').value = c.category;
+        $('#build-greeting').value = c.greeting || '';
+        $('#build-desc').value = c.desc || '';
+        $('#build-hair').value = (c.palette && c.palette.hair) || '#e8c97a';
+        $('#build-bg').value = (c.palette && c.palette.bg1) || '#3a5a40';
+        $('#build-name').dispatchEvent(new Event('input'));
+        $('#build-editing').classList.remove('hidden');
+        $('#build-editing-name').textContent = c.name;
+        $('#btn-build-submit').textContent = '✓ 保存修改';
+    });
+    $('#btn-build-cancel').addEventListener('click', () => resetBuildForm());
+    $('#btn-export-card').addEventListener('click', () => {
+        const c = findChar(state.currentDetail);
+        if (!c) return;
+        const payload = buildCardPayload(c);
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${c.name}-角色卡.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+        toast('角色卡 JSON 已导出');
+    });
+    $('#btn-export-png').addEventListener('click', async () => {
+        const c = findChar(state.currentDetail);
+        if (!c) return;
+        try {
+            const payload = buildCardPayload(c);
+            const cardBuf = await buildCardPng(c, JSON.stringify(payload));
+            const blob = new Blob([cardBuf], { type: 'image/png' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${c.name}.png`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+            toast('PNG 角色卡已导出（可导入任何 SillyTavern）');
+        } catch (err) { toast('导出失败：' + err.message); }
+    });
+    $('#btn-longimage-download').addEventListener('click', () => {
+        const pending = state._pendingPng;
+        if (!pending) { toast('预览已失效，请重新导出'); closeModal(); return; }
+        pending.cv.toBlob((blob) => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `对话-${pending.name}-${new Date().toISOString().slice(0, 10)}.png`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+            toast('对话长图已导出（' + (state.chat.session ? state.chat.session.messages.length : 0) + ' 条）');
+        }, 'image/png');
+        closeModal();
+    });
+    $('#btn-greet-cycle').addEventListener('click', () => {
+        const list = state._greetList || [];
+        if (list.length < 2) return;
+        state._greetIdx = (state._greetIdx + 1) % list.length;
+        $('#detail-greet').textContent = '「' + list[state._greetIdx] + '」';
+        toast('开场白 ' + (state._greetIdx + 1) + '/' + list.length);
+    });
+    $('#btn-start-chat').addEventListener('click', () => openChat(state.currentDetail, state._greetList ? state._greetList[state._greetIdx] : undefined));
     $('#btn-open-classic').addEventListener('click', () => {
         window.open('/?classic=1#character_list', '_blank');
         toast('已在新窗口打开经典酒馆，角色卡在左侧列表中');
     });
-    /* 聊天 */
-    $('#chat-form').addEventListener('submit', (e) => { e.preventDefault(); sendUserMessage($('#chat-input').value); });
+    /* 聊天：多行输入（Enter 发送 / Shift+Enter 换行 + 自适应增高） */
+    const chatInput = $('#chat-input');
+    const growInput = () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    };
+    chatInput.addEventListener('input', growInput);
+    const countEl = document.querySelector('#chat-count');
+    const syncCount = () => {
+        if (!countEl) return;
+        const n = chatInput.value.length;
+        countEl.textContent = n + '/300';
+        countEl.classList.toggle('limit', n >= 280);
+    };
+    chatInput.addEventListener('input', syncCount);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            $('#chat-form').requestSubmit();
+        }
+    });
+    $('#chat-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        sendUserMessage(chatInput.value);
+        chatInput.style.height = '';
+        if (countEl) { countEl.textContent = '0/300'; countEl.classList.remove('limit'); }
+    });
     $('#btn-chat-back').addEventListener('click', () => switchView('market'));
+    $('#btn-random-chat').addEventListener('click', () => {
+        const pool = allChars().filter(c => c.greeting);
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        openChat(pick.id);
+        toast('随机遇见「' + pick.name + '」');
+    });
+    $('#btn-chat-export').addEventListener('click', (e) => {
+        e.stopPropagation();
+        $('#export-menu').classList.toggle('hidden');
+    });
+    $$('#export-menu button').forEach(b => b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        $('#export-menu').classList.add('hidden');
+        doExportChat(b.dataset.fmt);
+    }));
+    document.addEventListener('click', (e) => {
+        const menu = $('#export-menu');
+        if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== $('#btn-chat-export')) {
+            menu.classList.add('hidden');
+        }
+    });
+    $('#imm-collapse-btn').addEventListener('click', () => {
+        const panel = $('#immersive-panel');
+        const collapsed = panel.classList.toggle('imm-collapsed');
+        $('#imm-collapse-btn').textContent = collapsed ? '展开状态' : '收起状态';
+    });
     $('#btn-chat-mode').addEventListener('click', () => {
         state.chat.immersive = !state.chat.immersive;
         if (state.chat.session) state.chat.session.immersive = state.chat.immersive;
@@ -855,7 +637,7 @@ function initTicker() {
     if (!el || !window.PT_NEWS) return;
     const items = [
         PT_NEWS.version + '「' + PT_NEWS.codename + '」现已上线',
-        '22 位冒险者已入驻酒馆',
+        '真实大模型已入伙：设置 → 模型接入，即刻真聊',
         '沉浸互动 BETA：用行动选项自然推进剧情',
         '像素点唱机：收起面板，音乐不中断',
         'Build 工坊：亲手捏一张专属角色卡',
@@ -865,22 +647,30 @@ function initTicker() {
     el.innerHTML = esc(half + half); /* 双份内容实现无缝循环 */
 }
 
-/* 访问计数 */
+/* 访问计数：优先服务器全站计数，服务器不可达时回退本地计数 */
 function bumpVisits() {
-    const visits = store.get('visits', 0) + 1;
-    store.set('visits', visits);
-    const base = 86315;
-    let n = base + visits;
     const el = $('#visit-count');
-    /* 数字滚动 */
-    let cur = base;
-    const step = () => {
-        cur += Math.ceil((n - cur) / 8);
-        if (cur >= n) { el.textContent = n.toLocaleString(); return; }
-        el.textContent = cur.toLocaleString();
-        requestAnimationFrame(step);
+    const animateTo = (n) => {
+        n = Math.max(0, Math.floor(n));
+        let cur = 0;
+        const step = () => {
+            cur += Math.ceil((n - cur) / 8) || 1;
+            if (cur >= n) { el.textContent = n.toLocaleString(); return; }
+            el.textContent = cur.toLocaleString();
+            requestAnimationFrame(step);
+        };
+        if (n === 0) { el.textContent = '0'; return; }
+        step();
     };
-    step();
+    const localCount = () => {
+        const visits = store.get('visits', 0) + 1;
+        store.set('visits', visits);
+        return visits;
+    };
+    fetch('/api/pixel/visit', { method: 'POST' })
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('http ' + r.status)))
+        .then(j => animateTo(Number.isFinite(j && j.visits) ? j.visits : localCount()))
+        .catch(() => animateTo(localCount()));
     $('#online-count').textContent = 3 + Math.floor(Math.random() * 9);
 }
 
@@ -893,6 +683,10 @@ function boot() {
     applyAccent();
     initTicker();
     bumpVisits();
+    if (window.PTChatAI) PTChatAI.refresh();
+    /* canonical 随部署域名自动更新 */
+    const canon = document.getElementById('pt-canonical');
+    if (canon) canon.href = location.origin + '/';
 
     /* 启动画面进度 */
     const tips = ['正在点燃炉火…', '正在擦拭酒杯…', '正在翻阅冒险者名册…', '酒馆开门迎客！'];
@@ -922,10 +716,20 @@ function boot() {
     initImport();
     initSettings();
     initExportImport();
+    initMarketSearch();
     initChatBottomBtn();
     bindEvents();
     PTFire.start($('#fireplace-canvas'));
     switchView('market');
 }
+
+/* 全局错误兜底：console 留痕 + 用户侧像素 toast */
+window.addEventListener('error', (e) => {
+    console.error('[PixelTavern]', e.message);
+    try { toast('出了点小状况：' + e.message, 4000); } catch { /* boot 前忽略 */ }
+});
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('[PixelTavern] unhandled rejection:', e.reason);
+});
 
 document.addEventListener('DOMContentLoaded', boot);

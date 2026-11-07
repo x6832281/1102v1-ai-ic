@@ -67,6 +67,7 @@ import { UPLOADS_DIRECTORY } from './constants.js';
 
 // Routers
 import { router as usersPublicRouter } from './endpoints/users-public.js';
+import pixelRouter from './endpoints/pixel.js';
 import { init as statsInit, onExit as statsOnExit } from './endpoints/stats.js';
 import { checkForNewContent } from './endpoints/content-manager.js';
 import { init as settingsInit } from './endpoints/settings.js';
@@ -209,6 +210,32 @@ if (!cliArgs.disableCsrf) {
     });
 }
 
+// 像素酒馆 SEO：robots.txt 与 sitemap.xml 动态生成（按请求主机名），优先于静态中间件，
+// 使门户可被搜索引擎收录（原版 SillyTavern 的 public/robots.txt 为全站 Disallow，保持原样不动）。
+app.get(['/robots.txt', '/sitemap.xml'], (req, res) => {
+    const proto = String(req.get('X-Forwarded-Proto') || req.protocol || 'https').split(',')[0].trim();
+    const host = String(req.get('X-Forwarded-Host') || req.hostname || 'localhost');
+    const base = `${proto}://${host}`;
+    const today = new Date().toISOString().slice(0, 10);
+    if (req.path === '/robots.txt') {
+        res.type('text/plain');
+        const lines = [
+            '# Pixel Tavern (像素酒馆)',
+            'User-agent: *',
+            'Allow: /',
+            'Disallow: /api/',
+            'Disallow: /login',
+            '',
+            `Sitemap: ${base}/sitemap.xml`,
+            '',
+        ];
+        return res.send(lines.join('\n'));
+    }
+    res.type('application/xml');
+    const urls = ` <url><loc>${base}/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>`;
+    return res.send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '\n</urlset>');
+});
+
 // Static files
 // Host index page
 // 像素酒馆 (Pixel Tavern): the default landing page is the pixel-tavern portal.
@@ -249,6 +276,9 @@ app.use(express.static(path.join(serverDirectory, 'public'), {}));
 
 // Public API
 app.use('/api/users', usersPublicRouter);
+
+// 像素酒馆 (Pixel Tavern) public API: AI proxy, stats. Still behind CSRF; see src/endpoints/pixel.js
+app.use('/api/pixel', pixelRouter);
 
 // Everything below this line requires authentication
 app.use(requireLoginMiddleware);

@@ -268,6 +268,12 @@ const PTFire = (() => {
         /* 石壁 */
         ctx.fillStyle = '#241c14';
         for (let x = 0; x < W; x += 4) ctx.fillRect(x, 0, 1, H);
+        /* 底座石台 */
+        for (let x = 0; x < W; x++) {
+            const n = Math.sin(x * 2.3) * 0.5 + 0.5;
+            ctx.fillStyle = n > 0.6 ? '#3a332a' : (n > 0.3 ? '#2e2822' : '#241f1a');
+            ctx.fillRect(x, H - 2, 1, 2);
+        }
         /* 柴 */
         ctx.fillStyle = '#5a3a22';
         ctx.fillRect(6, H - 4, 20, 3);
@@ -302,6 +308,36 @@ const PTFire = (() => {
         stop() { if (raf) cancelAnimationFrame(raf); raf = 0; },
     };
 })();
+
+/* ---------- 空状态像素灯笼 ---------- */
+function drawLantern(canvas) {
+    const M = [
+        '......GGGG......',
+        '.....G....G.....',
+        '....G......G....',
+        '.GGGGGGGGGGGGGG.',
+        '.GRRRRRRRRRRRRG.',
+        'GRRWRRRRRRRRWRRG',
+        'GRRRRRRRRRRRRRRG',
+        'GRRWRRRRRRRRWRRG',
+        'GRRRRRRRRRRRRRRG',
+        '.GRRRRRRRRRRRRG.',
+        '.GGGGGGGGGGGGGG.',
+        '....G.GGGG.G....',
+        '......G..G......',
+        '.....GG..GG.....',
+    ];
+    const COLS = { G: '#d4a94e', R: '#c0392b', W: '#ffb545' };
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const px = Math.min(canvas.width / 16, canvas.height / 14);
+    const ox = (canvas.width - 16 * px) / 2, oy = (canvas.height - 14 * px) / 2;
+    for (let y = 0; y < 14; y++) for (let x = 0; x < 16; x++) {
+        const c = M[y][x];
+        if (c !== '.') { ctx.fillStyle = COLS[c]; ctx.fillRect(ox + x * px, oy + y * px, px, px); }
+    }
+}
 
 /* ---------- 酒馆 Logo（像素小酒杯） ---------- */
 function drawTavernLogo(canvas) {
@@ -340,3 +376,4 @@ window.renderPixelIcons = renderPixelIcons;
 window.PTFire = PTFire;
 window.drawTavernLogo = drawTavernLogo;
 window.mulberry32 = mulberry32;
+window.drawLantern = drawLantern;

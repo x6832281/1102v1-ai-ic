@@ -1,0 +1,29 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# 公开路径：像素酒馆门户 + 像素 API（聊天代理/统计）+ SEO 文件
+	@public path / /pixel-tavern/* /api/pixel/* /robots.txt /sitemap.xml /favicon.ico
+	handle @public {
+		reverse_proxy tavern:8000
+	}
+
+	# 其余一切（原版 SillyTavern 界面、经典 API、登录页）需基础认证
+	handle {
+		basic_auth {
+			"{$BASICAUTH_USER}" {$BASICAUTH_HASH}
+		}
+		reverse_proxy tavern:8000
+	}
+}

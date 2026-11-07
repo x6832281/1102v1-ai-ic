@@ -1,0 +1,68 @@
+# 像素酒馆 · 生产部署（Docker Compose + Caddy 自动 HTTPS）
+#
+# 结构：
+#   caddy   —— 唯一暴露 80/443 的入口，自动申请/续期 Let's Encrypt 证书，
+#              反向代理到 tavern；像素门户与 /api/pixel/* 公开，
+#              其余路径（原版 SillyTavern 界面与 API）需基础认证保护。
+#   tavern  —— 本仓库构建的 SillyTavern（含像素酒馆门户与 /api/pixel 代理），
+#              不对宿主机暴露端口，仅在内网供 caddy 访问。
+#
+# 使用：复制 .env.example 为 .env 并填写后，执行  docker compose up -d --build
+
+services:
+  tavern:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: pixel-tavern
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - FORCE_COLOR=1
+      # 站点共享大模型（可选）：不配置则游客使用剧本引擎，用户可在设置里自带接入点
+      - PIXEL_LLM_BASE_URL=${PIXEL_LLM_BASE_URL:-}
+      - PIXEL_LLM_API_KEY=${PIXEL_LLM_API_KEY:-}
+      - PIXEL_LLM_MODEL=${PIXEL_LLM_MODEL:-}
+    volumes:
+      - "./config:/home/node/app/config"
+      - "./data:/home/node/app/data"
+    healthcheck:
+      test: ["CMD", "node", "src/healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      retries: 3
+    networks:
+      - tavern-net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: pixel-caddy
+    restart: unless-stopped
+    depends_on:
+      - tavern
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      # 你的域名，如 tavern.example.com（多个用空格分隔）
+      - DOMAIN=${DOMAIN:?请在 .env 中设置 DOMAIN}
+      # 证书通知邮箱（Let's Encrypt）
+      - ACME_EMAIL=${ACME_EMAIL:-}
+      # 基础认证：caddy hash-password --bcrypt 的输出（保护经典酒馆界面）
+      - BASICAUTH_USER=${BASICAUTH_USER:-admin}
+      - BASICAUTH_HASH=${BASICAUTH_HASH:-}
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "caddy-data:/data"
+      - "caddy-config:/config"
+    networks:
+      - tavern-net
+
+volumes:
+  caddy-data:
+  caddy-config:
+
+networks:
+  tavern-net:
