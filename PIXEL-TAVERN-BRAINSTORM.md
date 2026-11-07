@@ -1283,3 +1283,12 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - 实施：`body[data-skin="clean"]` 覆盖层（~120 行，style.css 末尾）——系统中文字体（PingFang/微软雅黑/Noto Sans SC）、圆角卡片/气泡/按钮/弹窗、柔和阴影、平滑过渡、现代滚动条；头像/炉火/Logo/灯笼等像素画与 .en 像素品牌小标签保留。默认 clean（body 静态属性防首屏闪烁），像素风在「设置 → 界面风格」随时切回，选择持久化于 pt_settings。
 - 验证：本地双风格 computed style 切换实测 + 截图；冒烟扩至 103 断言全过；ESLint 0。
 - 上线：64ac6d8f1 推送 → Vercel 自动部署 → ai-ic.top 浏览器截图确认清晰风格生效。
+
+---
+
+## 追加记录 · 品牌更名「像素酒馆」→「游戏酒馆」（2026.11.07，用户指令）
+
+- 范围：111 处品牌文本（UI 文案、SEO meta/OG/Twitter、webmanifest、启动画面/播报/欢迎弹窗、AI 角色扮演系统提示词、合规声明、服务器日志、部署文档与注释）；README git mv 为 README-GAME-TAVERN.md；经典主题显示名 Game Tavern；demo 卡元数据重生成。
+- 品牌资产：make-brand.mjs 新增 5×7 位图字体 G/M 字形，OG 横幅重绘为 GAME TAVERN（图标无文字不变）。
+- 保留（基础设施，访客不可见）：/pixel-tavern/ 路径与目录、/api/pixel/* 路由、PT_* 与 pt_* 标识符、PIXEL_LLM_* 环境变量、[pixel-lite] 日志前缀 —— 改动会断 URL/缓存/书签且无可见收益。
+- 资源指纹 v=1303；冒烟 103/103；ESLint 0；本地+线上（ai-ic.top）HTML 中旧名 0 处；浏览器截图确认。预览站同步重部署并改名为「游戏酒馆 Game Tavern」。
