@@ -164,9 +164,9 @@ try {
         }
     });
     const vjson = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
-    const before = (vjson.rewrites && (vjson.rewrites.beforeFiles || vjson.rewrites)) || [];
-    check('vercel.json / 重写到像素门户', JSON.stringify(before).includes('/pixel-tavern/index.html'));
-    check('vercel.json robots/sitemap 路由', JSON.stringify(before).includes('/robots.txt') && JSON.stringify(before).includes('/sitemap.xml'));
+    const vred = Array.isArray(vjson.redirects) ? vjson.redirects : [];
+    check('vercel.json / 门户路由（redirects 先于 filesystem）', vred.some(x => x.source === '/' && x.destination === '/pixel-tavern'));
+    check('vercel.json robots/sitemap 路由', vred.some(x => x.source === '/robots.txt') && vred.some(x => x.source === '/sitemap.xml'));
     const chatFn = fs.readFileSync(path.join(apiDir, 'chat.js'), 'utf8');
     check('chat 函数限时长（maxDuration）', chatFn.includes('maxDuration'));
 } catch (e) {

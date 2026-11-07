@@ -684,6 +684,10 @@ function boot() {
     initTicker();
     bumpVisits();
     if (window.PTChatAI) PTChatAI.refresh();
+    /* 静态托管（Vercel）下门户位于 /pixel-tavern：地址栏美化回根路径 */
+    if (location.pathname === '/pixel-tavern' || location.pathname === '/pixel-tavern/') {
+        try { history.replaceState(null, '', '/'); } catch { /* ignore */ }
+    }
     /* canonical 随部署域名自动更新 */
     const canon = document.getElementById('pt-canonical');
     if (canon) canon.href = location.origin + '/';

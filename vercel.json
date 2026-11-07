@@ -2,20 +2,9 @@
   "buildCommand": null,
   "outputDirectory": "public",
   "cleanUrls": true,
-  "rewrites": {
-    "beforeFiles": [
-      {
-        "source": "/",
-        "destination": "/pixel-tavern"
-      },
-      {
-        "source": "/robots.txt",
-        "destination": "/api/pixel/seo?type=robots"
-      },
-      {
-        "source": "/sitemap.xml",
-        "destination": "/api/pixel/seo?type=sitemap"
-      }
-    ]
-  }
+  "redirects": [
+    { "source": "/", "destination": "/pixel-tavern", "permanent": false },
+    { "source": "/robots.txt", "destination": "/api/pixel/robots", "permanent": false },
+    { "source": "/sitemap.xml", "destination": "/api/pixel/sitemap", "permanent": false }
+  ]
 }
