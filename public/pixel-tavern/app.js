@@ -92,8 +92,10 @@ function toggleFav(id) {
  * ============================================================ */
 function switchView(name) {
     state.view = name;
+    document.body.dataset.activeView = name;
     $$('.view').forEach(v => v.classList.toggle('hidden', v.dataset.view !== name));
     $$('#side-nav .side-item').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    $$('.mob-nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === name));
     /* 部分视图在进入时刷新 */
     if (name === 'shelf') {
         const myCards = [...state.custom, ...state.imported];
@@ -429,6 +431,9 @@ function bindEvents() {
         switchView(b.dataset.view);
         closeDrawer();
     }));
+    $$('.mob-nav-item').forEach(b => b.addEventListener('click', () => {
+        switchView(b.dataset.view);
+    }));
     $('#btn-settings-top').addEventListener('click', () => switchView('settings'));
     $('#btn-classic').addEventListener('click', () => {
         window.open('/?classic=1', '_blank');
@@ -694,6 +699,7 @@ function boot() {
     }, 2500);
 
     /* Logo 与图标 */
+    document.body.dataset.activeView = state.view || 'market';
     try { if ($('#logo-canvas')) drawTavernLogo($('#logo-canvas')); } catch (e) { console.warn(e); }
     try { if ($('#boot-logo')) drawTavernLogo($('#boot-logo')); } catch (e) { console.warn(e); }
     try { if (typeof renderPixelIcons === 'function') renderPixelIcons(); } catch (e) { console.warn(e); }

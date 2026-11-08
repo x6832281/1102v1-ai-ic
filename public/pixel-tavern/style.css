@@ -1593,25 +1593,217 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     to { opacity: 1; transform: none; }
 }
 
+/* ---------- 移动端专属组件默认隐藏 ---------- */
+#mobile-nav,
+.mobile-only {
+    display: none;
+}
+
+/* ---------- 创作成像工坊基底 ---------- */
+#build-wrap {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    max-width: 800px;
+}
+
+#build-preview-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 24px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+#build-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: var(--bg-2);
+}
+
+#build-form {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+#build-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+#build-form input,
+#build-form select,
+#build-form textarea {
+    font-family: var(--font-main);
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-s);
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#build-form input:focus,
+#build-form select:focus,
+#build-form textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 209, 178, 0.12);
+}
+
+.color-row {
+    display: flex;
+    gap: 20px;
+}
+
+.color-row label.mini {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* ---------- 对话纪要行基底 ---------- */
+.history-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.history-row:hover {
+    border-color: rgba(0, 209, 178, 0.35);
+    transform: translateY(-1px);
+}
+
+.hist-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.hist-name {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.hist-last {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 3px;
+}
+
+.hist-meta {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+}
+
+.hist-btns {
+    display: flex;
+    gap: 8px;
+}
+
 /* ============================================================
- * 移动端适配响应式规则
+ * 移动端全景响应式规则 (Mobile UX Overhaul)
  * ============================================================ */
 @media (max-width: 768px) {
-    #layout {
-        flex-direction: column;
+    html, body {
+        overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
     }
 
+    #layout {
+        flex-direction: column;
+        min-height: 100dvh;
+    }
+
+    /* 顶栏紧凑设计 */
+    #topbar {
+        height: 52px;
+        padding: 0 12px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .tb-left {
+        gap: 8px;
+    }
+
+    #btn-drawer {
+        display: inline-flex;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        font-size: 15px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #logo-canvas {
+        width: 30px;
+        height: 30px;
+    }
+
+    .logo-zh {
+        font-size: 14.5px;
+        letter-spacing: 0.5px;
+    }
+
+    .logo-en,
+    #version-badge,
+    .visit-box,
+    #btn-settings-top {
+        display: none !important;
+    }
+
+    .tb-right {
+        gap: 6px;
+    }
+
+    #btn-classic {
+        padding: 5px 10px;
+        font-size: 11.5px;
+        min-height: 32px;
+    }
+
+    /* 抽屉侧栏 */
     #sidebar {
         position: fixed;
         left: 0;
-        top: 60px;
+        top: 52px;
         bottom: 0;
         z-index: 80;
         width: 270px;
+        max-width: 80vw;
         background: var(--bg);
+        border-right: 1px solid var(--line);
         transform: translateX(-100%);
         transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
     }
 
     #sidebar.open {
@@ -1619,29 +1811,481 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
         box-shadow: 10px 0 40px rgba(0, 0, 0, 0.7);
     }
 
-    #btn-drawer {
-        display: inline-flex;
-    }
-
+    /* 主工作区内边距与滚动：预留底部导航条空间 */
     #main {
-        padding: 16px 16px 40px;
+        padding: 14px 14px calc(70px + env(safe-area-inset-bottom, 16px));
+        overflow-x: hidden;
     }
 
+    /* 视图头部与搜索框 */
+    .view-head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .view-title {
+        font-size: 18px;
+    }
+
+    .view-title .en {
+        font-size: 9px;
+        letter-spacing: 1px;
+        margin-bottom: 2px;
+    }
+
+    .head-actions {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    #search-input {
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+        max-width: none;
+        font-size: 16px !important; /* 防止 iOS Safari 自动缩放视角 */
+        padding: 9px 12px;
+        border-radius: var(--radius-s);
+    }
+
+    #btn-random-chat {
+        flex-shrink: 0;
+        padding: 0 12px;
+        font-size: 12.5px;
+        white-space: nowrap;
+        height: 38px;
+    }
+
+    /* 焦点卡带全宽沉浸 */
+    .shelf-block {
+        margin-left: -14px;
+        margin-right: -14px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+    }
+
+    #shelf-strip {
+        gap: 10px;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+    }
+
+    #shelf-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    #shelf-strip .card {
+        min-width: 110px;
+        width: 110px;
+    }
+
+    /* 分类药丸横滑行 */
+    #cat-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        margin: 0 -14px 12px;
+        padding: 2px 14px 6px;
+        gap: 8px;
+    }
+
+    #cat-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .cat-tab {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+
+    /* 对称双列卡片网格 */
     .card-grid {
-        grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+
+    .card-info {
+        padding: 8px 10px 10px;
+    }
+
+    .card-name {
+        font-size: 13.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-cat {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 2px;
+    }
+
+    .card-badge {
+        top: 6px;
+        left: 6px;
+        font-size: 9px;
+        padding: 1px 5px;
+    }
+
+    .card-badge.fav {
+        right: 6px;
+        font-size: 14px;
+    }
+
+    /* 移动端原生 App 级对话视图 */
+    body:has(.view[data-view="chat"]:not(.hidden)) #main,
+    body[data-active-view="chat"] #main {
+        padding: 0 !important;
+        overflow: hidden !important;
+        height: calc(100dvh - 52px) !important;
+    }
+
+    body:has(.view[data-view="chat"]:not(.hidden)) #sidebar,
+    body[data-active-view="chat"] #sidebar {
+        display: none !important;
+    }
+
+    .view[data-view="chat"] {
+        height: calc(100dvh - 52px) !important;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    #chat-header {
+        padding: 8px 12px;
+        gap: 8px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+    }
+
+    #btn-chat-back {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        padding: 0;
+        font-size: 13px;
+    }
+
+    #chat-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+    }
+
+    #chat-char-name {
+        font-size: 14.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #chat-char-title.sub {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #chat-mode-badge {
+        display: none !important;
+    }
+
+    .chat-actions {
+        gap: 6px;
+    }
+
+    .chat-actions .px-btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        padding: 0;
+        font-size: 12px;
+    }
+
+    #export-menu {
+        top: 50px;
+        right: 10px;
+    }
+
+    #chat-scroll {
+        padding: 10px 8px 6px;
+    }
+
+    #chat-log {
         gap: 12px;
     }
 
-    .visit-box {
-        display: none;
+    .msg.char {
+        gap: 8px;
+    }
+
+    .msg-avatar {
+        width: 28px;
+        height: 28px;
     }
 
     .msg .bubble {
-        max-width: 86%;
+        max-width: 88%;
+        padding: 10px 12px;
+        font-size: 13.5px;
+        border-radius: 12px;
     }
 
-    body:has(.view[data-view="chat"]:not(.hidden)) #sidebar {
-        display: none;
+    #chat-form {
+        padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 8px));
+        gap: 8px;
+        border-top: 1px solid var(--line);
+    }
+
+    #chat-input {
+        font-size: 16px !important; /* 关键：防止 iOS Safari 放大屏幕 */
+        padding: 9px 12px;
+        min-height: 42px;
+        max-height: 96px;
+        border-radius: 8px;
+    }
+
+    #btn-send {
+        padding: 0 14px;
+        height: 42px;
+        font-size: 13.5px;
+        min-width: 58px;
+    }
+
+    #btn-chat-bottom {
+        right: 12px;
+        bottom: calc(66px + env(safe-area-inset-bottom, 8px));
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    #immersive-panel {
+        margin: 8px 0 0;
+        padding: 10px 12px;
+    }
+
+    .imm-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .imm-state, .imm-track {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .option-chip {
+        font-size: 13px;
+        padding: 9px 12px;
+    }
+
+    /* 移动端底部快速导航栏 */
+    #mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(54px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: rgba(12, 15, 20, 0.94);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid var(--line);
+        z-index: 60;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    body:has(.view[data-view="chat"]:not(.hidden)) #mobile-nav,
+    body[data-active-view="chat"] #mobile-nav {
+        display: none !important;
+    }
+
+    .mob-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        font-family: var(--font-main);
+        font-size: 10.5px;
+        font-weight: 500;
+        padding: 6px 0 4px;
+        cursor: pointer;
+        transition: color 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+        gap: 3px;
+        height: 100%;
+    }
+
+    .mob-nav-item.active {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .mob-nav-item i.pi {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        color: currentColor;
+        margin-bottom: 2px;
+    }
+
+    /* 弹窗响应式设计 */
+    .modal-window {
+        padding: 16px 14px;
+        border-radius: 14px;
+        max-width: 92vw;
+        max-height: 86vh;
+    }
+
+    .modal-close {
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+
+    .detail-head {
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    #detail-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+    }
+
+    #detail-name {
+        font-size: 16.5px;
+    }
+
+    .detail-desc {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .detail-greet {
+        padding: 10px 12px;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .detail-btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .detail-btns button.big {
+        grid-column: 1 / -1;
+        padding: 11px 16px;
+        font-size: 14px;
+    }
+
+    .detail-btns button:not(.big) {
+        padding: 8px 10px;
+        font-size: 12.5px;
+    }
+
+    /* 工坊、纪要与设置移动端排版 */
+    #build-wrap {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    #build-preview-box {
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 14px;
+    }
+
+    #build-preview {
+        width: 80px;
+        height: 80px;
+    }
+
+    #build-form input,
+    #build-form select,
+    #build-form textarea {
+        font-size: 16px !important; /* 防止 iOS 缩放 */
+    }
+
+    .history-row {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px 12px;
+    }
+
+    .hist-meta {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        order: 3;
+        padding-top: 6px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .hist-btns {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        order: 4;
+        gap: 8px;
+    }
+
+    .hist-btns .px-btn {
+        flex: 1;
+        padding: 8px;
+    }
+
+    .set-row {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .set-row select,
+    .set-row input {
+        font-size: 15px;
+    }
+
+    /* Toast 浮层位置微调 */
+    #toast-wrap {
+        bottom: calc(64px + env(safe-area-inset-bottom, 12px));
+        max-width: 90vw;
+    }
+
+    body:has(.view[data-view="chat"]:not(.hidden)) #toast-wrap,
+    body[data-active-view="chat"] #toast-wrap {
+        bottom: calc(72px + env(safe-area-inset-bottom, 12px));
     }
 }
 
