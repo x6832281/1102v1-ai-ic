@@ -684,14 +684,24 @@ function bumpVisits() {
 
 /* 启动序列 */
 function boot() {
+    /* 兜底超时安全机制：无论发生何种情况，至多 2.5 秒后必须强行移除启动画面 */
+    const forceDismiss = setTimeout(() => {
+        const b = document.getElementById('boot');
+        if (b && !b.classList.contains('done')) {
+            b.classList.add('done');
+            setTimeout(() => { if (b.parentNode) b.remove(); }, 400);
+        }
+    }, 2500);
+
     /* Logo 与图标 */
-    drawTavernLogo($('#logo-canvas'));
-    drawTavernLogo($('#boot-logo'));
-    renderPixelIcons();
-    applyAccent();
-    initTicker();
-    bumpVisits();
-    if (window.PTChatAI) PTChatAI.refresh();
+    try { if ($('#logo-canvas')) drawTavernLogo($('#logo-canvas')); } catch (e) { console.warn(e); }
+    try { if ($('#boot-logo')) drawTavernLogo($('#boot-logo')); } catch (e) { console.warn(e); }
+    try { if (typeof renderPixelIcons === 'function') renderPixelIcons(); } catch (e) { console.warn(e); }
+    try { applyAccent(); } catch (e) { console.warn(e); }
+    try { initTicker(); } catch (e) { console.warn(e); }
+    try { bumpVisits(); } catch (e) { console.warn(e); }
+    try { if (window.PTChatAI) PTChatAI.refresh(); } catch (e) { console.warn(e); }
+
     /* 静态托管（Vercel）下门户位于 /pixel-tavern：地址栏美化回根路径 */
     if (location.pathname === '/pixel-tavern' || location.pathname === '/pixel-tavern/') {
         try { history.replaceState(null, '', '/'); } catch { /* ignore */ }
@@ -703,36 +713,46 @@ function boot() {
     /* 启动画面进度 */
     const tips = ['正在连接共鸣波谱…', '正在校准星轨频率…', '正在载入角色档案…', '幻境回声准备就绪！'];
     let tipIdx = 0;
-    const tipTimer = setInterval(() => { tipIdx = (tipIdx + 1) % tips.length; $('#boot-tip').textContent = tips[tipIdx]; }, 420);
+    const tipTimer = setInterval(() => {
+        tipIdx = (tipIdx + 1) % tips.length;
+        const tipEl = $('#boot-tip');
+        if (tipEl) tipEl.textContent = tips[tipIdx];
+    }, 380);
+
     const fill = $('#boot-bar-fill');
     let p = 0;
     const prog = setInterval(() => {
-        p += 8 + Math.random() * 16;
-        fill.style.width = Math.min(100, p) + '%';
+        p += 14 + Math.random() * 20;
+        if (fill) fill.style.width = Math.min(100, p) + '%';
         if (p >= 100) {
-            clearInterval(prog); clearInterval(tipTimer);
+            clearInterval(prog);
+            clearInterval(tipTimer);
+            clearTimeout(forceDismiss);
             setTimeout(() => {
-                $('#boot').classList.add('done');
-                setTimeout(() => $('#boot').remove(), 600);
+                const b = $('#boot');
+                if (b) {
+                    b.classList.add('done');
+                    setTimeout(() => { if (b.parentNode) b.remove(); }, 500);
+                }
                 if (!store.get('welcomed', false)) {
                     store.set('welcomed', true);
                     openModal('modal-welcome');
                 }
-            }, 250);
+            }, 180);
         }
-    }, 110);
+    }, 60);
 
-    renderTabs();
-    renderMarket();
-    initBuild();
-    initImport();
-    initSettings();
-    initExportImport();
-    initMarketSearch();
-    initChatBottomBtn();
-    bindEvents();
-    PTFire.start($('#fireplace-canvas'));
-    switchView('market');
+    try { renderTabs(); } catch (e) { console.warn(e); }
+    try { renderMarket(); } catch (e) { console.warn(e); }
+    try { initBuild(); } catch (e) { console.warn(e); }
+    try { initImport(); } catch (e) { console.warn(e); }
+    try { initSettings(); } catch (e) { console.warn(e); }
+    try { initExportImport(); } catch (e) { console.warn(e); }
+    try { initMarketSearch(); } catch (e) { console.warn(e); }
+    try { initChatBottomBtn(); } catch (e) { console.warn(e); }
+    try { bindEvents(); } catch (e) { console.warn(e); }
+    try { if ($('#fireplace-canvas')) PTFire.start($('#fireplace-canvas')); } catch (e) { console.warn(e); }
+    try { switchView('market'); } catch (e) { console.warn(e); }
 }
 
 /* 全局错误兜底：console 留痕 + 用户侧像素 toast */

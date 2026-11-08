@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
     <link rel="icon" href="/pixel-tavern/brand/icon-32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="/pixel-tavern/brand/icon-192.png">
-    <link rel="stylesheet" href="/pixel-tavern/style.css?v=2001">
+    <link rel="stylesheet" href="/pixel-tavern/style.css?v=2002">
 </head>
 <body data-skin="clean">
 
@@ -257,6 +257,10 @@
                         <button class="px-btn toggle" id="set-immersive" data-on="1">ON</button>
                     </div>
                     <div class="set-row">
+                        <label>启用真实大模型（关闭 = 仅剧本引擎）</label>
+                        <button class="px-btn toggle" id="set-ai" data-on="1">ON</button>
+                    </div>
+                    <div class="set-row">
                         <label>主题基调光泽</label>
                         <div class="accent-row" id="accent-row">
                             <button class="accent-swatch active" data-accent="jade" title="萤青 (默认)"></button>
@@ -355,6 +359,10 @@
                     <div class="detail-name" id="detail-name">—</div>
                     <div class="detail-title" id="detail-title">—</div>
                     <div class="detail-tags" id="detail-tags"></div>
+                    <div class="detail-stats" style="margin-top: 8px;">
+                        <div class="imm-bar"><span>共鸣</span><div class="bar"><i id="detail-pop"></i></div></div>
+                        <div class="imm-bar"><span>活跃</span><div class="bar"><i id="detail-act"></i></div></div>
+                    </div>
                 </div>
             </div>
             <div class="detail-desc" id="detail-desc">—</div>
@@ -370,6 +378,22 @@
                 <button class="px-btn hidden" id="btn-export-card" title="导出 JSON">⬇ JSON</button>
                 <button class="px-btn hidden" id="btn-export-png" title="导出 PNG 卡片">⬇ PNG 卡</button>
                 <button class="px-btn hidden" id="btn-greet-cycle" title="切换开场白">↻ 切换开场白</button>
+            </div>
+        </div>
+
+        <!-- 欢迎引导弹窗 -->
+        <div class="modal-window hidden" id="modal-welcome">
+            <button class="modal-close px-btn sq" data-close>✕</button>
+            <div class="view-title">欢迎来到幻境回声</div>
+            <p class="welcome-lead" style="color: var(--text-dim); margin: 8px 0 16px;">沉浸式原创角色叙事工坊与角色扮演沙龙。探索多维原创角色档案，体验分支互动剧情与环境音律。</p>
+            <div class="steps" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <div class="step" style="background: var(--panel-2); padding: 10px 14px; border-radius: var(--radius-s); border: 1px solid var(--line);"><b>01. 查阅档案</b><p style="color: var(--text-dim); font-size: 12.5px; margin-top: 2px;">在档案室按主题或特质检索感兴趣的角色生平。</p></div>
+                <div class="step" style="background: var(--panel-2); padding: 10px 14px; border-radius: var(--radius-s); border: 1px solid var(--line);"><b>02. 选定连线</b><p style="color: var(--text-dim); font-size: 12.5px; margin-top: 2px;">点击封面展开详细背景故事与初次会面开场白。</p></div>
+                <div class="step" style="background: var(--panel-2); padding: 10px 14px; border-radius: var(--radius-s); border: 1px solid var(--line);"><b>03. 开启对话</b><p style="color: var(--text-dim); font-size: 12.5px; margin-top: 2px;">进入沉浸空间，支持自由文本交互与决策分支选择。</p></div>
+            </div>
+            <div class="detail-btns">
+                <button class="px-btn gold big" id="btn-welcome-go">开始探索</button>
+                <button class="px-btn" id="btn-welcome-guide">使用指南</button>
             </div>
         </div>
 
@@ -396,11 +420,11 @@
 
     <div id="toast-wrap"></div>
 
-    <script src="/pixel-tavern/data.js?v=2001"></script>
-    <script src="/pixel-tavern/avatars.js?v=2001"></script>
-    <script src="/pixel-tavern/market.js?v=2001"></script>
-    <script src="/pixel-tavern/jukebox.js?v=2001"></script>
-    <script src="/pixel-tavern/chat.js?v=2001"></script>
-    <script src="/pixel-tavern/app.js?v=2001"></script>
+    <script src="/pixel-tavern/data.js?v=2002"></script>
+    <script src="/pixel-tavern/avatars.js?v=2002"></script>
+    <script src="/pixel-tavern/market.js?v=2002"></script>
+    <script src="/pixel-tavern/jukebox.js?v=2002"></script>
+    <script src="/pixel-tavern/chat.js?v=2002"></script>
+    <script src="/pixel-tavern/app.js?v=2002"></script>
 </body>
 </html>

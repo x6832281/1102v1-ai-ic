@@ -349,9 +349,111 @@ function drawLantern(canvas) {
     ctx.stroke();
 }
 
+/* ---------- 侧栏微型图标系统 ---------- */
+const PT_ICONS = {
+    market: [
+        '..1111..',
+        '.1....1.',
+        '1..11..1',
+        '1.1..1.1',
+        '11111111',
+        '1......1',
+        '1......1',
+        '11111111',
+    ],
+    shelf: [
+        '11111111',
+        '1......1',
+        '11111111',
+        '1......1',
+        '11111111',
+        '1......1',
+        '1......1',
+        '11111111',
+    ],
+    build: [
+        '......11',
+        '.....111',
+        '....111.',
+        '...111..',
+        '..111...',
+        '.111....',
+        '11......',
+        '1.......',
+    ],
+    fav: [
+        '.11..11.',
+        '11111111',
+        '11111111',
+        '11111111',
+        '.111111.',
+        '..1111..',
+        '...11...',
+        '....1...',
+    ],
+    history: [
+        '..1111..',
+        '.1....1.',
+        '1...1..1',
+        '1...1..1',
+        '1...11.1',
+        '1......1',
+        '.1....1.',
+        '..1111..',
+    ],
+    news: [
+        '1111111.',
+        '1.....11',
+        '1.111.11',
+        '1.....11',
+        '1.111.11',
+        '1.....11',
+        '11111111',
+        '........',
+    ],
+    guide: [
+        '..1111..',
+        '.1....1.',
+        '....11..',
+        '...11...',
+        '...11...',
+        '........',
+        '...11...',
+        '...11...',
+    ],
+    settings: [
+        '..1..1..',
+        '.111111.',
+        '11.11.11',
+        '.111111.',
+        '.111111.',
+        '11.11.11',
+        '.111111.',
+        '..1..1..',
+    ],
+};
+
+function renderPixelIcons() {
+    document.querySelectorAll('.pi[data-icon]').forEach(el => {
+        const icon = el.dataset.icon;
+        const m = PT_ICONS[icon];
+        if (!m) return;
+        const shadows = [];
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                if (m[y][x] === '1') shadows.push(`${x + 1}px ${y + 1}px 0 0 currentColor`);
+            }
+        }
+        el.style.width = '1px';
+        el.style.height = '1px';
+        el.style.boxShadow = shadows.join(',');
+    });
+}
+
 /* 导出为全局变量 */
 window.PTAvatar = PTAvatar;
 window.PTFire = PTFire;
 window.drawTavernLogo = drawTavernLogo;
 window.drawLantern = drawLantern;
 window.mulberry32 = mulberry32;
+window.renderPixelIcons = renderPixelIcons;
