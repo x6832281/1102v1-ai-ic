@@ -214,4 +214,64 @@ for (const size of [32, 64, 192, 512]) {
     fs.writeFileSync(path.join(OUT, `icon-${size}.png`), encodePNG(icon.w, icon.h, icon.px));
     console.log(`icon-${size}.png`, (fs.statSync(path.join(OUT, `icon-${size}.png`)).size / 1024).toFixed(1) + 'KB');
 }
+
+/* ---------- 深空回声场景（无文字，/web 背景） ---------- */
+function drawScene() {
+    const w = 1440, h = 810;
+    const cv = makeCanvas(w, h);
+    /* 深空渐变 */
+    for (let y = 0; y < h; y++) {
+        const t = y / h;
+        const c = [Math.round(8 + 8 * t), Math.round(13 + 10 * t), Math.round(20 + 14 * t)];
+        cv.rect(0, y, w, 1, c);
+    }
+    /* 星云辉光（青 + 琥珀两团） */
+    cv.glow(w * 0.28, h * 0.30, 300, C.teal, 46);
+    cv.glow(w * 0.74, h * 0.62, 340, C.amber, 30);
+    cv.glow(w * 0.5, h * 0.9, 380, [60, 90, 110], 26);
+    /* 星点 */
+    let seed = 20261112;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 0xFFFFFFFF; };
+    for (let i = 0; i < 520; i++) {
+        const x = Math.floor(rnd() * w), y = Math.floor(rnd() * h);
+        const bright = rnd();
+        cv.set(x, y, bright > 0.7 ? C.white : C.tealSoft, Math.round(40 + bright * 150));
+        if (bright > 0.93) { cv.set(x + 1, y, C.tealSoft, 120); cv.set(x, y + 1, C.tealSoft, 120); }
+    }
+    /* 细网格 */
+    for (let y = 0; y < h; y += 36) cv.rect(0, y, w, 1, C.line, 90);
+    for (let x = 0; x < w; x += 36) cv.rect(x, 0, 1, h, C.line, 90);
+    /* 三层回声弧（中心偏左） */
+    const cx = w * 0.42, cy = h * 0.52, r = 240;
+    cv.arc(cx, cy, r, -Math.PI * 0.3, Math.PI * 1.4, C.teal, 9, 210);
+    cv.arc(cx, cy, r * 0.78, -Math.PI * 0.12, Math.PI * 1.22, C.tealSoft, 5, 130);
+    cv.arc(cx, cy, r * 1.24, -Math.PI * 0.22, Math.PI * 1.3, C.tealSoft, 4, 80);
+    /* 琥珀棱镜（小） */
+    cv.seg(cx + 40, cy - r * 0.5, cx + r * 0.52, cy + r * 0.42, C.amber, 6, 210);
+    cv.seg(cx + r * 0.52, cy + r * 0.42, cx - r * 0.36, cy + r * 0.42, C.amberHi, 6, 190);
+    cv.seg(cx - r * 0.36, cy + r * 0.42, cx + 40, cy - r * 0.5, C.amberHi, 6, 210);
+    cv.glow(cx + 20, cy, 60, C.teal, 60);
+    cv.disc(cx + 20, cy, 14, C.white, 240);
+    /* 双正弦波形（贯穿） */
+    for (let x = 0; x < w; x++) {
+        const y1 = h * 0.30 + Math.sin(x * 0.014) * 42 + Math.sin(x * 0.004) * 18;
+        const y2 = h * 0.74 + Math.sin(x * 0.011 + 1.6) * 30 + Math.sin(x * 0.005 + 0.8) * 14;
+        cv.set(x, y1, C.tealSoft, 190);
+        cv.set(x, y1 + 1, C.teal, 120);
+        cv.set(x, y2, C.amberHi, 120);
+    }
+    /* 边缘暗角 */
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const ex = Math.min(x, w - 1 - x) / w, ey = Math.min(y, h - 1 - y) / h;
+        const vig = Math.max(0, 0.5 - Math.min(ex, ey) * 2.2);
+        if (vig > 0) cv.set(x, y, [6, 10, 8], Math.round(vig * 255));
+    }
+    return { w, h, px: cv.px };
+}
+const scene = drawScene();
+const CLONE_SITES = path.resolve(__dirname, '..', '..', 'ai-website-cloner-template', 'public', 'sites', 'echocraft');
+fs.mkdirSync(path.join(CLONE_SITES, 'backgrounds'), { recursive: true });
+const sceneFile = path.join(CLONE_SITES, 'backgrounds', 'echo-scene.png');
+fs.writeFileSync(sceneFile, encodePNG(scene.w, scene.h, scene.px));
+console.log('echo-scene.png', scene.w + 'x' + scene.h, (fs.statSync(sceneFile).size / 1024).toFixed(0) + 'KB');
 console.log('DONE ->', OUT);
