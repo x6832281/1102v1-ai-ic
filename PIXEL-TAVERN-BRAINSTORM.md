@@ -1315,3 +1315,11 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **实施 4 项**：①tools/smoke.mjs 基线迁移（角色≥12/webmanifest 幻境回声/version-badge/合规声明/移除皮肤断言/EchoCraft 令牌/PT_NEWS 结构断言/门户标题中立）→100/100；②index.html 补合规声明（隐私/版权/未成年人提示，EchoCraft 措辞）；③tools/make-echocraft-brand.mjs 重绘 og-banner(1200×630, 23KB)+icon-32/64/192/512（青色回声弧+琥珀棱镜+白核+波形线，5×7 字体新增 C/H/F/S）；④新增原创角色 c-astronomer「谢观澜 · 钦天监观星郎」（往昔长风，14→15，全字段含 immersive）。
 - **验证**：smoke 100/100；ESLint 0；data.js 语法过；本地 / 8 00 端口含新声明。
 - **下轮建议**：/web 发现页同步 EchoCraft 品牌（现仍为游戏酒馆旧版，品牌不一致）；点唱机曲目扩充；GitHub 开源角色卡收集（核许可证→docs/credits.md）；门户 OG meta 描述同步 V2.0。
+
+## 优化循环 R2（2026.11.12，cron 自动轮）
+
+- **目标**：R1 遗留最大缺口 —— /web 发现页仍为「游戏酒馆」旧品牌，与门户 EchoCraft 不一致。
+- **点子 ≥5**：①/web 全面同步 EchoCraft（品牌/数据/封面/背景）②EchoCraft 深空回声场景生成 ③新算法封面批量合成 ④门户 OG meta 校验（用户改版已同步，无需改）⑤点唱机/开源角色卡（顺延）。
+- **实施**：①浏览器端用新 PTAvatar.drawToCanvas 合成 15 张封面（bg1→bg2 深空渐变 + 回声弧点缀 + 网格纹理）；②make-echocraft-brand.mjs 扩展 drawScene（1440×810 深空回声场景：星云辉光/星点/三层回声弧/琥珀棱镜/双波形/暗角，153KB）；③clone 全面改版（品牌 幻境回声 ECHOCRAFT V2.0、PERSONA DOSSIER、新分类 tabs、V2.0 公告、scene 路径、去 pixelated）；④主仓库 public/sites/game-tavern 移除（被 echocraft 取代）。
+- **验证**：npm run check 全绿；本地 /web/ 15/15 封面 + 场景 + 品牌（截图）；旧品牌 0 残留。
+- **下轮建议**：推送上线（含 /web EchoCraft 版 + EchoCraft og-banner/icons）；点唱机曲目扩充；GitHub 开源角色卡收集（核许可证）。
