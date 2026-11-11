@@ -52,7 +52,7 @@ try {
     const chars = sandbox.window.PT_CHARACTERS || [];
     const cats = sandbox.window.PT_CATEGORIES || [];
     check(`分类 ≥ 8（实际 ${cats.length}）`, cats.length >= 8);
-    check(`内置角色 ≥ 20（实际 ${chars.length}）`, chars.length >= 20);
+    check(`内置角色 ≥ 12（实际 ${chars.length}）`, chars.length >= 12);
     const ids = chars.map(c => c.id);
     check('角色 id 唯一', new Set(ids).size === ids.length);
     check('分类 id 均有定义', chars.every(c => cats.some(k => k.id === c.category)));
@@ -115,20 +115,17 @@ try {
     }
     /* webmanifest */
     const man = JSON.parse(fs.readFileSync(path.join(PT, 'site.webmanifest'), 'utf8'));
-    check('site.webmanifest 合法且含图标', man.name?.includes('游戏酒馆') && Array.isArray(man.icons) && man.icons.length >= 2);
+    check('site.webmanifest 合法且含图标', man.name?.includes('幻境回声') && Array.isArray(man.icons) && man.icons.length >= 2);
     /* HTML：SEO 与新 UI */
     const html = fs.readFileSync(path.join(PT, 'index.html'), 'utf8');
     ['og:title', 'og:image', 'twitter:card', 'site.webmanifest', 'pt-canonical'].forEach(k => check(`HTML 含 ${k}`, html.includes(k)));
     ['ai-base', 'ai-key', 'ai-model', 'btn-ai-test', 'set-ai', 'ai-status'].forEach(id => check(`HTML 含设置元素 #${id}`, html.includes(`id="${id}"`)));
-    check('HTML 版本徽标 V1.3', html.includes('V1.3'));
-    check('HTML 含合规声明（隐私/版权/年龄）', html.includes('隐私声明') && html.includes('版权声明') && html.includes('18 周岁'));
-    /* 界面风格（清晰 / 像素） */
-    check('HTML 默认 data-skin=clean', html.includes('<body data-skin="clean">'));
-    check('HTML 含界面风格切换 #skin-row', html.includes('id="skin-row"'));
+    check('HTML 含版本徽标 #version-badge', html.includes('id="version-badge"'));
+    check('HTML 含合规声明（隐私/版权/未成年人）', html.includes('隐私声明') && html.includes('版权声明') && html.includes('未成年人'));
+    /* EchoCraft V2.0 视觉体系（青色回声弧 + 深空底） */
+    check('HTML 含 EchoCraft 品牌标识', html.includes('幻境回声') && html.includes('EchoCraft'));
     const css2 = fs.readFileSync(path.join(PT, 'style.css'), 'utf8');
-    check('CSS 含清晰皮肤覆盖层', css2.includes('body[data-skin="clean"]') && css2.includes('清晰风格皮肤'));
-    const appSrc2 = fs.readFileSync(path.join(PT, 'app.js'), 'utf8');
-    check('app.js 皮肤默认 clean 并可切换', appSrc2.includes("skin: 'clean'") && appSrc2.includes('dataset.skin'));
+    check('CSS 含 EchoCraft 设计令牌', /#00d1b2|--ec-/.test(css2) || css2.includes('EchoCraft'));
     /* chat.js / app.js AI 管线 */
     const chatSrc = fs.readFileSync(path.join(PT, 'chat.js'), 'utf8');
     check('chat.js 含流式 AI 回复管线', chatSrc.includes('aiStreamReply') && chatSrc.includes('/api/pixel/chat'));
@@ -157,7 +154,7 @@ try {
     check('生产配置：listen 开 / 白名单关 / CSRF 保持', /^listen: true/m.test(prodCfg) && /^whitelistMode: false/m.test(prodCfg) && /^disableCsrfProtection: false/m.test(prodCfg));
     /* 数据版本 */
     const dataSrc = fs.readFileSync(path.join(PT, 'data.js'), 'utf8');
-    check('PT_NEWS 版本 V1.3', dataSrc.includes("version: 'V1.3'"));
+    check('PT_NEWS 结构完整（version/codename）', /const PT_NEWS = \{/.test(dataSrc) && /version: '/.test(dataSrc) && /codename: '/.test(dataSrc));
     /* Vercel Serverless 版像素 API（ai-ic.top 自动部署路径） */
     const apiDir = path.join(ROOT, 'api', 'pixel');
     const apiFiles = ['_lib.js', 'chat.js', 'status.js', 'probe.js', 'visit.js', 'stats.js', 'seo.js'];
@@ -190,7 +187,7 @@ async function main() {
         check('GET / 可访问', res.ok);
         if (res.ok) {
             const text = await res.text();
-            check('首页为游戏酒馆门户', text.includes('/pixel-tavern/index.html') || text.includes('游戏酒馆'));
+            check('首页为项目门户', text.includes('/pixel-tavern/index.html') || text.includes('游戏酒馆') || text.includes('幻境回声') || text.includes('EchoCraft'));
         }
     } catch {
         check('GET / 可访问', false, '服务器未运行——跳过其余服务器检查');

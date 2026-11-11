@@ -1305,3 +1305,13 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - 修复：Next 16 dev 跨域 HMR 阻断（allowedDevOrigins）；visit 计数 CSRF 握手（先 GET /csrf-token 再 POST，Serverless/ST 两种后端通吃）；根级资产路径需同时存在于主仓库 public/sites/。
 - 验证：npm run check 全绿；主站冒烟 103/103；线上 21/21 封面加载、visit 计数递增、场景背景渲染、无任何原站资产/品牌残留（innerHTML 检测）。
 - 位置关系：ai-ic.top/ = 原门户（功能完整可聊天）→ ai-ic.top/web/ = 新发现页（静态展示+漏斗入口）→ /?classic=1 = 经典酒馆。若要将 /web/ 设为主页：vercel.json 把 / 重定向目标改为 /web 即可（一行）。
+
+---
+
+## 优化循环 R1（2026.11.12，新自动化系列首轮）
+
+- **基线诊断**：项目被用户推进至「幻境回声 · EchoCraft V2.0「星轨共鸣」」——全新原创世界观（14 角色/7 分类/immersive 角色剧本块）、移动端底部导航、启动修复；brand/ 图标与 og-banner 仍是旧品牌资产；合规声明在改版中遗失；smoke 断言过时（8 红）。
+- **点子 ≥5**：①smoke 断言迁移至 EchoCraft ②合规声明补齐 ③品牌资产重绘（og-banner+四尺寸图标，回声弧+棱镜视觉）④新增原创角色（往昔长风缺员）⑤/web 发现页与 EchoCraft 品牌同步（大活，顺延）⑥点唱机曲目扩充（顺延）⑦GitHub 开源角色卡收集（顺延，需核许可证）。
+- **实施 4 项**：①tools/smoke.mjs 基线迁移（角色≥12/webmanifest 幻境回声/version-badge/合规声明/移除皮肤断言/EchoCraft 令牌/PT_NEWS 结构断言/门户标题中立）→100/100；②index.html 补合规声明（隐私/版权/未成年人提示，EchoCraft 措辞）；③tools/make-echocraft-brand.mjs 重绘 og-banner(1200×630, 23KB)+icon-32/64/192/512（青色回声弧+琥珀棱镜+白核+波形线，5×7 字体新增 C/H/F/S）；④新增原创角色 c-astronomer「谢观澜 · 钦天监观星郎」（往昔长风，14→15，全字段含 immersive）。
+- **验证**：smoke 100/100；ESLint 0；data.js 语法过；本地 / 8 00 端口含新声明。
+- **下轮建议**：/web 发现页同步 EchoCraft 品牌（现仍为游戏酒馆旧版，品牌不一致）；点唱机曲目扩充；GitHub 开源角色卡收集（核许可证→docs/credits.md）；门户 OG meta 描述同步 V2.0。
