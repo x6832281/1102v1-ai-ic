@@ -289,6 +289,7 @@ function initBuild() {
         const draft = {
             id: '_draft', name: $('#build-name').value || '新角色', seed: Math.floor(Math.random() * 100000),
             palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
+            avatar: $('#build-hairstyle').value ? { hairStyle: $('#build-hairstyle').value } : null,
         };
         PTAvatar.draw(pv, draft);
     }
@@ -312,6 +313,7 @@ function initBuild() {
             card.greeting = $('#build-greeting').value.trim() || '你好，我是' + name + '。很高兴与你连线。';
             card.desc = $('#build-desc').value.trim() || '由幻境回声创作者工坊构建的个性化档案。';
             card.lore = parseLoreInput($('#build-lore').value);
+            card.avatar = $('#build-hairstyle').value ? { hairStyle: $('#build-hairstyle').value } : null;
             card.palette = { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' };
             saveCustom();
             resetBuildForm();
@@ -330,6 +332,7 @@ function initBuild() {
             desc: $('#build-desc').value.trim() || '由幻境回声创作者工坊构建的个性化档案。',
             greeting: $('#build-greeting').value.trim() || '你好，我是' + name + '。很高兴与你连线。',
             lore: parseLoreInput($('#build-lore').value),
+            avatar: $('#build-hairstyle').value ? { hairStyle: $('#build-hairstyle').value } : null,
             origin: 'custom',
             palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
             script: {
