@@ -174,7 +174,7 @@ try {
     check('Seraphina 门户补充文件存在', fs.existsSync(path.join(ROOT, 'tools', 'card-overrides', 'default_Seraphina.png.json')));
     check('门户背景场景 bg-echo.png 存在', fs.existsSync(path.join(PT, 'bg-echo.png')));
     const avSrc = fs.readFileSync(path.join(PT, 'avatars.js'), 'utf8');
-    check('肖像引擎为 24×28 具象半身像', avSrc.includes('buildGrid') && avSrc.includes('青琥珀双缘光'));
+    check('肖像引擎为琉璃像馆共享绘制器', avSrc.includes('window.ECPainter') && fs.existsSync(path.join(PT, 'portrait-painter.js')));
     check('CSS 引用背景场景', fs.readFileSync(path.join(PT, 'style.css'), 'utf8').includes('bg-echo.png'));
     check('data.js 角色源指向卡库编译产物', dataSrc.includes('window.PT_CARD_CHARACTERS'));
     const webCardDir = path.join(ROOT, 'public', 'web', 'sites', 'echocraft', 'cards');
