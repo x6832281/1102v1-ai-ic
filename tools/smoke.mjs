@@ -176,6 +176,7 @@ try {
     const avSrc = fs.readFileSync(path.join(PT, 'avatars.js'), 'utf8');
     check('肖像引擎为琉璃像馆共享绘制器', avSrc.includes('window.ECPainter') && fs.existsSync(path.join(PT, 'portrait-painter.js')));
     check('CSS 引用背景场景', fs.readFileSync(path.join(PT, 'style.css'), 'utf8').includes('bg-echo.png'));
+    check('存在页脚声明', fs.readFileSync(path.join(PT, 'index.html'), 'utf8').includes('site-foot'));
     check('data.js 角色源指向卡库编译产物', dataSrc.includes('window.PT_CARD_CHARACTERS'));
     const webCardDir = path.join(ROOT, 'public', 'web', 'sites', 'echocraft', 'cards');
     const webCards = fs.existsSync(webCardDir) ? fs.readdirSync(webCardDir).filter(f => f.startsWith('card-') && f.endsWith('.png')) : [];

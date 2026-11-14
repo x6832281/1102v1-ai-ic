@@ -171,11 +171,13 @@ function openChat(id, greetOverride) {
     }
     $('#chat-log').innerHTML = '';
     $('#immersive-panel').classList.toggle('hidden', !state.chat.immersive);
+    /* 新会话消息极少时默认收起面板，避免挤压会话区 */
+    if (state.chat.session.messages.length < 2) $('#immersive-panel').classList.add('imm-collapsed');
     updateModeBadge();
     closeModal();
     switchView('chat');
     /* 开场白 */
-    pushMessage('char', greet || '……', { save: true, tts: true, instant: false });
+    pushMessage('char', greet || '……', { save: true, tts: true, instant: !state.settings.typewriter });
     updateImmersive(greet || '');
     /* 设定集切入：预填输入框，由用户确认发送（R17） */
     if (state._loreSeeding) {
@@ -190,9 +192,10 @@ function openChat(id, greetOverride) {
 function updateModeBadge() {
     const b = $('#chat-mode-badge');
     b.textContent = state.chat.immersive ? '沉浸互动' : '传统聊天';
+    b.classList.toggle('amber-badge', state.chat.immersive);
     $('#immersive-panel').classList.toggle('hidden', !state.chat.immersive);
     /* 窄屏默认收起状态条（只留行动选项） */
-    $('#immersive-panel').classList.toggle('imm-collapsed', window.innerWidth <= 640);
+    if (window.innerWidth <= 640) $('#immersive-panel').classList.add('imm-collapsed'); /* 仅小屏强制收起，不撤销用户/新会话的折叠态 */
     const cb = $('#imm-collapse-btn');
     if (cb) cb.textContent = window.innerWidth <= 640 ? '展开状态' : '收起状态';
 }
@@ -216,7 +219,7 @@ function pushMessage(role, text, opts = {}) {
     if (role === 'char' && state.chat.char) {
         const av = document.createElement('img');
         av.className = 'msg-avatar';
-        av.src = PTAvatar.toDataURL(state.chat.char, 48);
+        av.src = PTAvatar.toDataURL(state.chat.char, 96);
         av.alt = '';
         av.draggable = false;
         wrap.appendChild(av);
@@ -406,7 +409,7 @@ function sendUserMessage(text, fromOption = false) {
     /* 思考延迟 */
     const typing = document.createElement('div');
     typing.className = 'msg char typing';
-    const tAvatar = PTAvatar.toDataURL(state.chat.char, 48);
+    const tAvatar = PTAvatar.toDataURL(state.chat.char, 96);
     typing.innerHTML = `<img class="msg-avatar" src="${tAvatar}" alt="" draggable="false"><div class="bubble"><div class="msg-body dots"><i></i><i></i><i></i></div></div>`;
     $('#chat-log').appendChild(typing);
     $('#chat-log').scrollTop = $('#chat-log').scrollHeight;

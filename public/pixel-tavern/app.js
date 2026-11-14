@@ -441,7 +441,8 @@ function renderAIStatus() {
 function syncMiniPlayBtn() {
     const playing = PTJukebox.playing;
     $('#btn-mini-play').textContent = playing ? '❚❚' : '▶';
-    $('#mini-eq').classList.toggle('on', playing);
+    const eq = document.getElementById('mini-eq');
+    if (eq) eq.classList.toggle('on', playing);
 }
 
 /* 对话页「回到底部」浮动按钮 */
@@ -717,7 +718,7 @@ function initTicker() {
         '真实大模型接入：偏好设置 → 模型接入，即刻流式生成',
         '沉浸分支交互：通过决策选项自然推进剧情走向',
         '环境音律舱：纯净背景白噪音，专注更深层次叙事',
-        '创作者工坊：捏制并录入属于你的专属角色档案',
+        '创作者工坊：自制角色档案，随建随聊',
         '底层核心：顶栏一键直通原生 SillyTavern 引擎',
     ];
     const half = items.join('　◆　') + '　◆　';

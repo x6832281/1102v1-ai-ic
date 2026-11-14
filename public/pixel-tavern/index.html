@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap">
     <link rel="icon" href="/pixel-tavern/brand/icon-32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="/pixel-tavern/brand/icon-192.png">
-    <link rel="stylesheet" href="/pixel-tavern/style.css?v=2003">
+    <link rel="stylesheet" href="/pixel-tavern/style.css?v=2128">
 </head>
 <body data-skin="clean">
 
@@ -57,7 +57,7 @@
         </div>
         <div class="tb-right">
             <div class="visit-box" title="全域共鸣会话统计">全域共鸣 <b id="visit-count">…</b> 次</div>
-            <button class="px-btn tb-btn" id="btn-classic" title="进入经典底层核心（原版 SillyTavern）">经典核心</button>
+            <button class="px-btn tb-btn head-ghost" id="btn-classic" title="进入经典底层核心（原版 SillyTavern）">经典核心</button>
             <button class="px-btn tb-btn" id="btn-settings-top" title="系统偏好">⚙ 偏好设置</button>
         </div>
     </header>
@@ -92,7 +92,7 @@
                 <canvas id="fireplace-canvas" width="56" height="40"></canvas>
                 <div class="fire-info">
                     <div class="fire-title">波形平稳</div>
-                    <div class="fire-sub">在线协作者 <b id="online-count">3</b></div>
+                    <div class="fire-sub"><b id="online-count">3</b> 人在线共鸣</div>
                 </div>
             </div>
 
@@ -104,7 +104,7 @@
                     <button class="px-btn sq play" id="btn-mini-play" title="播放/暂停">▶</button>
                     <button class="px-btn sq" id="btn-mini-next" title="下一曲">▶▶</button>
                 </div>
-                <div id="mini-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                
             </div>
         </aside>
 
@@ -292,7 +292,7 @@
             <section class="view hidden" data-view="chat">
                 <div id="chat-header">
                     <button class="px-btn sq" id="btn-chat-back" title="返回档案室">◀</button>
-                    <canvas id="chat-avatar" width="44" height="44"></canvas>
+                    <canvas id="chat-avatar" width="132" height="132"></canvas>
                     <div class="chat-title">
                         <div id="chat-char-name">—</div>
                         <div id="chat-char-title" class="sub">—</div>
@@ -341,7 +341,7 @@
         <div class="modal-window hidden" id="modal-detail">
             <button class="modal-close px-btn sq" data-close>✕</button>
             <div class="detail-head">
-                <canvas id="detail-avatar" width="128" height="128"></canvas>
+                <canvas id="detail-avatar" width="192" height="192"></canvas>
                 <div class="detail-meta">
                     <div class="detail-name" id="detail-name">—</div>
                     <div class="detail-title" id="detail-title">—</div>
@@ -433,15 +433,16 @@
         </button>
     </nav>
 
+    <footer class="site-foot">幻境回声 · EchoCraft — 沉浸式叙事沙龙 · 对话内容由 AI 生成，请注意辨别 · <a href="/pixel-tavern/">经典核心</a></footer>
     <div id="toast-wrap"></div>
 
-    <script src="/pixel-tavern/cards.js?v=2123"></script>
-    <script src="/pixel-tavern/data.js?v=2123"></script>
-    <script src="/pixel-tavern/portrait-painter.js?v=2123"></script>
-    <script src="/pixel-tavern/avatars.js?v=2123"></script>
-    <script src="/pixel-tavern/market.js?v=2123"></script>
-    <script src="/pixel-tavern/jukebox.js?v=2123"></script>
-    <script src="/pixel-tavern/chat.js?v=2123"></script>
-    <script src="/pixel-tavern/app.js?v=2123"></script>
+    <script src="/pixel-tavern/cards.js?v=2128"></script>
+    <script src="/pixel-tavern/data.js?v=2128"></script>
+    <script src="/pixel-tavern/portrait-painter.js?v=2128"></script>
+    <script src="/pixel-tavern/avatars.js?v=2128"></script>
+    <script src="/pixel-tavern/market.js?v=2128"></script>
+    <script src="/pixel-tavern/jukebox.js?v=2128"></script>
+    <script src="/pixel-tavern/chat.js?v=2128"></script>
+    <script src="/pixel-tavern/app.js?v=2128"></script>
 </body>
 </html>

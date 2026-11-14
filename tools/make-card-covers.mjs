@@ -120,8 +120,6 @@ function drawPoster(card) {
         cv.rect(tx, ty, dx * tick, dy * 5, hexRGB(ECHO_AMBER), 230);
         cv.rect(tx, ty, dx * 5, dy * tick, hexRGB(ECHO_AMBER), 230);
     }
-    /* 回声点阵 */
-    for (let i = 0; i < 5; i++) cv.rect(W / 2 - 40 + i * 20, H - 52, 6, 6, i % 2 ? hexRGB(ECHO_AMBER) : hexRGB(ECHO_TEAL), 220);
     return { w: W, h: H, px: cv.px };
 }
 
