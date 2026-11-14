@@ -133,7 +133,14 @@
             trim: hint.trim || (rand() < 0.5 ? TEAL : AMBER),
             eye: hint.eye || null,
             eyeTilt: rand() * 0.12 - 0.06,
+            /* 五官几何三档分布：眼长/眼距/眉粗/嘴宽/鼻长按种子落档 */
+            eyeL: [0.88, 1, 1.14][Math.floor(rand() * 3)],
+            eyeDX: [24, 26, 28][Math.floor(rand() * 3)],
             eyeSize: 0.9 + rand() * 0.25,
+            browW: [8, 10, 12][Math.floor(rand() * 3)],
+            browY: [-18, -16, -14][Math.floor(rand() * 3)],
+            mouthW: [5.6, 6.8, 8][Math.floor(rand() * 3)],
+            noseY: [32, 34, 36][Math.floor(rand() * 3)],
             faceW: 0.94 + rand() * 0.12,
             cat: char.category || 'quiet',
         };
@@ -228,6 +235,14 @@
         }
 
 
+        /* ===== 轮廓描边底层（暗色外扩，人物立起来） ===== */
+        const oc = shade(p.bg1, -84);
+        g.ell(headCX - S(62), shY + S(28), S(49), S(45), 0, oc, oc, 1);
+        g.ell(headCX + S(62), shY + S(28), S(49), S(45), 0, oc, oc, 1);
+        g.ell(headCX, shY + S(120), S(119), S(127), 0, oc, oc, 1);
+        g.ell(headCX, headCY + S(2), S(81), S(90), 0, oc, oc, 1);
+        g.ell(headCX, headCY, S(61), S(73), 0, oc, oc, 1);
+
         /* ===== 身体 ===== */
         g.ell(headCX - S(62), shY + S(28), S(46), S(42), 0, bodyTop, bodyBot, 1);
         g.ell(headCX + S(62), shY + S(28), S(46), S(42), 0, bodyTop, bodyBot, 1);
@@ -238,10 +253,21 @@
         g.glow(headCX + S(30), shY + S(40), S(24), shade(p.bg1, -40), 0.3);
         g.capsule(headCX - S(26), shY - S(2), headCX, shY + S(18), Math.max(1.4, S(2.8)), trimC, 0.92);
         g.capsule(headCX + S(26), shY - S(2), headCX, shY + S(18), Math.max(1.4, S(2.8)), trimC, 0.92);
+        /* 内衬衫领（白）+ 外套翻领（深） */
+        g.capsule(headCX - S(10), shY + S(2), headCX - S(2), shY + S(16), Math.max(0.8, S(1.6)), skinHi, 0.85);
+        g.capsule(headCX + S(10), shY + S(2), headCX + S(2), shY + S(16), Math.max(0.8, S(1.6)), skinHi, 0.85);
+        g.capsule(headCX - S(30), shY + S(6), headCX - S(8), shY + S(30), Math.max(1.2, S(2.4)), bodyBot, 0.9);
+        g.capsule(headCX + S(30), shY + S(6), headCX + S(8), shY + S(30), Math.max(1.2, S(2.4)), bodyBot, 0.9);
+        /* 扣子两枚 */
+        g.glow(headCX + S(2), shY + S(42), S(2.6), trimC, 0.85);
+        g.glow(headCX + S(2), shY + S(60), S(2.6), trimC, 0.7);
         g.glow(headCX, shY + S(2), S(15), skinDD, 0.5);
         g.capsule(headCX - S(96), shY + S(44), headCX - S(50), shY + S(12), Math.max(0.8, S(1.4)), trimC, 0.26);
         g.capsule(headCX + S(96), shY + S(44), headCX + S(50), shY + S(12), Math.max(0.8, S(1.4)), trimC, 0.26);
         g.glow(headCX - S(52), shY + S(52), S(3.4), trimC, 0.9);
+        /* 布纹斜线 */
+        g.polyline([[headCX - S(90), shY + S(110)], [headCX - S(40), shY + S(150)]], Math.max(0.6, S(1)), shade(p.bg1, 14), 0.3);
+        g.polyline([[headCX + S(38), shY + S(126)], [headCX + S(88), shY + S(162)]], Math.max(0.6, S(1)), shade(p.bg1, 14), 0.3);
 
         /* ===== 颈 ===== */
         g.ell(headCX, headCY + S(62), S(17), S(26), 0, skinC, skinD, 1);
@@ -259,34 +285,48 @@
         g.ell(headCX + S(56), headCY + S(4), S(9), S(13), 0.12, skinC, skinD, 1);
         g.glow(headCX - S(38), headCY + S(30), S(14), [244, 158, 158], 0.42);
         g.glow(headCX + S(38), headCY + S(30), S(14), [244, 158, 158], 0.42);
-        g.glow(headCX, headCY + S(34), S(6), skinDD, 0.42);
+        g.glow(headCX, headCY + S(p.noseY || 34), S(6), skinDD, 0.55);
+        /* 鼻梁高光 + 下巴反光 */
+        g.capsule(headCX, headCY + S((p.noseY || 34) - 14), headCX, headCY + S((p.noseY || 34) - 3), Math.max(0.7, S(1.5)), skinHi, 0.4);
+        g.glow(headCX, headCY + S(56), S(9), skinHi, 0.4);
 
         /* ===== 眼睛 ===== */
         const eyeY = headCY + S(10);
         for (const side of [-1, 1]) {
-            const ex = headCX + side * S(26);
+            const ex = headCX + side * S(p.eyeDX || 26);
+            const eL = S(10) * (p.eyeL || 1);
             g.glow(ex, eyeY, S(17), skinHi, 0.3);
             const es = S(p.eyeSize || 1);
             g.ell(ex, eyeY + side * S(p.eyeTilt || 0) * 8, S(15), S(11.5) * (p.eyeSize || 1), 0, skinD, skinC, 0.45);
-            g.ell(ex, eyeY + S(1), S(10.5) * (p.eyeSize || 1), S(7.6) * (p.eyeSize || 1), 0, [225, 230, 238], [198, 208, 220], 0.42);
+            /* 虹膜直填（无眼白底板）： radial 亮心 + 顶部月牙影 + 瞳 + 双高光 */
+            g.ell(ex, eyeY + S(1), eL, S(7.6) * (p.eyeSize || 1), 0, skinDD, skinD, 0.5);
             g.ell(ex, eyeY, S(10) * (p.eyeSize || 1), S(9) * (p.eyeSize || 1), 0, eyeC, eyeC, 1, { radial: true, inner: mix(eyeC, [255, 255, 255], 0.52) });
+            /* 虹膜粗结构：5 根粗辐条 + 亮环（卡片尺寸可读） */
+            for (let a = 0; a < 5; a++) {
+                const ang2 = (a / 5) * Math.PI * 2 + 0.4 + side * 0.2;
+                g.polyline([[ex, eyeY + S(1)], [ex + Math.cos(ang2) * S(7.6), eyeY + Math.sin(ang2) * S(6.6)]], Math.max(0.8, S(1.7)), shade(p.bg1, -92), 0.55);
+            }
+            g.band(ex, eyeY, S(5.6), 0, Math.PI * 2, Math.max(0.7, S(1.2)), mix(eyeC, [255, 255, 255], 0.62), 0.66);
             g.ell(ex, eyeY - S(3.4), S(9.4), S(3.2), 0, shade(p.bg1, -78), shade(p.bg1, -78), 0.26);
             g.ell(ex, eyeY + S(1), S(4.4), S(5), 0, [16, 20, 32], [8, 10, 18], 1);
             g.glow(ex - side * S(3.6), eyeY - S(3.2), S(3.4), [255, 255, 255], 0.95);
             g.glow(ex + side * S(3.8), eyeY + S(3.6), S(1.9), [255, 255, 255], 0.55);
             g.capsule(ex - side * S(13), eyeY - S(9.8), ex + side * S(11), eyeY - S(8.6), Math.max(1.2, S(2.8)), hairDD, 0.92);
             g.capsule(ex + side * S(11), eyeY - S(8.6), ex + side * S(16), eyeY - S(12.4), Math.max(0.9, S(1.8)), hairDD, 0.8);
-            g.capsule(ex - side * S(8), eyeY + S(11), ex + side * S(8), eyeY + S(11), Math.max(0.8, S(1.6)), skinHi, 0.5);
-            g.capsule(ex - side * S(9), headCY - S(17), ex + side * S(10), headCY - S(15), Math.max(1.2, S(3)), mix(hairD, skinC, 0.38), 0.8);
+            /* 眉形弧化（两段微弧，替代直边横带） */
+            const bw = S(p.browW || 9);
+            g.capsule(ex - side * bw * 0.7, headCY - S((p.browY || 17) + 1), ex + side * bw * 0.35, headCY - S(p.browY || 17), Math.max(0.9, S(1.9)), mix(hairD, skinC, 0.5), 0.62);
+            g.capsule(ex + side * bw * 0.35, headCY - S(p.browY || 17), ex + side * bw * 0.75, headCY - S((p.browY || 17) - 1), Math.max(0.9, S(1.9)), mix(hairD, skinC, 0.5), 0.62);
         }
 
+        const mw = S(p.mouthW || 6.8);
         /* 口型 */
         if (p.mouth === 'smile') {
             g.ell(headCX, headCY + S(47), S(7.6), S(3.6), 0, mix(lipC, [255, 255, 255], 0.12), lipC, 0.92);
         } else if (p.mouth === 'soft') {
-            g.ell(headCX, headCY + S(47), S(6.8), S(3.4), 0, lipC, shade(p.hair, -12), 0.92);
+            g.ell(headCX, headCY + S(47), mw, S(3.4), 0, lipC, shade(p.hair, -12), 0.92);
         } else {
-            g.capsule(headCX - S(6.4), headCY + S(47), headCX + S(6.4), headCY + S(47), Math.max(1, S(1.7)), [158, 88, 78], 0.85);
+            g.capsule(headCX - mw * 0.8, headCY + S(47), headCX + mw * 0.8, headCY + S(47), Math.max(1, S(1.7)), [158, 88, 78], 0.85);
         }
 
         /* ===== 头发：发丝线（后层收尾） ===== */
@@ -307,21 +347,35 @@
             g.ell(headCX, headCY - S(58), S(88), S(10.5), 0, hairL, hairD, 1);
             g.capsule(headCX - S(58), headCY - S(54), headCX + S(58), headCY - S(50), Math.max(1.1, S(2.4)), trimC, 0.9);
         } else {
-            g.ell(headCX, headCY - S(40), S(60), S(34), 0, hairL, hairC, 1);
+            /* 发顶（亮）→ 前发（深）分层，刘海用深色调保证可读 */
+            g.ell(headCX, headCY - S(46), S(58), S(30), 0, hairL, hairC, 1);
             if (p.bangs === 'full') {
-                g.ell(headCX, headCY - S(19), S(55), S(19), 0, hairC, hairD, 1);
+                g.ell(headCX, headCY - S(20), S(54), S(17), 0, hairD, hairDD, 1);
+                g.glow(headCX, headCY - S(5), S(40), hairDD, 0.32);
             } else if (p.bangs === 'side') {
-                g.ell(headCX - S(20), headCY - S(20), S(38), S(16), -0.14, hairC, hairD, 1);
-                g.ell(headCX + S(34), headCY - S(12), S(22), S(14), 0.2, hairD, hairDD, 0.9);
+                g.ell(headCX - S(22), headCY - S(20), S(36), S(15), -0.16, hairD, hairDD, 1);
+                g.ell(headCX + S(30), headCY - S(13), S(20), S(12), 0.2, hairD, hairDD, 0.9);
+                g.ell(headCX - S(30), headCY - S(5), S(26), S(6), -0.1, hairDD, hairDD, 0.75);
             } else if (p.bangs === 'center') {
-                for (const side of [-1, 1]) g.ell(headCX + side * S(28), headCY - S(20), S(30), S(16), side * 0.12, hairC, hairD, 1);
+                for (const side of [-1, 1]) g.ell(headCX + side * S(28), headCY - S(21), S(28), S(14), side * 0.14, hairD, hairDD, 1);
+                g.glow(headCX, headCY - S(8), S(14), skinDD, 0.3);
             } else {
-                for (const side of [-1, 1]) g.ell(headCX + side * S(30), headCY - S(18), S(23), S(13), side * 0.18, hairC, hairD, 0.96);
+                for (const side of [-1, 1]) g.ell(headCX + side * S(30), headCY - S(19), S(22), S(12), side * 0.18, hairD, hairDD, 0.96);
+                g.ell(headCX, headCY - S(8), S(14), S(5), 0, hairDD, hairDD, 0.7);
             }
             for (const side of [-1, 1]) g.ell(headCX + side * S(52), headCY - S(2), S(14), S(21), side * 0.08, hairC, hairDD, 0.95);
         }
         /* 刘海投影 AO（顶光下眼窝上方的一线暗） */
         if (!p.hat) g.glow(headCX, headCY - S(4), S(46), shade(p.hair, -70), 0.18);
+        /* 发丝簇：渐变丝线（暗底+亮芯） */
+        g.polyline([[headCX - S(44), headCY - S(26)], [headCX - S(30), headCY - S(10)], [headCX - S(24), headCY + S(6)]], Math.max(0.8, S(1.8)), hairDD, 0.4);
+        g.polyline([[headCX - S(42), headCY - S(28)], [headCX - S(30), headCY - S(12)]], Math.max(0.5, S(1.1)), hairL, 0.65);
+        g.polyline([[headCX + S(40), headCY - S(28)], [headCX + S(28), headCY - S(12)]], Math.max(0.5, S(1.1)), hairL, 0.58);
+        g.polyline([[headCX + S(44), headCY - S(26)], [headCX + S(30), headCY + S(2)]], Math.max(0.8, S(1.6)), hairDD, 0.35);
+        if (p.hairStyle === 'long' || p.hairStyle === 'bob') {
+            g.polyline([[headCX - S(66), headCY + S(16)], [headCX - S(70), headCY + S(56)]], Math.max(0.7, S(1.4)), hairL, 0.42);
+            g.polyline([[headCX + S(66), headCY + S(18)], [headCX + S(70), headCY + S(58)]], Math.max(0.7, S(1.4)), hairL, 0.4);
+        }
         /* 发丝光泽线 */
         g.polyline([[headCX - S(34), headCY - S(40)], [headCX - S(20), headCY - S(30)]], Math.max(0.8, S(1.5)), hairL, 0.55);
         g.polyline([[headCX + S(12), headCY - S(42)], [headCX + S(30), headCY - S(34)]], Math.max(0.8, S(1.3)), hairL, 0.45);
@@ -329,7 +383,7 @@
             g.polyline([[headCX - S(66), headCY + S(30)], [headCX - S(62), headCY + S(76)]], Math.max(0.8, S(1.6)), hairL, 0.5);
             g.polyline([[headCX + S(66), headCY + S(34)], [headCX + S(64), headCY + S(80)]], Math.max(0.8, S(1.6)), hairL, 0.45);
         }
-        g.glow(headCX - S(6), headCY - S(52), S(34), [255, 255, 255], 0.2);
+        g.glow(headCX - S(6), headCY - S(56), S(34), [255, 255, 255], 0.2);
         g.glow(headCX - S(22), headCY - S(40), S(18), [255, 255, 255], 0.12);
 
         /* ===== 配饰 ===== */
@@ -337,12 +391,9 @@
             const gc = [226, 236, 245];
             for (const side of [-1, 1]) {
                 const ex = headCX + side * S(26);
-                g.capsule(ex - S(12), eyeY - S(9.4), ex + S(12), eyeY - S(8.8), Math.max(0.8, S(1.05)), gc, 0.45);
-                g.capsule(ex - S(12), eyeY + S(9.6), ex + S(12), eyeY + S(9), Math.max(0.8, S(1.05)), gc, 0.45);
-                g.capsule(ex - S(13), eyeY - S(9), ex - S(13), eyeY + S(9.4), Math.max(0.8, S(1.05)), gc, 0.45);
-                g.capsule(ex + S(13), eyeY - S(9), ex + S(13), eyeY + S(9.4), Math.max(0.8, S(1.05)), gc, 0.45);
+                g.band(ex, eyeY, S(12.5), 0, Math.PI * 2, Math.max(0.9, S(1.4)), gc, 0.55);
             }
-            g.capsule(headCX - S(12), eyeY - S(5.5), headCX + S(12), eyeY - S(5), Math.max(0.7, S(0.9)), gc, 0.4);
+            g.capsule(headCX - S(13), eyeY - S(4), headCX + S(13), eyeY - S(4), Math.max(0.7, S(1.1)), gc, 0.5);
         }
         if (p.earring) {
             g.glow(headCX - S(56), headCY + S(16), S(3.8), amberC, 0.95);
