@@ -2,7 +2,7 @@
  * 幻境回声 · EchoCraft — 门户角色数据（生成物，勿手改）
  * 来源：data/default-user/characters/*.png（经典酒馆卡库，唯一角色数据源）
  * 重新生成：node tools/make-demo-cards.mjs && node tools/build-cards.mjs
- * 生成时间：2026-11-14T04:22:55.327Z
+ * 生成时间：2026-11-14T05:32:11.511Z
  * ============================================================ */
 'use strict';
 
@@ -31,6 +31,13 @@ window.PT_CARD_CHARACTERS = [
             "hair": "#3a4a5a",
             "bg1": "#4a6a7a",
             "skin": "#f0dcc8"
+        },
+        "avatar": {
+            "hairStyle": "short",
+            "bangs": "center",
+            "mouth": "calm",
+            "trim": "#00d1b2",
+            "glasses": false
         },
         "script": {
             "track": "雨港深宵——第 33 盏灯的船，还有七天到港",
@@ -93,6 +100,13 @@ window.PT_CARD_CHARACTERS = [
             "bg1": "#2a3a4a",
             "skin": "#f5e3d8"
         },
+        "avatar": {
+            "hairStyle": "long",
+            "bangs": "center",
+            "trim": "#00d1b2",
+            "mouth": "soft",
+            "earring": false
+        },
         "script": {
             "track": "森林深处精灵的庇护所——客人正在康复中",
             "keywords": [],
@@ -135,6 +149,13 @@ window.PT_CARD_CHARACTERS = [
             "hair": "#e9e04a",
             "bg1": "#3a3f6b",
             "skin": "#f6d9ba"
+        },
+        "avatar": {
+            "hairStyle": "twin",
+            "bangs": "full",
+            "mouth": "smile",
+            "trim": "#fbbf24",
+            "glasses": false
         },
         "script": {
             "track": "东九街区夜巡——配电井 C-7 区隐患排查进行中",
@@ -197,6 +218,13 @@ window.PT_CARD_CHARACTERS = [
             "bg1": "#6b4f3a",
             "skin": "#f0d5b8"
         },
+        "avatar": {
+            "hairStyle": "short",
+            "bangs": "side",
+            "mouth": "smile",
+            "trim": "#00d1b2",
+            "glasses": false
+        },
         "script": {
             "track": "凌晨一点的巷口店——今晚的最后一位客人已经落座",
             "keywords": [
@@ -254,9 +282,16 @@ window.PT_CARD_CHARACTERS = [
             "（活动室的灯只剩一盏，她坐在计分牌下发呆，听见开门声也没有回头）「社长任期还剩八十九天。」（她忽然开口，像是在对空气宣布）「之后谁接手、白板上的笔迹谁来擦、这间屋子会不会换锁……都跟我没关系了。」（她终于转过头，镜片后的眼睛有一瞬间没有设防）「……你说是吧。没关系的东西，为什么要让人这么……算了，当我没说。今天想辩什么？」"
         ],
         "palette": {
-            "hair": "#e8c97a",
+            "hair": "#23283a",
             "bg1": "#2c3e6b",
             "skin": "#f2d3b3"
+        },
+        "avatar": {
+            "hairStyle": "long",
+            "bangs": "side",
+            "glasses": true,
+            "mouth": "calm",
+            "trim": "#00d1b2"
         },
         "script": {
             "track": "新学期第 7 场辩论赛备赛周——决赛辩题待定",
@@ -319,6 +354,14 @@ window.PT_CARD_CHARACTERS = [
             "bg1": "#3d5a80",
             "skin": "#f5e3cf"
         },
+        "avatar": {
+            "hairStyle": "long",
+            "bangs": "center",
+            "trim": "#00d1b2",
+            "earring": false,
+            "mouth": "calm",
+            "glasses": false
+        },
         "script": {
             "track": "云海之约——东境云层深处有异动，剑阁收到传讯",
             "keywords": [
@@ -379,6 +422,13 @@ window.PT_CARD_CHARACTERS = [
             "hair": "#7a4a3a",
             "bg1": "#c98a8a",
             "skin": "#f6ddc6"
+        },
+        "avatar": {
+            "hairStyle": "ponytail",
+            "bangs": "full",
+            "mouth": "soft",
+            "trim": "#fbbf24",
+            "glasses": false
         },
         "script": {
             "track": "大学城秋日——两栋楼之间的旧楼梯与十四年的顺手",
@@ -441,6 +491,14 @@ window.PT_CARD_CHARACTERS = [
             "bg1": "#6b4a8a",
             "skin": "#f8e0cc"
         },
+        "avatar": {
+            "hairStyle": "bob",
+            "bangs": "full",
+            "hat": true,
+            "mouth": "smile",
+            "trim": "#fbbf24",
+            "glasses": false
+        },
         "script": {
             "track": "黄昏旅团营地——毕业考核的夜行科目备演中",
             "keywords": [
@@ -501,6 +559,14 @@ window.PT_CARD_CHARACTERS = [
             "hair": "#6b4f3a",
             "bg1": "#5f7a5a",
             "skin": "#f7e2cd"
+        },
+        "avatar": {
+            "hairStyle": "bun",
+            "bangs": "side",
+            "earring": true,
+            "mouth": "soft",
+            "trim": "#fbbf24",
+            "glasses": false
         },
         "script": {
             "track": "宫城入冬——今岁御药房的安神方正在重新配伍",

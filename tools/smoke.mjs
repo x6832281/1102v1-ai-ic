@@ -162,12 +162,16 @@ try {
     /* 卡库管线（角色数据源工具链，V2.1 卡源合一） */
     ['make-demo-cards.mjs', 'build-cards.mjs', 'make-card-covers.mjs'].forEach(f => check(`卡库工具存在 tools/${f}`, fs.existsSync(path.join(ROOT, 'tools', f))));
     check('Seraphina 门户补充文件存在', fs.existsSync(path.join(ROOT, 'tools', 'card-overrides', 'default_Seraphina.png.json')));
+    check('门户背景场景 bg-echo.png 存在', fs.existsSync(path.join(PT, 'bg-echo.png')));
+    const avSrc = fs.readFileSync(path.join(PT, 'avatars.js'), 'utf8');
+    check('肖像引擎为 24×28 具象半身像', avSrc.includes('buildGrid') && avSrc.includes('青琥珀双缘光'));
+    check('CSS 引用背景场景', fs.readFileSync(path.join(PT, 'style.css'), 'utf8').includes('bg-echo.png'));
     check('data.js 角色源指向卡库编译产物', dataSrc.includes('window.PT_CARD_CHARACTERS'));
     const webCardDir = path.join(ROOT, 'public', 'web', 'sites', 'echocraft', 'cards');
     const webCards = fs.existsSync(webCardDir) ? fs.readdirSync(webCardDir).filter(f => f.startsWith('card-') && f.endsWith('.png')) : [];
     check(`/web 卡封面 ≥ 9（实际 ${webCards.length}）`, webCards.length >= 9);
     const webHtml = fs.existsSync(path.join(ROOT, 'public', 'web', 'index.html')) ? fs.readFileSync(path.join(ROOT, 'public', 'web', 'index.html'), 'utf8') : '';
-    check('/web 含 V2.1 卡源合一公告', webHtml.includes('卡源合一'));
+    check('/web 含 V2.2 琉璃像馆公告', webHtml.includes('琉璃像馆'));
     /* Vercel Serverless 版像素 API（ai-ic.top 自动部署路径） */
     const apiDir = path.join(ROOT, 'api', 'pixel');
     const apiFiles = ['_lib.js', 'chat.js', 'status.js', 'probe.js', 'visit.js', 'stats.js', 'seo.js'];

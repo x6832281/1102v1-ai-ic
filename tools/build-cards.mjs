@@ -85,6 +85,7 @@ function compile(d, file, override) {
         greeting: first,
         alts,
         palette: ext.palette || ov.palette || { hair: '#e8c97a', bg1: '#3a5a40', skin: '#f2d3b3' },
+        avatar: ext.avatar || ov.avatar || null,
         script,
         origin: 'builtin',
         cardFile: file,

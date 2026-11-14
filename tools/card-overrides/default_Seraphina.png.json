@@ -33,6 +33,13 @@
         "让她教你一句精灵语的问候",
         "安静地陪她整理草药"
       ]
+    },
+    "avatar": {
+      "hairStyle": "long",
+      "bangs": "center",
+      "trim": "#00d1b2",
+      "mouth": "soft",
+      "earring": false
     }
   },
   "content": {

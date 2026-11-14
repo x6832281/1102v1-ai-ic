@@ -22,8 +22,8 @@ const PT_CATEGORIES = [
 const PT_CHARACTERS = window.PT_CARD_CHARACTERS || [];
 
 const PT_NEWS = {
-    version: 'V2.1',
-    codename: '卡源合一',
+    version: 'V2.2',
+    codename: '琉璃像馆',
     date: '2026.11.14',
 };
 

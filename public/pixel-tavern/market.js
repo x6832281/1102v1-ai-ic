@@ -72,7 +72,7 @@ function makeCardEl(char, opts = {}) {
     const cover = document.createElement('div');
     cover.className = 'card-cover';
     const av = document.createElement('img');
-    av.src = PTAvatar.toDataURL(char, 96); /* 走缓存，重渲染零重绘 */
+    av.src = PTAvatar.toDataURL(char, 320, 400); /* 全幅封面（走缓存，重渲染零重绘） */
     av.alt = '';
     av.draggable = false;
     cover.appendChild(av);
@@ -114,8 +114,8 @@ function makeCardEl(char, opts = {}) {
     const info = document.createElement('div');
     info.className = 'card-info';
     info.innerHTML = `<div class="card-name">${highlight(char.name, searchQ)}</div><div class="card-cat">${highlight(char.title || '', searchQ)} · ${esc(catName(char.category))}</div>`;
+    cover.appendChild(info); /* 信息层内嵌封面底部（渐变压字） */
     el.appendChild(cover);
-    el.appendChild(info);
     el.addEventListener('click', () => openDetail(char.id));
     /* 键盘可达：Tab 聚焦 + Enter/Space 打开详情 */
     el.tabIndex = 0;
@@ -140,17 +140,44 @@ function renderGrid(sel, chars, emptyText) {
     chars.forEach(c => grid.appendChild(makeCardEl(c)));
 }
 
+/* 焦点档案（SPOTLIGHT）：推荐角色优先，无推荐标记时按分类首见兜底，保证不空 */
+function renderSpotlight() {
+    const strip = $('#shelf-strip');
+    strip.innerHTML = '';
+    const pool = allChars();
+    let featured = pool.filter(c => (c.tags || []).includes('推荐'));
+    if (!featured.length) {
+        const seen = new Set();
+        featured = pool.filter(c => (c.category === 'custom' ? true : !seen.has(c.category) && seen.add(c.category)));
+    }
+    featured.slice(0, 8).forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'spot-item';
+        el.tabIndex = 0;
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', '聚焦角色 ' + c.name);
+        const raw = ((c.alts && c.alts[0]) || c.greeting || '').replace(/\s+/g, ' ').trim();
+        const quote = raw.length > 32 ? raw.slice(0, 32) + '…' : raw;
+        el.innerHTML =
+            `<div class="spot-avatar"><img src="${PTAvatar.toDataURL(c, 112)}" alt=""></div>` +
+            `<div class="spot-meta"><div class="spot-name">${highlight(c.name, searchQ)}</div>` +
+            `<div class="spot-title">${esc(c.title || '')} · ${esc(catName(c.category))}</div>` +
+            (quote ? `<div class="spot-quote">${esc(quote)}</div>` : '') +
+            `</div>`;
+        el.addEventListener('click', () => openDetail(c.id));
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(c.id); }
+        });
+        strip.appendChild(el);
+    });
+}
+
 function renderMarket() {
     refreshTodayCache();
     const list = filteredMarket();
     renderGrid('#card-grid', list, '没有匹配的角色卡，换个分类或关键词试试。');
     $('#result-count').textContent = list.length;
-    /* 滑卡书架：取前 8 张 */
-    const strip = $('#shelf-strip');
-    strip.innerHTML = '';
-    allChars().filter(c => (c.tags || []).includes('推荐')).slice(0, 8).forEach(c => {
-        strip.appendChild(makeCardEl(c, { small: true }));
-    });
+    renderSpotlight();
 }
 
 /* ============================================================
