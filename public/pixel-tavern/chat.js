@@ -163,7 +163,11 @@ function openChat(id, greetOverride) {
     PTAvatar.draw($('#chat-avatar'), c);
     /* 角色专属环境音律：只切换选中曲目，是否播放仍由用户决定 */
     if (typeof c.ambient === 'number' && window.PTJukebox && window.PTJukebox.current) {
-        if (window.PTJukebox.index !== c.ambient) window.PTJukebox.select(c.ambient);
+        if (window.PTJukebox.index !== c.ambient) {
+            window.PTJukebox.select(c.ambient);
+            const mn = document.getElementById('mini-track-name');
+            if (mn) mn.textContent = window.PTJukebox.current.name + ' · ' + c.name; /* 迷你播放器同步曲名（R16） */
+        }
     }
     $('#chat-log').innerHTML = '';
     $('#immersive-panel').classList.toggle('hidden', !state.chat.immersive);
