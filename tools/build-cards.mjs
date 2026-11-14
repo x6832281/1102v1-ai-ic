@@ -66,6 +66,7 @@ function compile(d, file, override) {
                 try { return [new RegExp(src), reply]; } catch { return null; }
             }).filter(Boolean),
             fallbacks: scriptSrc.fallbacks || [],
+            chapters: scriptSrc.chapters || [],
             options: scriptSrc.options || [],
         };
     }

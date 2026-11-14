@@ -70,6 +70,7 @@ try {
     check('lore keys 均为合法正则', chars.every(c => c.lore.every(e => { try { new RegExp(e.keys); return true; } catch { return false; } })));
     const jbCount = (fs.readFileSync(path.join(PT, 'jukebox.js'), 'utf8').match(/name: '/g) || []).length;
     check('角色 ambient 音律索引合法', chars.every(c => c.ambient == null || (Number.isInteger(c.ambient) && c.ambient >= 0 && c.ambient < jbCount)));
+    check('剧情章节阈值递增', chars.every(c => { const ch = (c.script && c.script.chapters) || []; return ch.every((x, i) => i === 0 || x.at > ch[i - 1].at); }));
     const jbSrc = fs.readFileSync(path.join(PT, 'jukebox.js'), 'utf8');
     check('点唱机曲目 ≥ 7', (jbSrc.match(/name: '/g) || []).length >= 7);
     check('工坊含设定集输入 build-lore', fs.readFileSync(path.join(PT, 'index.html'), 'utf8').includes('build-lore'));

@@ -327,7 +327,13 @@ function renderTrack() {
     const box = $('#imm-track-text');
     if (!box) return;
     const c = state.chat.char;
-    const main = (c && c.script && c.script.track) || '—';
+    /* 章节推进：script.chapters = [{at: 共鸣阈值, text}]，取最后一个 at <= 当前共鸣度的章节 */
+    let main = (c && c.script && c.script.track) || '—';
+    const chapters = (c && c.script && c.script.chapters) || [];
+    if (chapters.length) {
+        const hit = chapters.filter(ch => (ch.at || 0) <= state.chat.favor).pop();
+        if (hit) main = hit.text;
+    }
     let html = `<div class="tl-item now">${esc(main)}</div>`;
     state.chat.events.slice(-3).reverse().forEach(ev => {
         html += `<div class="tl-item old">${esc(ev)}</div>`;
