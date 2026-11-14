@@ -943,6 +943,95 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* ---------- 世界书 v1：设定集折叠区 ---------- */
+.detail-lore {
+    margin-top: 12px;
+    border: 1px solid rgba(0, 209, 178, 0.18);
+    border-radius: 10px;
+    background: rgba(9, 15, 24, 0.5);
+    overflow: hidden;
+}
+
+.detail-lore summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.detail-lore summary::-webkit-details-marker {
+    display: none;
+}
+
+.detail-lore summary::before {
+    content: '▸';
+    color: var(--accent);
+    transition: transform 0.18s ease;
+}
+
+.detail-lore[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.detail-lore .en {
+    font-size: 10px;
+    color: var(--text-dim);
+}
+
+.detail-lore .lore-hint {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-dim);
+}
+
+#detail-lore-list {
+    padding: 2px 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lore-item {
+    border-left: 2px solid rgba(0, 209, 178, 0.35);
+    padding: 4px 0 4px 12px;
+}
+
+.lore-item.core {
+    border-left-color: rgba(245, 158, 11, 0.55);
+}
+
+.lore-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lore-title i {
+    font-style: normal;
+    font-size: 9.5px;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    background: rgba(245, 158, 11, 0.16);
+    color: #fbbf24;
+}
+
+.lore-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-top: 3px;
+}
+
 .empty-tip {
     grid-column: 1 / -1;
     text-align: center;

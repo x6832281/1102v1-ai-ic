@@ -193,6 +193,17 @@ function openDetail(id) {
     $('#detail-tags').innerHTML = (c.tags || []).map(t => `<span class="px-tag">${esc(t)}</span>`).join('');
     $('#detail-desc').textContent = c.desc || '（暂无简介）';
     $('#detail-greet').textContent = '「' + (c.greeting || '……') + '」';
+    /* 世界书 v1：设定集折叠区 */
+    const loreBox = $('#detail-lore');
+    const loreList = $('#detail-lore-list');
+    if (loreBox && loreList) {
+        const lore = c.lore || [];
+        loreBox.classList.toggle('hidden', !lore.length);
+        loreBox.open = false;
+        loreList.innerHTML = lore.map(e =>
+            `<div class="lore-item${e.core ? ' core' : ''}"><div class="lore-title">${esc(e.title || '')}${e.core ? '<i>核心</i>' : ''}</div><div class="lore-text">${esc(e.text || '')}</div></div>`
+        ).join('');
+    }
     const rand = mulberry32(id.length * 131 + (c.seed || 0));
     $('#detail-pop').style.width = (55 + Math.floor(rand() * 40)) + '%';
     $('#detail-act').style.width = (35 + Math.floor(rand() * 60)) + '%';

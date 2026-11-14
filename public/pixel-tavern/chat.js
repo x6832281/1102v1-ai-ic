@@ -40,16 +40,42 @@ function aiReady() {
     return Boolean((PT_AI.status && PT_AI.status.ai) || (cfg.base && cfg.key));
 }
 
+/* 世界书 v1：按最近对话关键词挑设定集条目；命中不足时补核心条目 */
+function pickLore(char, hist) {
+    const lore = char.lore || [];
+    if (!lore.length) return '';
+    const recent = (hist || []).slice(-6).map(m => m.text || '').join('\n');
+    const picked = [];
+    const seen = new Set();
+    for (const entry of lore) {
+        if (entry.keys) {
+            try {
+                if (new RegExp(entry.keys, 'i').test(recent)) { picked.push(entry); seen.add(entry.title); }
+            } catch { /* 非法正则跳过 */ }
+        }
+    }
+    if (picked.length < 2) {
+        for (const entry of lore) {
+            if (entry.core && !seen.has(entry.title)) { picked.push(entry); seen.add(entry.title); }
+            if (picked.length >= 4) break;
+        }
+    }
+    if (picked.length > 6) picked.length = 6;
+    return picked.map(e => '- ' + (e.title || '设定') + '：' + e.text).join('\n');
+}
+
 function buildAIMessages(char) {
+    const hist = (state.chat.session && state.chat.session.messages) || [];
+    const loreText = pickLore(char, hist);
     const sys = [
         '你是「' + char.name + '」——幻境回声 (EchoCraft) 沉浸式叙事互动中的角色。',
         char.title ? '角色定位：' + char.title + '。' : '',
         char.desc ? '角色设定：' + char.desc : '',
         char.example ? '对话风格示例（{{user}} = 用户，{{char}} = 你；模仿其语气与格式）：\n' + char.example : '',
+        loreText ? '设定集（世界观与关系背景；可在对话中自然引用相关细节，不要一次性罗列，不要生硬复述）：\n' + loreText : '',
         '风格要求：全程用中文；保持角色扮演不出戏，不要提及你是 AI 或模型；动作用（…）表示，台词用「…」，偶尔用*轻动作*；每次回复控制在 50~200 字；根据用户的输入自然推进剧情，可以主动制造小事件或提问。',
     ].filter(Boolean).join('\n');
     const msgs = [{ role: 'system', content: sys }];
-    const hist = (state.chat.session && state.chat.session.messages) || [];
     for (const m of hist.slice(-24)) {
         if (m.role === 'user') msgs.push({ role: 'user', content: m.text });
         else if (m.role === 'char') msgs.push({ role: 'assistant', content: m.text });

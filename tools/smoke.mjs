@@ -65,6 +65,8 @@ try {
     check('轮换开场白二段化', chars.every(c => Array.isArray(c.alts) && c.alts.length >= 2));
     check('剧本关键词均为合法正则', chars.every(c => (c.script.keywords || []).every(([re]) => { try { new RegExp(re.source ?? re); return true; } catch { return false; } })));
     check('角色人设量级（合计正文 ≥ 12000 字）', chars.reduce((n, c) => n + c.desc.length + c.alts.join('').length + (c.example || '').length, 0) >= 12000);
+    check('每位角色有设定集 lore ≥ 3 条', chars.every(c => Array.isArray(c.lore) && c.lore.length >= 3));
+    check('lore 条目含 keys 与 text', chars.every(c => c.lore.every(e => typeof e.keys === 'string' && typeof e.text === 'string' && e.text.length > 20)));
 } catch (e) {
     check('卡库数据可在 vm 沙箱执行', false, e.message);
 }
