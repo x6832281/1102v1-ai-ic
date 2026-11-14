@@ -1372,3 +1372,10 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **实施**：①导出载荷补 avatar/lore/example 并镜像 echocraft 命名空间——导出的 PNG 卡丢进经典酒馆卡库可被 build-cards 直接识别收回门户（双向闭环）；②PNG/JSON 导入还原扩展（lore/avatar/example/alternate_greetings/title/palette），外来卡也享受世界书注入与具象头像；③详情页默认选中「当日开场白」（按日序，仍可手动切换）。
 - **验证**：smoke 121/121；浏览器实测导出载荷（lore/avatar/echocraft ✓）与 spotlight 轮换（首位移至 Seraphina ✓）。
 - **提交**：本地（未推送）。
+
+## 决策轮 R8+R9（2026.11.14，持续优化）
+
+- **R8**：重写 README.md 为 EchoCraft 项目门面（特性/三入口/卡库管线/部署/授权致谢），公开 GitHub 仓库的门面与 AGPL 合规声明一次到位。
+- **R9**：聊天视图角色身份感——openChat 注入 --chat-accent（角色环境色），聊天头部底线与角色气泡左缘随角色变色；详情弹窗头像 96→128。
+- **验证**：smoke 121/121；语法全绿。
+- **提交**：本地（未推送）。

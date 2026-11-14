@@ -152,6 +152,12 @@ function openChat(id, greetOverride) {
         session: { id: 's_' + Date.now(), charId: c.id, charName: c.name, time: Date.now(), messages: [] },
         fbIdx: 0, favor: 20, mood: 60, events: [], aiBusy: false,
     };
+    /* 角色身份色：聊天头部与角色气泡以角色环境色作点缀 */
+    const acc = (c.palette && c.palette.bg1) || '#2c3e6b';
+    const hx = acc.replace('#','');
+    const n = parseInt(hx.length === 3 ? hx.split('').map(x=>x+x).join('') : hx, 16);
+    document.documentElement.style.setProperty('--chat-accent', acc);
+    document.documentElement.style.setProperty('--chat-accent-soft', 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ', 0.16)');
     $('#chat-char-name').textContent = c.name;
     $('#chat-char-title').textContent = c.title ? c.title + ' · ' + catName(c.category) : catName(c.category);
     PTAvatar.draw($('#chat-avatar'), c);

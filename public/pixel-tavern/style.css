@@ -1073,6 +1073,7 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 }
 
 #chat-header {
+    border-bottom: 2px solid var(--chat-accent-soft, rgba(0, 209, 178, 0.25));
     display: flex;
     align-items: center;
     gap: 14px;
@@ -1202,6 +1203,7 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 .msg.char .bubble {
     background: var(--panel-2);
     border-color: rgba(255, 255, 255, 0.1);
+    border-left: 2px solid var(--chat-accent-soft, rgba(0, 209, 178, 0.3));
     border-top-left-radius: 4px;
 }
 
