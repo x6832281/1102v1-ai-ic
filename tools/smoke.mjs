@@ -28,12 +28,12 @@ function section(t) { console.log(`\n■ ${t}`); }
 
 /* ---------- 1. 文件完整性 ---------- */
 section('文件完整性');
-['index.html', 'style.css', 'app.js', 'chat.js', 'market.js', 'data.js', 'avatars.js', 'jukebox.js', 'fonts/zpix-subset.woff2']
+['index.html', 'style.css', 'app.js', 'chat.js', 'market.js', 'cards.js', 'data.js', 'avatars.js', 'jukebox.js', 'fonts/zpix-subset.woff2']
     .forEach(f => check(`存在 ${f}`, fs.existsSync(path.join(PT, f))));
 
 /* ---------- 2. JS 语法 ---------- */
 section('JS 语法（node --check）');
-['app.js', 'chat.js', 'market.js', 'data.js', 'avatars.js', 'jukebox.js'].forEach(f => {
+['cards.js', 'app.js', 'chat.js', 'market.js', 'data.js', 'avatars.js', 'jukebox.js'].forEach(f => {
     try {
         execFileSync(process.execPath, ['--check', path.join(PT, f)], { stdio: 'pipe' });
         check(`语法 ${f}`, true);
@@ -42,27 +42,31 @@ section('JS 语法（node --check）');
     }
 });
 
-/* ---------- 3. 角色数据不变量 ---------- */
-section('角色数据不变量');
+/* ---------- 3. 角色数据不变量（卡库编译产物 cards.js 为唯一角色源） ---------- */
+section('角色数据不变量（卡库编译产物）');
 try {
-    const src = fs.readFileSync(path.join(PT, 'data.js'), 'utf8');
+    const cardsSrc = fs.readFileSync(path.join(PT, 'cards.js'), 'utf8');
     const sandbox = { window: {}, console };
     vm.createContext(sandbox);
-    vm.runInContext(src, sandbox);
+    vm.runInContext(cardsSrc, sandbox);   /* cards.js 先载入：window.PT_CARD_CHARACTERS */
+    vm.runInContext(fs.readFileSync(path.join(PT, 'data.js'), 'utf8'), sandbox);
     const chars = sandbox.window.PT_CHARACTERS || [];
     const cats = sandbox.window.PT_CATEGORIES || [];
+    check('cards.js 为生成物（含勿手改标记）', cardsSrc.includes('生成物，勿手改'));
     check(`分类 ≥ 8（实际 ${cats.length}）`, cats.length >= 8);
-    check(`内置角色 ≥ 12（实际 ${chars.length}）`, chars.length >= 12);
+    check(`内置角色 ≥ 9（实际 ${chars.length}）`, chars.length >= 9);
     const ids = chars.map(c => c.id);
     check('角色 id 唯一', new Set(ids).size === ids.length);
+    check('角色 id 以 card- 开头（卡源标记）', chars.every(c => typeof c.id === 'string' && c.id.startsWith('card-')));
     check('分类 id 均有定义', chars.every(c => cats.some(k => k.id === c.category)));
     check('每位角色有 greeting', chars.every(c => typeof c.greeting === 'string' && c.greeting.length > 0));
     check('每位角色有剧本 fallbacks', chars.every(c => c.script && Array.isArray(c.script.fallbacks) && c.script.fallbacks.length > 0));
     check('每位角色有调色板', chars.every(c => c.palette && c.palette.hair && c.palette.bg1 && c.palette.skin));
     check('轮换开场白二段化', chars.every(c => Array.isArray(c.alts) && c.alts.length >= 2));
     check('剧本关键词均为合法正则', chars.every(c => (c.script.keywords || []).every(([re]) => { try { new RegExp(re.source ?? re); return true; } catch { return false; } })));
+    check('角色人设量级（合计正文 ≥ 12000 字）', chars.reduce((n, c) => n + c.desc.length + c.alts.join('').length + (c.example || '').length, 0) >= 12000);
 } catch (e) {
-    check('data.js 可在 vm 沙箱执行', false, e.message);
+    check('卡库数据可在 vm 沙箱执行', false, e.message);
 }
 
 /* ---------- 4. HTML 资源引用 ---------- */
@@ -155,6 +159,15 @@ try {
     /* 数据版本 */
     const dataSrc = fs.readFileSync(path.join(PT, 'data.js'), 'utf8');
     check('PT_NEWS 结构完整（version/codename）', /const PT_NEWS = \{/.test(dataSrc) && /version: '/.test(dataSrc) && /codename: '/.test(dataSrc));
+    /* 卡库管线（角色数据源工具链，V2.1 卡源合一） */
+    ['make-demo-cards.mjs', 'build-cards.mjs', 'make-card-covers.mjs'].forEach(f => check(`卡库工具存在 tools/${f}`, fs.existsSync(path.join(ROOT, 'tools', f))));
+    check('Seraphina 门户补充文件存在', fs.existsSync(path.join(ROOT, 'tools', 'card-overrides', 'default_Seraphina.png.json')));
+    check('data.js 角色源指向卡库编译产物', dataSrc.includes('window.PT_CARD_CHARACTERS'));
+    const webCardDir = path.join(ROOT, 'public', 'web', 'sites', 'echocraft', 'cards');
+    const webCards = fs.existsSync(webCardDir) ? fs.readdirSync(webCardDir).filter(f => f.startsWith('card-') && f.endsWith('.png')) : [];
+    check(`/web 卡封面 ≥ 9（实际 ${webCards.length}）`, webCards.length >= 9);
+    const webHtml = fs.existsSync(path.join(ROOT, 'public', 'web', 'index.html')) ? fs.readFileSync(path.join(ROOT, 'public', 'web', 'index.html'), 'utf8') : '';
+    check('/web 含 V2.1 卡源合一公告', webHtml.includes('卡源合一'));
     /* Vercel Serverless 版像素 API（ai-ic.top 自动部署路径） */
     const apiDir = path.join(ROOT, 'api', 'pixel');
     const apiFiles = ['_lib.js', 'chat.js', 'status.js', 'probe.js', 'visit.js', 'stats.js', 'seo.js'];

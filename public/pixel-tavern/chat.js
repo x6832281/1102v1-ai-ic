@@ -45,6 +45,7 @@ function buildAIMessages(char) {
         '你是「' + char.name + '」——幻境回声 (EchoCraft) 沉浸式叙事互动中的角色。',
         char.title ? '角色定位：' + char.title + '。' : '',
         char.desc ? '角色设定：' + char.desc : '',
+        char.example ? '对话风格示例（{{user}} = 用户，{{char}} = 你；模仿其语气与格式）：\n' + char.example : '',
         '风格要求：全程用中文；保持角色扮演不出戏，不要提及你是 AI 或模型；动作用（…）表示，台词用「…」，偶尔用*轻动作*；每次回复控制在 50~200 字；根据用户的输入自然推进剧情，可以主动制造小事件或提问。',
     ].filter(Boolean).join('\n');
     const msgs = [{ role: 'system', content: sys }];
