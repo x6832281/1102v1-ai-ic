@@ -1323,3 +1323,17 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **实施**：①浏览器端用新 PTAvatar.drawToCanvas 合成 15 张封面（bg1→bg2 深空渐变 + 回声弧点缀 + 网格纹理）；②make-echocraft-brand.mjs 扩展 drawScene（1440×810 深空回声场景：星云辉光/星点/三层回声弧/琥珀棱镜/双波形/暗角，153KB）；③clone 全面改版（品牌 幻境回声 ECHOCRAFT V2.0、PERSONA DOSSIER、新分类 tabs、V2.0 公告、scene 路径、去 pixelated）；④主仓库 public/sites/game-tavern 移除（被 echocraft 取代）。
 - **验证**：npm run check 全绿；本地 /web/ 15/15 封面 + 场景 + 品牌（截图）；旧品牌 0 残留。
 - **下轮建议**：推送上线（含 /web EchoCraft 版 + EchoCraft og-banner/icons）；点唱机曲目扩充；GitHub 开源角色卡收集（核许可证）。
+
+## 决策轮 R3（2026.11.14，用户发起 brainstorming）
+
+- **起点**：用户问「角色和内容是不是都没有」。盘点结论：非「没有」而是「薄」——15 位原创角色每位仅 ~400 字总量，全项目 0 世界书；而经典酒馆卡库里有 Seraphina（官方默认卡，2851 字人设）+ 8 张 ~75 字演示卡，且两套体系互不相通、线上站（Serverless）只见门户 15 位。
+- **用户决策**：删掉门户 15 位原创角色，改用经典酒馆角色卡（卡库成为唯一角色数据源）。
+- **实施（V2.1「卡源合一」）**：
+  1. make-demo-cards.mjs 重写：8 位原创卡全面加厚（人设 500-700 字 + 3 段轮换开场 + 示例对话 + extensions 离线剧本/分类/调色板），品牌改 EchoCraft；
+  2. build-cards.mjs 新增：PNG 卡库 → cards.js 编译（window.PT_CARD_CHARACTERS），卡 PNG 缺失时由 tools/card-overrides 兜底（Seraphina 补充中文轮换开场/分类/剧本）；
+  3. data.js 瘦身为编辑数据；chat.js AI 提示词注入示例对话；沉浸面板对无剧本卡自动兜底（原有机制）；
+  4. make-card-covers.mjs 新增：9 张 512×640 EchoCraft 海报（/web 用）；修复 drawAvatar hex 调色板未转 RGB 的隐患（卡图此前渲染异常）；
+  5. /web 发现页 9 卡 + V2.1 公告；版本徽标 V2.1。
+- **验证**：smoke 113/113 全绿（含本地服务器检查：经典酒馆角色卡 API 实际 9 张）；clone lint 0。
+- **提交**：主仓库 febf8037b、clone cf38f96（均本地，未推送）。
+- **下轮建议**：推送部署；世界书/lorebook 长线内容体系（当前 0 条）；开源角色卡收集（核许可证 → docs/credits.md）。
