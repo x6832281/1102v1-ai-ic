@@ -111,6 +111,7 @@ const CARDS = [
     {
         file: 'JiangWanyin.png', name: '江晚吟', title: '辩论社社长',
         category: 'mystery', seed: 11,
+        geo: { eyeL: 1.0, eyeDX: 26, browW: 7, browY: -18, mouthW: 6.2, noseY: 34, jawW: 0.96, faceW: 0.96 },
         ambient: 3,
         avatar: { hairStyle: 'long', bangs: 'side', glasses: true, mouth: 'calm', trim: '#00d1b2' },
         lore: [
@@ -155,6 +156,7 @@ const CARDS = [
     {
         file: 'LuoQingxian.png', name: '洛清弦', title: '御剑仙子',
         category: 'fantasy', seed: 21,
+        geo: { eyeL: 1.18, eyeDX: 28, browW: 6, browY: -19, mouthW: 5.6, noseY: 36, jawW: 1.0, faceW: 1.0 },
         ambient: 0,
         avatar: { hairStyle: 'long', bangs: 'center', trim: '#00d1b2', earring: false, mouth: 'calm' , glasses: false},
         lore: [
@@ -199,6 +201,7 @@ const CARDS = [
     {
         file: 'SuNianan.png', name: '苏念安', title: '青梅竹马',
         category: 'quiet', seed: 31,
+        geo: { eyeL: 0.94, eyeDX: 24, browW: 9, browY: -17, mouthW: 7.4, noseY: 33, jawW: 1.06, faceW: 1.04 },
         ambient: 0,
         avatar: { hairStyle: 'ponytail', bangs: 'full', mouth: 'soft', trim: '#fbbf24' , glasses: false},
         lore: [
@@ -242,6 +245,7 @@ const CARDS = [
     {
         file: 'GuXingci.png', name: '顾星辞', title: '咖啡店长',
         category: 'quiet', seed: 32,
+        geo: { eyeL: 0.84, eyeDX: 30, browW: 5, browY: -16, mouthW: 5.2, noseY: 34, jawW: 0.94, faceW: 0.94 },
         ambient: 2,
         avatar: { hairStyle: 'short', bangs: 'side', mouth: 'smile', trim: '#00d1b2' , glasses: false},
         lore: [
@@ -286,6 +290,7 @@ const CARDS = [
     {
         file: 'DianGuang.png', name: '电光', title: '异能管理局新人',
         category: 'neon', seed: 51,
+        geo: { eyeL: 1.18, eyeDX: 27, browW: 8, browY: -19, mouthW: 8.4, noseY: 30, jawW: 1.0, faceW: 1.0 },
         ambient: 4,
         avatar: { hairStyle: 'twin', bangs: 'full', mouth: 'smile', trim: '#fbbf24' , glasses: false},
         lore: [
@@ -329,6 +334,7 @@ const CARDS = [
     {
         file: 'WenRuan.png', name: '温阮', title: '尚药局女官',
         category: 'history', seed: 61,
+        geo: { eyeL: 1.05, eyeDX: 25, browW: 7, browY: -16, mouthW: 6.4, noseY: 36, jawW: 1.02, faceW: 1.02 },
         ambient: 3,
         avatar: { hairStyle: 'bun', bangs: 'side', earring: true, mouth: 'soft', trim: '#fbbf24' , glasses: false},
         lore: [
@@ -373,6 +379,7 @@ const CARDS = [
     {
         file: 'BaiChe.png', name: '白澈', title: '雨港灯夫',
         category: 'fantasy', seed: 71,
+        geo: { eyeL: 0.9, eyeDX: 29, browW: 6, browY: -17, mouthW: 6.0, noseY: 34, jawW: 0.98, faceW: 0.98 },
         ambient: 5,
         avatar: { hairStyle: 'short', bangs: 'center', mouth: 'calm', trim: '#00d1b2' , glasses: false},
         lore: [
@@ -416,6 +423,7 @@ const CARDS = [
     {
         file: 'Vila.png', name: '薇拉', title: '见习魔女',
         category: 'fantasy', seed: 81,
+        geo: { eyeL: 1.12, eyeDX: 23, browW: 8, browY: -18, mouthW: 7.8, noseY: 32, jawW: 1.0, faceW: 1.0 },
         ambient: 6,
         avatar: { hairStyle: 'bob', bangs: 'full', hat: true, mouth: 'smile', trim: '#fbbf24' , glasses: false},
         lore: [
@@ -493,6 +501,7 @@ for (const c of CARDS) {
                     title: c.title,
                     avatar: c.avatar || null,
                     lore: c.lore || null,
+                    geo: c.geo || null,
                     ambient: typeof c.ambient === 'number' ? c.ambient : null,
                     category: c.category,
                     seed: c.seed,

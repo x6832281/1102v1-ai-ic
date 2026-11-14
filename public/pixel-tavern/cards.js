@@ -2,7 +2,7 @@
  * 幻境回声 · EchoCraft — 门户角色数据（生成物，勿手改）
  * 来源：data/default-user/characters/*.png（经典酒馆卡库，唯一角色数据源）
  * 重新生成：node tools/make-demo-cards.mjs && node tools/build-cards.mjs
- * 生成时间：2026-11-14T09:57:21.470Z
+ * 生成时间：2026-11-14T19:16:21.178Z
  * ============================================================ */
 'use strict';
 
@@ -63,6 +63,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "雨夜有旅人在灯下停留，他会递过去半块干姜糖——老码头的规矩：灯下的人，都算路上的人。"
             }
         ],
+        "geo": {
+            "eyeL": 0.9,
+            "eyeDX": 29,
+            "browW": 6,
+            "browY": -17,
+            "mouthW": 6,
+            "noseY": 34,
+            "jawW": 0.98,
+            "faceW": 0.98
+        },
         "ambient": 5,
         "script": {
             "track": "雨港深宵——第 33 盏灯的船，还有七天到港",
@@ -176,6 +186,7 @@ window.PT_CARD_CHARACTERS = [
                 "text": "Her magic is nurturing rather than forceful: closing wounds, warming rooms, calming nightmares. It tires her, and she pretends it does not."
             }
         ],
+        "geo": null,
         "ambient": 0,
         "script": {
             "track": "森林深处精灵的庇护所——客人正在康复中",
@@ -252,6 +263,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "工牌背面写着一行小字：「成为传说级巡夜员，让所有人夜里敢关灯睡觉。」——包括她自己。巡逻日志末页画着一张手绘地图，你常待的街口那格被涂了黄色，旁边标注：「安全」。"
             }
         ],
+        "geo": {
+            "eyeL": 1.18,
+            "eyeDX": 27,
+            "browW": 8,
+            "browY": -19,
+            "mouthW": 8.4,
+            "noseY": 30,
+            "jawW": 1,
+            "faceW": 1
+        },
         "ambient": 4,
         "script": {
             "track": "东九街区夜巡——配电井 C-7 区隐患排查进行中",
@@ -370,6 +391,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "手冲赛银奖那年，他退了租约。别人问他图什么，他只说想让咖啡回到「一杯」本身。店里恒温二十二度，磨豆机的节奏从不乱——稳得像他这个人。"
             }
         ],
+        "geo": {
+            "eyeL": 0.84,
+            "eyeDX": 30,
+            "browW": 5,
+            "browY": -16,
+            "mouthW": 5.2,
+            "noseY": 34,
+            "jawW": 0.94,
+            "faceW": 0.94
+        },
         "ambient": 2,
         "script": {
             "track": "凌晨一点的巷口店——今晚的最后一位客人已经落座",
@@ -488,6 +519,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "周五决赛在即，辩题周四定，正反方抽签。她给某人留了「义务陪练」的位置——名义是辅导，实际出勤簿上那人的名字排在第一行。赛后惯例是校门口的关东煮。"
             }
         ],
+        "geo": {
+            "eyeL": 1,
+            "eyeDX": 26,
+            "browW": 7,
+            "browY": -18,
+            "mouthW": 6.2,
+            "noseY": 34,
+            "jawW": 0.96,
+            "faceW": 0.96
+        },
         "ambient": 3,
         "script": {
             "track": "新学期第 7 场辩论赛备赛周——决赛辩题待定",
@@ -607,6 +648,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "东境云层深处接连传来异动，剑阁长老议了三日未决。她擦拭闻弦的次数变多了——山上没有捷径，等待也是修行的一环。"
             }
         ],
+        "geo": {
+            "eyeL": 1.18,
+            "eyeDX": 28,
+            "browW": 6,
+            "browY": -19,
+            "mouthW": 5.6,
+            "noseY": 36,
+            "jawW": 1,
+            "faceW": 1
+        },
         "ambient": 0,
         "script": {
             "track": "云海之约——东境云层深处有异动，剑阁收到传讯",
@@ -720,6 +771,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "书包里永远多装一份你爱吃的点心，牛奶永远是「第二件半价顺手买的」。所有关心都要包装成顺手，所有在意都要否认三连——但便利贴上的「别多想」三个字，总是描粗一圈。日记本上了锁，钥匙挂在钥匙串最里面。"
             }
         ],
+        "geo": {
+            "eyeL": 0.94,
+            "eyeDX": 24,
+            "browW": 9,
+            "browY": -17,
+            "mouthW": 7.4,
+            "noseY": 33,
+            "jawW": 1.06,
+            "faceW": 1.04
+        },
         "ambient": 0,
         "script": {
             "track": "大学城秋日——两栋楼之间的旧楼梯与十四年的顺手",
@@ -839,6 +900,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "她的笔记里给旅团收留的那位旅人留了一页，标题歪歪扭扭写着「搭档观察记录」：哪天笑得最多、喝汤先喝汤底还是先吃料、说「没关系」的时候哪几次是真的没关系。她不知道这一页叫什么——师父知道了大概会告诉她：那叫在意。"
             }
         ],
+        "geo": {
+            "eyeL": 1.12,
+            "eyeDX": 23,
+            "browW": 8,
+            "browY": -18,
+            "mouthW": 7.8,
+            "noseY": 32,
+            "jawW": 1,
+            "faceW": 1
+        },
         "ambient": 6,
         "script": {
             "track": "黄昏旅团营地——毕业考核的夜行科目备演中",
@@ -958,6 +1029,16 @@ window.PT_CARD_CHARACTERS = [
                 "text": "搭脉之前她先看你的眼睛——「脉会撒谎，眼睛不会」。隔着一道帘子能听出咳嗽的深浅，隔着三步能闻出空腹喝的凉茶。这是吃饭的本事，也是她关心人的方式。"
             }
         ],
+        "geo": {
+            "eyeL": 1.05,
+            "eyeDX": 25,
+            "browW": 7,
+            "browY": -16,
+            "mouthW": 6.4,
+            "noseY": 36,
+            "jawW": 1.02,
+            "faceW": 1.02
+        },
         "ambient": 3,
         "script": {
             "track": "宫城入冬——今岁御药房的安神方正在重新配伍",

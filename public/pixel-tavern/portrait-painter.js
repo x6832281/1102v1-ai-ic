@@ -184,12 +184,15 @@
         g._s = s;
 
         const p = buildSpec(char, char.seed || 1);
+        const geo = char.geo || {};
+        /* 卡设几何优先于随机：geo.eyeL/eyeDX/browW/mouthW/noseY/jawW 覆盖随机值 */
         const rand = mulberry32((char.seed || 1) * 3 + 7);
         const skinC = hexRGB(p.skin), skinD = shade(p.skin, -20), skinDD = shade(p.skin, -46), skinHi = shade(p.skin, 14);
         const hairC = hexRGB(p.hair), hairL = shade(p.hair, 44), hairD = shade(p.hair, -32), hairDD = shade(p.hair, -62);
         const bgC = hexRGB(p.bg1);
         const bodyTop = shade(p.bg1, -8), bodyBot = shade(p.bg1, -64);
         const eyeC = mix(shade(p.bg1, -74), hexRGB(TEAL), 0.2);
+        const geoL = geo.eyeL, geoDX = geo.eyeDX, geoBrowW = geo.browW, geoBrowY = geo.browY, geoMouthW = geo.mouthW, geoNoseY = geo.noseY, geoJawW = geo.jawW;
         const lipC = [186, 104, 92];
         const trimC = hexRGB(p.trim);
         const tealC = hexRGB(TEAL), amberC = hexRGB(AMBER);
@@ -285,16 +288,16 @@
         g.ell(headCX + S(56), headCY + S(4), S(9), S(13), 0.12, skinC, skinD, 1);
         g.glow(headCX - S(38), headCY + S(30), S(14), [244, 158, 158], 0.42);
         g.glow(headCX + S(38), headCY + S(30), S(14), [244, 158, 158], 0.42);
-        g.glow(headCX, headCY + S(p.noseY || 34), S(6), skinDD, 0.55);
+        g.glow(headCX, headCY + S(geoNoseY || p.noseY || 34), S(6), skinDD, 0.55);
         /* 鼻梁高光 + 下巴反光 */
-        g.capsule(headCX, headCY + S((p.noseY || 34) - 14), headCX, headCY + S((p.noseY || 34) - 3), Math.max(0.7, S(1.5)), skinHi, 0.4);
+        g.capsule(headCX, headCY + S((geoNoseY || p.noseY || 34) - 14), headCX, headCY + S((geoNoseY || p.noseY || 34) - 3), Math.max(0.7, S(1.5)), skinHi, 0.4);
         g.glow(headCX, headCY + S(56), S(9), skinHi, 0.4);
 
         /* ===== 眼睛 ===== */
         const eyeY = headCY + S(10);
         for (const side of [-1, 1]) {
-            const ex = headCX + side * S(p.eyeDX || 26);
-            const eL = S(10) * (p.eyeL || 1);
+            const ex = headCX + side * S(geoDX || p.eyeDX || 26);
+            const eL = S(10) * (geoL || p.eyeL || 1);
             g.glow(ex, eyeY, S(17), skinHi, 0.3);
             const es = S(p.eyeSize || 1);
             g.ell(ex, eyeY + side * S(p.eyeTilt || 0) * 8, S(15), S(11.5) * (p.eyeSize || 1), 0, skinD, skinC, 0.45);
@@ -315,14 +318,14 @@
             g.capsule(ex + side * S(11), eyeY - S(8.6), ex + side * S(16), eyeY - S(12.4), Math.max(0.9, S(1.8)), hairDD, 0.8);
             /* 眉形弧化（full 刘海自然遮盖眉区时跳过） */
             const skipBrow = p.bangs === 'full' && !p.hat;
-            const bw = S(p.browW || 9);
+            const bw = S(geoBrowW || p.browW || 9);
             if (!skipBrow) {
-                g.capsule(ex - side * bw * 0.7, headCY - S((p.browY || 17) + 1), ex + side * bw * 0.35, headCY - S(p.browY || 17), Math.max(0.9, S(1.9)), mix(hairD, skinC, 0.5), 0.62);
-                g.capsule(ex + side * bw * 0.35, headCY - S(p.browY || 17), ex + side * bw * 0.75, headCY - S((p.browY || 17) - 1), Math.max(0.9, S(1.9)), mix(hairD, skinC, 0.5), 0.62);
+                g.capsule(ex - side * bw * 0.7, headCY - S((geoBrowY || p.browY || 17) + 1), ex + side * bw * 0.35, headCY - S(geoBrowY || p.browY || 17), Math.max(0.9, S(1.9)), mix(hairD, skinC, 0.5), 0.62);
+                g.capsule(ex + side * bw * 0.35, headCY - S(geoBrowY || p.browY || 17), ex + side * bw * 0.75, headCY - S((geoBrowY || p.browY || 17) - 1), Math.max(0.9, S(1.9)), mix(hairD, skinC, 0.5), 0.62);
             }
         }
 
-        const mw = S(p.mouthW || 6.8);
+        const mw = S(geoMouthW || p.mouthW || 6.8);
         /* 口型 */
         if (p.mouth === 'smile') {
             g.ell(headCX, headCY + S(47), S(7.6), S(3.6), 0, mix(lipC, [255, 255, 255], 0.12), lipC, 0.92);

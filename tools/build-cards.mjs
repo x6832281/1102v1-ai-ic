@@ -88,6 +88,7 @@ function compile(d, file, override) {
         palette: ext.palette || ov.palette || { hair: '#e8c97a', bg1: '#3a5a40', skin: '#f2d3b3' },
         avatar: ext.avatar || ov.avatar || null,
         lore: ext.lore || ov.lore || null,
+        geo: ext.geo || ov.geo || null,
         ambient: (typeof ext.ambient === 'number' ? ext.ambient : null) ?? (typeof ov.ambient === 'number' ? ov.ambient : null),
         script,
         origin: 'builtin',
