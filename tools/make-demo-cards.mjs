@@ -111,6 +111,7 @@ const CARDS = [
     {
         file: 'JiangWanyin.png', name: '江晚吟', title: '辩论社社长',
         category: 'mystery', seed: 11,
+        ambient: 3,
         avatar: { hairStyle: 'long', bangs: 'side', glasses: true, mouth: 'calm', trim: '#00d1b2' },
         lore: [
             { keys: '辩论社|活动室|社团|比赛|辩题', title: '市三中辩论社', core: true, text: '市三中辩论社，五届市冠军。活动室规矩三条：资料看完归原位、输赢不许摔门、最后走的人关灯。出勤簿第一行永远是同一个名字——那是她默认会来的人。' },
@@ -149,6 +150,7 @@ const CARDS = [
     {
         file: 'LuoQingxian.png', name: '洛清弦', title: '御剑仙子',
         category: 'fantasy', seed: 21,
+        ambient: 0,
         avatar: { hairStyle: 'long', bangs: 'center', trim: '#00d1b2', earring: false, mouth: 'calm' , glasses: false},
         lore: [
             { keys: '剑|闻弦|御剑|剑阁', title: '太虚剑阁与「闻弦」', core: true, text: '太虚剑阁首席弟子，佩剑「闻弦」随她十一年，出鞘四十七次，皆为人，不为胜负。御剑三千里不歇，从不下山——除非山下出现了值得下山的人。' },
@@ -187,6 +189,7 @@ const CARDS = [
     {
         file: 'SuNianan.png', name: '苏念安', title: '青梅竹马',
         category: 'quiet', seed: 31,
+        ambient: 0,
         avatar: { hairStyle: 'ponytail', bangs: 'full', mouth: 'soft', trim: '#fbbf24' , glasses: false},
         lore: [
             { keys: '十四年|小时候|青梅|长大|幼儿园', title: '十四年的时间线', core: true, text: '幼儿园小班起做了十四年邻居，如今读同一所大学。从分半根冰棍到同走一段夜路——她说久到有些话，说出来会显得很奇怪，所以等你先说。' },
@@ -224,6 +227,7 @@ const CARDS = [
     {
         file: 'GuXingci.png', name: '顾星辞', title: '咖啡店长',
         category: 'quiet', seed: 32,
+        ambient: 2,
         avatar: { hairStyle: 'short', bangs: 'side', mouth: 'smile', trim: '#00d1b2' , glasses: false},
         lore: [
             { keys: '咖啡|店|星辞|打烊|深夜', title: '星辞咖啡', core: true, text: '巷口「星辞咖啡」，日落开门天亮打烊。做过三年连锁店长、拿过手冲赛银奖，却在事业最好的时候盘下这条巷子里最便宜的铺面。他说：深夜的人比白天诚实，也更值得一杯好咖啡。' },
@@ -262,6 +266,7 @@ const CARDS = [
     {
         file: 'DianGuang.png', name: '电光', title: '异能管理局新人',
         category: 'neon', seed: 51,
+        ambient: 4,
         avatar: { hairStyle: 'twin', bangs: 'full', mouth: 'smile', trim: '#fbbf24' , glasses: false},
         lore: [
             { keys: '工号|巡夜|巡逻|新人|管理局', title: '工号 7042', core: true, text: '霓虹城异能管理局最年轻的巡夜新人。入局不到一年：零投诉、三次提前发现配电井隐患、给迷路的醉汉登记过十七次家庭住址。局长晨会点名表扬那天，她敬礼时指尖劈了个火花，烧了局长的公文一角——全组替她瞒了三天。' },
@@ -299,6 +304,7 @@ const CARDS = [
     {
         file: 'WenRuan.png', name: '温阮', title: '尚药局女官',
         category: 'history', seed: 61,
+        ambient: 3,
         avatar: { hairStyle: 'bun', bangs: 'side', earring: true, mouth: 'soft', trim: '#fbbf24' , glasses: false},
         lore: [
             { keys: '药|尚药局|女官|调药|化苦为甘', title: '化苦为甘', core: true, text: '江南药户出身，十六岁入尚药局，三年从碾房做到御药房。一手「化苦为甘」：再苦的方子经她手煎出来，入口先甘后温。局里说她性子软——可药理上她一寸不让。' },
@@ -337,6 +343,7 @@ const CARDS = [
     {
         file: 'BaiChe.png', name: '白澈', title: '雨港灯夫',
         category: 'fantasy', seed: 71,
+        ambient: 5,
         avatar: { hairStyle: 'short', bangs: 'center', mouth: 'calm', trim: '#00d1b2' , glasses: false},
         lore: [
             { keys: '妖灯|灯|点灯|灯夫|码头', title: '三十七盏妖灯', core: true, text: '雨港老码头不进电网——三十七盏妖灯从防波堤第一根灯柱排到灯塔脚下，代代由灯夫手工点灯。每盏灯芯里封着一缕不肯散的旧梦：灯亮着，梦就安分；灯灭了，雨夜就会有不该有的脚步声。铁律写在守灯簿扉页：灯，永不吹灭。' },
@@ -374,6 +381,7 @@ const CARDS = [
     {
         file: 'Vila.png', name: '薇拉', title: '见习魔女',
         category: 'fantasy', seed: 81,
+        ambient: 6,
         avatar: { hairStyle: 'bob', bangs: 'full', hat: true, mouth: 'smile', trim: '#fbbf24' , glasses: false},
         lore: [
             { keys: '星星|帽子|毕业|考核|第七颗', title: '六颗半的尖顶帽', core: true, text: '正式魔女的帽子缀七颗银星，她的缝到六颗半——最后半颗是师父拿锡纸糊的「鼓励分」。第七颗要等毕业考核（笔试、实操、单独夜行）。她早就想好：第七颗用旅团每个人的帚毛缠的线来缝，这样它飞起来的时候，就带着大家。' },
@@ -445,6 +453,7 @@ for (const c of CARDS) {
                     title: c.title,
                     avatar: c.avatar || null,
                     lore: c.lore || null,
+                    ambient: typeof c.ambient === 'number' ? c.ambient : null,
                     category: c.category,
                     seed: c.seed,
                     palette: c.pal,

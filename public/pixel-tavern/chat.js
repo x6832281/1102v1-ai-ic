@@ -161,6 +161,10 @@ function openChat(id, greetOverride) {
     $('#chat-char-name').textContent = c.name;
     $('#chat-char-title').textContent = c.title ? c.title + ' · ' + catName(c.category) : catName(c.category);
     PTAvatar.draw($('#chat-avatar'), c);
+    /* 角色专属环境音律：只切换选中曲目，是否播放仍由用户决定 */
+    if (typeof c.ambient === 'number' && window.PTJukebox && window.PTJukebox.current) {
+        if (window.PTJukebox.index !== c.ambient) window.PTJukebox.select(c.ambient);
+    }
     $('#chat-log').innerHTML = '';
     $('#immersive-panel').classList.toggle('hidden', !state.chat.immersive);
     updateModeBadge();

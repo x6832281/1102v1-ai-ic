@@ -183,6 +183,13 @@ const PTJukebox = (() => {
         return playing;
     }
 
+    function select(i) {
+        if (!Number.isInteger(i) || i < 0 || i >= TRACKS.length) return TRACKS[trackIdx];
+        trackIdx = i;
+        step = 0;
+        return TRACKS[trackIdx];
+    }
+
     function next(dir = 1) {
         trackIdx = (trackIdx + dir + TRACKS.length) % TRACKS.length;
         step = 0;
@@ -196,6 +203,7 @@ const PTJukebox = (() => {
 
     return {
         TRACKS,
+        select,
         play,
         pause,
         toggle,
