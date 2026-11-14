@@ -1366,3 +1366,9 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **实施**：①创作者工坊接入 lore 编辑器（`关键词 | 标题 | 内容` 每行一条，首行核心，创建/编辑双向支持，自制角色同样享受世界书注入）；②焦点档案 spotlight 每日轮换（按日序旋转池子，聚焦位每天不同）；③点唱机 +3 首原创环境音律（霓虹天台/雨港灯影/魔女营地，7 首总量，各配对应角色世界）；④新增 docs/CREDITS.md（SillyTavern AGPL 基座、Seraphina 卡来源、Zpix 字体子集如实登记 + 收录规则）。
 - **验证**：smoke 121/121（新增曲目数/build-lore/CREDITS 断言）。
 - **提交**：本地（未推送）。
+
+## 决策轮 R7（2026.11.14，持续优化）
+
+- **实施**：①导出载荷补 avatar/lore/example 并镜像 echocraft 命名空间——导出的 PNG 卡丢进经典酒馆卡库可被 build-cards 直接识别收回门户（双向闭环）；②PNG/JSON 导入还原扩展（lore/avatar/example/alternate_greetings/title/palette），外来卡也享受世界书注入与具象头像；③详情页默认选中「当日开场白」（按日序，仍可手动切换）。
+- **验证**：smoke 121/121；浏览器实测导出载荷（lore/avatar/echocraft ✓）与 spotlight 轮换（首位移至 Seraphina ✓）。
+- **提交**：本地（未推送）。

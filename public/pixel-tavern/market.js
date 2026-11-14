@@ -239,7 +239,8 @@ function openDetail(id) {
     if (expPngBtn) expPngBtn.classList.toggle('hidden', !(c.origin === 'custom' || c.origin === 'imported'));
     /* 轮换开场白预览 */
     state._greetList = [c.greeting, ...(c.alts || [])];
-    state._greetIdx = 0;
+    const gl = c.alts && c.alts.length ? c.alts.length : 1;
+    state._greetIdx = Math.floor(Date.now() / 864e5) % gl; /* 每日开场白：按日序轮换，可手动切换 */
     const cycleBtn = $('#btn-greet-cycle');
     if (cycleBtn) cycleBtn.classList.toggle('hidden', state._greetList.length < 2);
     const favBtn = $('#btn-fav-toggle');
@@ -400,33 +401,43 @@ function initImport() {
                 const data = parsePngCard(buf);
                 if (data) {
                     const d = data.data || data;
+                    const px = (d.extensions && (d.extensions.pixel_tavern || d.extensions.echocraft)) || null;
+                    const alt = (d.alternate_greetings || []).map(g => String(g).slice(0, 300));
                     card = {
                         id: 'imported_' + Date.now(),
                         name: d.name || file.name.replace(/\.png$/i, ''),
-                        title: (d.metadata && d.metadata.nickname) || '导入角色',
+                        title: (d.metadata && d.metadata.nickname) || (px && px.title) || '导入角色',
                         category: 'custom',
                         seed: Math.floor(Math.random() * 100000),
                         tags: ['导入'],
                         desc: (d.description || '从角色卡 PNG 导入。').slice(0, 300),
                         greeting: (d.first_mes || '……').slice(0, 300),
+                        alts: [(d.first_mes || '……').slice(0, 300), ...alt].slice(0, 3),
+                        example: (d.mes_example || '').slice(0, 1200),
+                        lore: (px && px.lore) || null,
+                        avatar: (px && px.avatar) || null,
                         origin: 'imported',
-                        palette: { hair: '#b8a8e8', bg1: '#4a4a6b', bg2: '#2a2a42', skin: '#f2d3b3' },
+                        palette: (px && px.palette) || { hair: '#b8a8e8', bg1: '#4a4a6b', bg2: '#2a2a42', skin: '#f2d3b3' },
                     };
                 }
             } else {
                 const text = await file.text();
                 const d = JSON.parse(text);
                 const dd = d.data || d;
-                const px = dd.extensions && dd.extensions.pixel_tavern;
+                const px = dd.extensions && (dd.extensions.pixel_tavern || dd.extensions.echocraft);
                 card = {
                     id: 'imported_' + Date.now(),
                     name: dd.name || '导入角色',
-                    title: (dd.metadata && dd.metadata.nickname) || '导入角色',
+                    title: (dd.metadata && dd.metadata.nickname) || (px && px.title) || '导入角色',
                     category: 'custom',
                     seed: Math.floor(Math.random() * 100000),
                     tags: ['导入'],
                     desc: (dd.description || '').slice(0, 300) || '从 JSON 导入的角色卡。',
                     greeting: (dd.first_mes || '……').slice(0, 300),
+                    alts: [(dd.first_mes || '……').slice(0, 300), ...((dd.alternate_greetings || []).map(g => String(g).slice(0, 300)))].slice(0, 3),
+                    example: (dd.mes_example || '').slice(0, 1200),
+                    lore: (px && px.lore) || null,
+                    avatar: (px && px.avatar) || null,
                     origin: 'imported',
                     palette: (px && px.palette) || { hair: '#b8a8e8', bg1: '#4a4a6b', bg2: '#2a2a42', skin: '#f2d3b3' },
                 };
@@ -562,12 +573,20 @@ function buildCardPayload(c) {
                     id: c.id,
                     palette: c.palette,
                     origin: c.origin,
+                    avatar: c.avatar || null,
+                    lore: c.lore || null,
+                    example: c.example || '',
                     script: c.script ? {
                         keywords: (c.script.keywords || []).map(([re, reply]) => [re.source ?? String(re), re.flags ?? '', reply]),
                         fallbacks: c.script.fallbacks || [],
                         track: c.script.track || '',
                         options: c.script.options || [],
                     } : null,
+                },
+                echocraft: {
+                    title: c.title || '',
+                    avatar: c.avatar || null,
+                    lore: c.lore || null,
                 },
             },
         },
