@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -68,6 +69,17 @@ try {
     check('每位角色有设定集 lore ≥ 3 条', chars.every(c => Array.isArray(c.lore) && c.lore.length >= 3));
     check('lore 条目含 keys 与 text', chars.every(c => c.lore.every(e => typeof e.keys === 'string' && typeof e.text === 'string' && e.text.length > 20)));
     check('lore keys 均为合法正则', chars.every(c => c.lore.every(e => { try { new RegExp(e.keys); return true; } catch { return false; } })));
+    /* lore 快照测试：防止设定集文本被静默改写（有意变更需重跑 node tools/update-lore-snapshot.mjs） */
+    const snapPath = path.join(ROOT, 'tools', 'lore-snapshot.json');
+    const loreNow = JSON.stringify(chars.map(c => ({ id: c.id, lore: (c.lore || []).map(e => ({ keys: e.keys, title: e.title, text: e.text, core: !!e.core })) })));
+    const loreHash = crypto.createHash('sha256').update(loreNow).digest('hex').slice(0, 16);
+    if (!fs.existsSync(snapPath)) {
+        fs.writeFileSync(snapPath, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), hash: loreHash }, null, 2));
+        check('lore 快照缺失 → 已生成基线', true);
+    } else {
+        const snapHash = JSON.parse(fs.readFileSync(snapPath, 'utf8')).hash;
+        check('lore 快照一致（无静默改写）', snapHash === loreHash);
+    }
     const jbCount = (fs.readFileSync(path.join(PT, 'jukebox.js'), 'utf8').match(/name: '/g) || []).length;
     check('角色 ambient 音律索引合法', chars.every(c => c.ambient == null || (Number.isInteger(c.ambient) && c.ambient >= 0 && c.ambient < jbCount)));
     check('剧情章节阈值递增', chars.every(c => { const ch = (c.script && c.script.chapters) || []; return ch.every((x, i) => i === 0 || x.at > ch[i - 1].at); }));
