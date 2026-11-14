@@ -3,8 +3,67 @@
   "outputDirectory": "public",
   "cleanUrls": true,
   "redirects": [
-    { "source": "/", "destination": "/pixel-tavern", "permanent": false },
-    { "source": "/robots.txt", "destination": "/api/pixel/robots", "permanent": false },
-    { "source": "/sitemap.xml", "destination": "/api/pixel/sitemap", "permanent": false }
+    {
+      "source": "/",
+      "destination": "/pixel-tavern",
+      "permanent": false
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/pixel/robots",
+      "permanent": false
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/pixel/sitemap",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/pixel-tavern",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/pixel-tavern/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/pixel-tavern/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/web",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/web/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
   ]
 }
