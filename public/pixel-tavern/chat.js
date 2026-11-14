@@ -330,11 +330,19 @@ function renderTrack() {
     /* 章节推进：script.chapters = [{at: 共鸣阈值, text}]，取最后一个 at <= 当前共鸣度的章节 */
     let main = (c && c.script && c.script.track) || '—';
     const chapters = (c && c.script && c.script.chapters) || [];
+    let chIdx = -1;
     if (chapters.length) {
-        const hit = chapters.filter(ch => (ch.at || 0) <= state.chat.favor).pop();
+        chapters.forEach((ch, i) => { if ((ch.at || 0) <= state.chat.favor) chIdx = i; });
+        const hit = chapters[chIdx];
         if (hit) main = hit.text;
     }
-    let html = `<div class="tl-item now">${esc(main)}</div>`;
+    /* 章节 UI：章号徽标 + 推进时轻推一条叙事 toast（R15 微调） */
+    const badge = chIdx >= 0 ? `<span class="ch-badge">第 ${chIdx + 1}/${chapters.length} 章</span>` : '';
+    if (chIdx >= 0 && typeof state.chat.lastChapterIdx === 'number' && chIdx > state.chat.lastChapterIdx && chIdx > 0) {
+        toast('剧情推进 —— 进入第 ' + (chIdx + 1) + ' 章');
+    }
+    state.chat.lastChapterIdx = chIdx;
+    let html = `<div class="tl-item now">${badge}${esc(main)}</div>`;
     state.chat.events.slice(-3).reverse().forEach(ev => {
         html += `<div class="tl-item old">${esc(ev)}</div>`;
     });

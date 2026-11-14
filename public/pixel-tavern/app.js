@@ -112,6 +112,10 @@ function switchView(name) {
 /* ============================================================
  * 历史
  * ============================================================ */
+/* 会话纪要筛选（瞬时态，不入库） */
+let histQuery = '';
+let histChip = '';
+
 function renderHistory() {
     const box = $('#history-list');
     box.innerHTML = '';
@@ -124,12 +128,41 @@ function renderHistory() {
         stats.innerHTML = `共 <b>${state.history.length}</b> 段对话 · <b>${totalMsgs}</b> 条消息 · 与 <b>${chars}</b> 位角色互动 · 你输出了 <b>${words}</b> 字`;
     }
     if (!state.history.length) {
+        /* 无会话时同样清空筛选控件状态 */
+        const chips = $('#hist-chips');
+        if (chips) chips.innerHTML = '';
         box.innerHTML = '<div class="empty-tip"><canvas class="empty-art" width="128" height="112"></canvas>还没有历史对话。从集市挑一位角色开始冒险吧！</div>';
         const art = box.querySelector('.empty-art');
         if (art) drawLantern(art);
         return;
     }
-    state.history.forEach(h => {
+    /* 筛选 chips：按会话中出现过的角色聚合（R15） */
+    const chipsBox = $('#hist-chips');
+    if (chipsBox) {
+        const seen = new Map();
+        state.history.forEach(h => { if (!seen.has(h.charId)) seen.set(h.charId, h.charName || '未知'); });
+        chipsBox.innerHTML = `<button type="button" class="hist-chip${histChip === '' ? ' active' : ''}" data-id="">全部 ${state.history.length}</button>` +
+            [...seen.entries()].map(([id, name]) =>
+                `<button type="button" class="hist-chip${histChip === id ? ' active' : ''}" data-id="${esc(id)}">${esc(name)}</button>`
+            ).join('');
+        chipsBox.querySelectorAll('.hist-chip').forEach(b => b.addEventListener('click', () => {
+            histChip = b.dataset.id || '';
+            renderHistory();
+        }));
+    }
+    /* 过滤：角色 chip + 实时关键词（角色名与会话全文） */
+    const q = histQuery.trim().toLowerCase();
+    const list = state.history.filter(h => {
+        if (histChip && h.charId !== histChip) return false;
+        if (!q) return true;
+        return (h.charName || '').toLowerCase().includes(q)
+            || (h.messages || []).some(m => (m.text || '').toLowerCase().includes(q));
+    });
+    if (!list.length) {
+        box.innerHTML = '<div class="empty-tip">没有匹配的会话——换个关键词，或点「全部」复位。</div>';
+        return;
+    }
+    list.forEach(h => {
         const row = document.createElement('div');
         row.className = 'history-row';
         const char = findChar(h.charId);
@@ -174,6 +207,12 @@ function renderHistory() {
         box.appendChild(row);
     });
 }
+
+/* 纪要实时筛选输入（一次性绑定，输入即时重渲染） */
+(function initHistSearch() {
+    const inp = $('#hist-search');
+    if (inp) inp.addEventListener('input', () => { histQuery = inp.value; renderHistory(); });
+})();
 
 function reopenHistory(id) {
     const h = state.history.find(x => x.id === id);
