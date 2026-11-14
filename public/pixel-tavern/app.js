@@ -133,15 +133,8 @@ function renderHistory() {
         const row = document.createElement('div');
         row.className = 'history-row';
         const char = findChar(h.charId);
-        if (char) {
-            const av = document.createElement('img');
-            av.className = 'hist-avatar';
-            av.src = PTAvatar.toDataURL(char, 64);
-            av.alt = '';
-            av.draggable = false;
-            row.appendChild(av);
-        }
-        row.innerHTML += `
+        /* 头像在 HTML 之后前置插入（innerHTML += 会抹掉先前 appendChild 的节点） */
+        row.innerHTML = `
             <div class="hist-main">
                 <div class="hist-name">${esc(h.charName)}</div>
                 <div class="hist-last">${esc((h.messages[h.messages.length - 1] || {}).text || '').slice(0, 60)}</div>
@@ -150,6 +143,21 @@ function renderHistory() {
                 <span>${new Date(h.time).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                 <span>${h.messages.length} 条</span>
             </div>`;
+        if (char) {
+            const av = document.createElement('img');
+            av.className = 'hist-avatar';
+            av.src = PTAvatar.toDataURL(char, 64);
+            av.alt = '';
+            av.draggable = false;
+            row.prepend(av);
+        } else {
+            /* 孤儿会话（角色已被移除/旧世代数据）：首字占位头像兜底 */
+            const fb = document.createElement('span');
+            fb.className = 'hist-avatar fallback';
+            fb.textContent = (h.charName || '？').slice(0, 1);
+            fb.setAttribute('aria-hidden', 'true');
+            row.prepend(fb);
+        }
         const openBtn = document.createElement('button');
         openBtn.className = 'px-btn'; openBtn.textContent = '继续';
         openBtn.addEventListener('click', () => reopenHistory(h.id));
