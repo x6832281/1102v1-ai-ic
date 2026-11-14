@@ -177,6 +177,12 @@ function openChat(id, greetOverride) {
     /* 开场白 */
     pushMessage('char', greet || '……', { save: true, tts: true, instant: false });
     updateImmersive(greet || '');
+    /* 设定集切入：预填输入框，由用户确认发送（R17） */
+    if (state._loreSeeding) {
+        const inp = $('#chat-input');
+        if (inp) inp.value = state._loreSeeding;
+        state._loreSeeding = null;
+    }
     /* 确保页面从集市滚动位置回到顶部（输入法/焦点可能引发残留滚动） */
     requestAnimationFrame(() => window.scrollTo(0, 0));
 }
@@ -368,7 +374,10 @@ function updateImmersive(replyText) {
     const optsBox = $('#chat-options');
     optsBox.innerHTML = '';
     const base = ['继续和 ta 聊聊这件事', '换个轻松的话题', '告辞，改日再来'];
-    const custom = (c.script && c.script.options) || [];
+    /* 行动选项按章节联动：当前章节有专属 options 时优先（R17） */
+    const chaptersNow = (c.script && c.script.chapters) || [];
+    const cur = chaptersNow.length ? chaptersNow.filter(ch => (ch.at || 0) <= state.chat.favor).pop() : null;
+    const custom = (cur && cur.options && cur.options.length) ? cur.options : ((c.script && c.script.options) || []);
     const pool = custom.length ? custom : base;
     shuffle(pool).slice(0, 3).forEach(op => {
         const b = document.createElement('button');

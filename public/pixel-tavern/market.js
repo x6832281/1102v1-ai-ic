@@ -202,9 +202,17 @@ function openDetail(id) {
         const lore = c.lore || [];
         loreBox.classList.toggle('hidden', !lore.length);
         loreBox.open = false;
-        loreList.innerHTML = lore.map(e =>
-            `<div class="lore-item${e.core ? ' core' : ''}"><div class="lore-title">${esc(e.title || '')}${e.core ? '<i>核心</i>' : ''}</div><div class="lore-text">${esc(e.text || '')}</div></div>`
+        loreList.innerHTML = lore.map((e, i) =>
+            `<div class="lore-item${e.core ? ' core' : ''}" data-i="${i}" title="点击以此话题切入对话"><div class="lore-title">${esc(e.title || '')}${e.core ? '<i>核心</i>' : ''}</div><div class="lore-text">${esc(e.text || '')}</div></div>`
         ).join('');
+        loreList.querySelectorAll('.lore-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const entry = lore[Number(el.dataset.i) || 0];
+                if (!entry) return;
+                state._loreSeeding = '说到「' + (entry.title || '设定') + '」——我想多了解一点。';
+                if (typeof window.openChat === 'function') window.openChat(c.id);
+            });
+        });
     }
     const rand = mulberry32(id.length * 131 + (c.seed || 0));
     $('#detail-pop').style.width = (55 + Math.floor(rand() * 40)) + '%';

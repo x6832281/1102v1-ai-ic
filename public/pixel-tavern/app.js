@@ -194,6 +194,22 @@ function renderHistory() {
         const openBtn = document.createElement('button');
         openBtn.className = 'px-btn'; openBtn.textContent = '继续';
         openBtn.addEventListener('click', () => reopenHistory(h.id));
+        const expBtn = document.createElement('button');
+        expBtn.className = 'px-btn'; expBtn.textContent = '⬇'; expBtn.title = '导出这段对话（Markdown）';
+        expBtn.addEventListener('click', () => {
+            const lines = ['# 与 ' + (h.charName || '角色') + ' 的对话', '', '- 时间：' + new Date(h.time).toLocaleString('zh-CN'), '- 消息数：' + h.messages.length, ''];
+            (h.messages || []).forEach(msg => {
+                lines.push((msg.role === 'user' ? '**你**：' : '**' + (h.charName || '角色') + '**：') + (msg.text || ''));
+                lines.push('');
+            });
+            const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'echo-' + (h.charName || 'chat') + '-' + new Date(h.time).toISOString().slice(0, 10) + '.md';
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 3000);
+            toast('已导出这段对话（Markdown）');
+        });
         const delBtn = document.createElement('button');
         delBtn.className = 'px-btn danger'; delBtn.textContent = '删除';
         delBtn.addEventListener('click', () => askConfirm('删除这段对话记录？', () => {
@@ -202,7 +218,7 @@ function renderHistory() {
         }));
         const btns = document.createElement('div');
         btns.className = 'hist-btns';
-        btns.appendChild(openBtn); btns.appendChild(delBtn);
+        btns.appendChild(openBtn); btns.appendChild(expBtn); btns.appendChild(delBtn);
         row.appendChild(btns);
         box.appendChild(row);
     });
