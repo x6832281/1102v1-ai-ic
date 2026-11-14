@@ -486,6 +486,7 @@ function bindEvents() {
         $('#build-cat').value = c.category;
         $('#build-greeting').value = c.greeting || '';
         $('#build-desc').value = c.desc || '';
+        $('#build-lore').value = (c.lore || []).map(e => [e.keys, e.title, e.text].join(' | ')).join('\n');
         $('#build-hair').value = (c.palette && c.palette.hair) || '#e8c97a';
         $('#build-bg').value = (c.palette && c.palette.bg1) || '#3a5a40';
         $('#build-name').dispatchEvent(new Event('input'));

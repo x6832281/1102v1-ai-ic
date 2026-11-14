@@ -144,11 +144,13 @@ function renderGrid(sel, chars, emptyText) {
 function renderSpotlight() {
     const strip = $('#shelf-strip');
     strip.innerHTML = '';
+    const day = Math.floor(Date.now() / 864e5);
     const pool = allChars();
-    let featured = pool.filter(c => (c.tags || []).includes('推荐'));
+    const rotated = pool.map((c, i) => pool[(i + day) % pool.length]);
+    let featured = rotated.filter(c => (c.tags || []).includes('推荐'));
     if (!featured.length) {
         const seen = new Set();
-        featured = pool.filter(c => (c.category === 'custom' ? true : !seen.has(c.category) && seen.add(c.category)));
+        featured = rotated.filter(c => (c.category === 'custom' ? true : !seen.has(c.category) && seen.add(c.category)));
     }
     featured.slice(0, 8).forEach(c => {
         const el = document.createElement('div');
@@ -260,6 +262,20 @@ function resetBuildForm() {
     $('#build-name').dispatchEvent(new Event('input'));
 }
 
+/* 世界书输入解析：每行「关键词 | 标题 | 内容」（两段式视为关键词 | 内容），首行标记核心 */
+function parseLoreInput(raw) {
+    return (raw || '').split('\n').map(l => l.trim()).filter(Boolean).map((line, i) => {
+        const parts = line.split('|').map(p => p.trim()).filter(Boolean);
+        if (parts.length < 2) return null;
+        return {
+            keys: parts[0],
+            title: parts.length >= 3 ? parts[1] : (parts[1].slice(0, 10) || '设定 ' + (i + 1)),
+            text: parts.length >= 3 ? parts.slice(2).join('：') : parts[1],
+            core: i === 0,
+        };
+    }).filter(e => e && e.text);
+}
+
 function initBuild() {
     const sel = $('#build-cat');
     PT_CATEGORIES.filter(c => c.id !== 'all' && c.id !== 'custom').forEach(c => {
@@ -294,6 +310,7 @@ function initBuild() {
             card.category = $('#build-cat').value;
             card.greeting = $('#build-greeting').value.trim() || '你好，我是' + name + '。很高兴与你连线。';
             card.desc = $('#build-desc').value.trim() || '由幻境回声创作者工坊构建的个性化档案。';
+            card.lore = parseLoreInput($('#build-lore').value);
             card.palette = { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' };
             saveCustom();
             resetBuildForm();
@@ -311,6 +328,7 @@ function initBuild() {
             tags: ['自制'],
             desc: $('#build-desc').value.trim() || '由幻境回声创作者工坊构建的个性化档案。',
             greeting: $('#build-greeting').value.trim() || '你好，我是' + name + '。很高兴与你连线。',
+            lore: parseLoreInput($('#build-lore').value),
             origin: 'custom',
             palette: { hair: $('#build-hair').value, bg1: $('#build-bg').value, bg2: $('#build-bg').value, skin: '#f2d3b3' },
             script: {

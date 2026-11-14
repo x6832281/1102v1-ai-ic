@@ -67,6 +67,10 @@ try {
     check('角色人设量级（合计正文 ≥ 12000 字）', chars.reduce((n, c) => n + c.desc.length + c.alts.join('').length + (c.example || '').length, 0) >= 12000);
     check('每位角色有设定集 lore ≥ 3 条', chars.every(c => Array.isArray(c.lore) && c.lore.length >= 3));
     check('lore 条目含 keys 与 text', chars.every(c => c.lore.every(e => typeof e.keys === 'string' && typeof e.text === 'string' && e.text.length > 20)));
+    const jbSrc = fs.readFileSync(path.join(PT, 'jukebox.js'), 'utf8');
+    check('点唱机曲目 ≥ 7', (jbSrc.match(/name: '/g) || []).length >= 7);
+    check('工坊含设定集输入 build-lore', fs.readFileSync(path.join(PT, 'index.html'), 'utf8').includes('build-lore'));
+    check('存在 docs/CREDITS.md 许可证文档', fs.existsSync(path.join(ROOT, 'docs', 'CREDITS.md')));
 } catch (e) {
     check('卡库数据可在 vm 沙箱执行', false, e.message);
 }
