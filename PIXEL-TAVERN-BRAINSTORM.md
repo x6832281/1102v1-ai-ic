@@ -1509,3 +1509,4 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **镜环虚边**：band() 步进 48/r*2 → 64/r*3，环线边缘台阶消除。
 - **验证**：smoke 130/130；本地核验 --accent=#00d1b2、data-accent=echo。
 - **R27 追加（critic R26 复验新发现 P1×2）**：①顾星辞开场白 -menu 泄漏记号→『菜单撕掉之前』（make-demo-cards 源头修复，全链路重编译）；②行内台词竖条——.quote 行内 span 误用块级 border-left，句中读作游离光标，改纯色高亮。critic 附带微调（光渍 alpha +0.05）一并落地。双修复经打字机流式完成后 DOM 直读核验（hasMenu:false / hasMenuFix:true / quoteBar:false）。
+- **R27 终验 PASS（art-critic 独立实测）**：流完成态聊天图 5x 像素核查零竖条+高亮语义保留+「菜单撕掉」无回归；重渲 neon 封面光渍达标定格；线上 cards.js 实拉 100,628B 三方一致（「菜单撕掉」×2 / -menu 零命中 / 哦。零命中）。判定链：R25 ITERATE → R25b ITERATE → R25f DELIVER → R26 四项 PASS → R27 全项 PASS 正式收口。P0×3、P1×8、P2×5 全关闭，余量仅 mystery 镜环虚边与 quiet 垂线语义两条微瑕（critic 裁定不构成开工理由，顺路处理）。
