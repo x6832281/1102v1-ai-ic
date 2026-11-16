@@ -2657,3 +2657,15 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 #detail-lore-list::-webkit-scrollbar-track {
     background: transparent;
 }
+
+/* R25e：横向滚动区右缘渐隐（滚动可供性） */
+#shelf-strip {
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 30px), rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 30px), rgba(0, 0, 0, 0) 100%);
+}
+@media (max-width: 760px) {
+    #cat-tabs {
+        -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), rgba(0, 0, 0, 0) 100%);
+        mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), rgba(0, 0, 0, 0) 100%);
+    }
+}
