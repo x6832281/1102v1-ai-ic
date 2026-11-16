@@ -203,7 +203,7 @@ function openDetail(id) {
         loreBox.classList.toggle('hidden', !lore.length);
         loreBox.open = false;
         loreList.innerHTML = lore.map((e, i) =>
-            `<div class="lore-item${e.core ? ' core' : ''}" data-i="${i}" title="点击以此话题切入对话"><div class="lore-title">${esc(e.title || '')}${e.core ? '<i>核心</i>' : ''}</div><div class="lore-text">${esc(e.text || '')}</div></div>`
+            `<div class="lore-item${e.core ? ' core' : ''}" data-i="${i}" title="点击以此话题切入对话"><div class="lore-title">${esc(e.title || '')}${e.core ? '<i>核心</i>' : ''}</div><div class="lore-text">${esc(e.text || '').split(/\n+/).map((t) => `<p>${t}</p>`).join('')}</div></div>`
         ).join('');
         loreList.querySelectorAll('.lore-item').forEach(el => {
             el.addEventListener('click', () => {

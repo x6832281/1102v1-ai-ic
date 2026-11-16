@@ -2,7 +2,7 @@
  * 幻境回声 · EchoCraft — 门户角色数据（生成物，勿手改）
  * 来源：data/default-user/characters/*.png（经典酒馆卡库，唯一角色数据源）
  * 重新生成：node tools/make-demo-cards.mjs && node tools/build-cards.mjs
- * 生成时间：2026-11-14T19:16:21.178Z
+ * 生成时间：2026-11-16T15:34:07.489Z
  * ============================================================ */
 'use strict';
 
@@ -334,7 +334,7 @@ window.PT_CARD_CHARACTERS = [
         "id": "card-guxingci",
         "name": "顾星辞",
         "title": "咖啡店长",
-        "category": "quiet",
+        "category": "odyssey",
         "seed": 32,
         "tags": [
             "幻境回声",

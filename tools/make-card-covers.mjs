@@ -108,7 +108,7 @@ const W = 512, H = 640;
 function drawPoster(card) {
     const cv = makeCanvas(W, H);
     /* 清晰人物 + 深空氛围（与门户同一引擎） */
-    ECPainter.paint(cv.px, W, H, { palette: card.palette, avatar: card.avatar, seed: card.seed, name: card.name });
+    ECPainter.paint(cv.px, W, H, { palette: card.palette, avatar: card.avatar, seed: card.seed, name: card.name, category: card.category, geo: card.geo });
     /* 海报框线（描边式，不遮盖人物） */
     const F = (x, y, w, h, c, a, t) => { cv.rect(x, y, w, t, c, a); cv.rect(x, y + h - t, w, t, c, a); cv.rect(x, y, t, h, c, a); cv.rect(x + w - t, y, t, h, c, a); };
     F(10, 10, W - 20, H - 20, hexRGB(ECHO_TEAL), 190, 2);

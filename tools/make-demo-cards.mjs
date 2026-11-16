@@ -244,7 +244,7 @@ const CARDS = [
     },
     {
         file: 'GuXingci.png', name: '顾星辞', title: '咖啡店长',
-        category: 'quiet', seed: 32,
+        category: 'odyssey', seed: 32,
         geo: { eyeL: 0.84, eyeDX: 30, browW: 5, browY: -16, mouthW: 5.2, noseY: 34, jawW: 0.94, faceW: 0.94 },
         ambient: 2,
         avatar: { hairStyle: 'short', bangs: 'side', mouth: 'smile', trim: '#00d1b2' , glasses: false},

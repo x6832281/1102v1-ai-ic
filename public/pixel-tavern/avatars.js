@@ -67,7 +67,7 @@ const PTAvatar = (() => {
         const seed = options.seed ?? char.seed ?? hashString(char.name || char.id || 'echo');
         if (window.ECPainter) {
             const img = ctx.createImageData(W, H);
-            window.ECPainter.paint(img.data, W, H, { palette: char.palette, avatar: char.avatar, seed: seed, name: char.name });
+            window.ECPainter.paint(img.data, W, H, { palette: char.palette, avatar: char.avatar, seed: seed, name: char.name, category: char.category, geo: char.geo });
             ctx.putImageData(img, 0, 0);
         } else {
             /* 兜底：共享绘制器缺失时的极简占位 */

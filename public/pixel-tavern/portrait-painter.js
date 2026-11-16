@@ -110,6 +110,11 @@
             polyline(pts, r, col, a) {
                 for (let i = 0; i < pts.length - 1; i++) this.capsule(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], r, col, a);
             },
+            rect(x, y, w, h, col, a) {
+                const x0 = Math.max(0, Math.round(x)), x1 = Math.min(this.W, Math.round(x + w));
+                const y0 = Math.max(0, Math.round(y)), y1 = Math.min(this.H, Math.round(y + h));
+                for (let yy = y0; yy < y1; yy++) for (let xx = x0; xx < x1; xx++) put(xx, yy, col[0], col[1], col[2], a);
+            },
             _s: 1,
         };
     }
@@ -146,31 +151,154 @@
         };
     }
 
-    /* ---------- 分类场景道具（人物身后的叙事环境，软剪影） ---------- */
-    function sceneProps(g, S, wx, headCY, base, p, rand) {
+    /* ---------- 分类场景：有纵深/光源/氛围的微型环境画 v3 ----------
+     * 可见性三原则：亮天光当背景 → 暗剪影母题（明度差 ≥15%、画幅 ≥25%）→ 前景点源。
+     * 眼区/身体区为场景禁区；弧带与画框留白。 */
+    function sceneProps(g, S, scx, headCY, base, p, rand) {
+        const C = { warm: [255, 186, 110], tealSoft: [102, 212, 190] };
+        const R = (a, b) => a + rand() * (b - a);
+
         if (p.cat === 'fantasy') {
-            for (let i = 0; i < 5; i++) {
-                const fx = wx + S(-130 + i * 65), fh = S(90 + rand() * 60);
-                g.ell(fx, base - S(30) - fh / 2, S(26), fh / 2, 0, shade(p.bg1, -46), shade(p.bg1, -70), 0.85);
+            /* 天光：月光主导的左上天空 */
+            g.glow(scx - S(84), headCY - S(78), S(96), [148, 196, 178], 0.32);
+            g.glow(scx - S(84), headCY - S(78), S(26), [228, 246, 236], 0.55);
+            g.ell(scx - S(84), headCY - S(78), S(15), S(15), 0, [240, 250, 242], [206, 230, 218], 0.9);
+            /* 地平雾带（比背景亮一档，给树影当衬底） */
+            g.ell(scx, base - S(58), S(196), S(72), 0, mix(shade(p.bg1, 10), [126, 164, 146], 0.4), shade(p.bg1, -6), 0.45);
+            /* 远景：整幅森林墙树冠线 */
+            for (let i = 0; i < 12; i++) {
+                const tx = scx + S(-165 + i * 30 + R(-6, 6)), th = S(R(56, 104));
+                g.ell(tx, base - S(10) - th / 2, S(16), th / 2, 0, shade(p.bg1, -50), shade(p.bg1, -68), 0.8);
             }
-            for (let i = 0; i < 8; i++) g.glow(wx + S(-120 + rand() * 240), headCY + S(-60 + rand() * 160), S(2.2 + rand() * 2), [190, 255, 214], 0.5);
-        } else if (p.cat === 'neon') {
-            for (let i = 0; i < 6; i++) {
-                const bx = wx + S(-150 + i * 52), bw = S(44), bh = S(70 + rand() * 80);
-                g.ell(bx, base - bh / 2, bw / 2, bh / 2, 0, shade(p.bg1, -50), shade(p.bg1, -72), 0.9);
-            }
-            g.glow(wx + S(-96), base - S(150), S(16), hexRGB(AMBER), 0.55);
-            g.glow(wx + S(110), base - S(110), S(14), hexRGB(TEAL), 0.5);
-        } else if (p.cat === 'history') {
+            /* 中景：左右大树（暗剪影 + 月侧亮边） */
             for (const side of [-1, 1]) {
-                const lx = wx + side * S(118), ly = headCY - S(70);
-                g.ell(lx, ly, S(13), S(16), 0, [214, 120, 66], [140, 64, 40], 0.92);
-                g.capsule(lx, ly - S(24), lx, ly - S(15), Math.max(0.8, S(1.2)), [120, 80, 50], 0.8);
-                g.glow(lx, ly, S(26), [255, 170, 90], 0.4);
+                const tx = scx + side * S(112 + R(0, 14)), th = S(R(150, 196));
+                g.capsule(tx, base, tx + S(side * 6), base - th, S(5), shade(p.bg1, -76), 0.95);
+                for (let c = 0; c < 4; c++) {
+                    const cx2 = tx + S(side * R(-6, 16)), cy2 = base - th - S(c * 12 + R(0, 8)), cr = S(R(18, 26));
+                    g.ell(cx2 - S(side * 3), cy2 - S(3), cr, cr * 0.78, R(-0.3, 0.3), [152, 192, 174], [128, 168, 150], 0.3);
+                    g.ell(cx2, cy2, cr, cr * 0.78, R(-0.3, 0.3), shade(p.bg1, -58), shade(p.bg1, -76), 0.92);
+                }
             }
+            /* 月光光柱（斜切） */
+            g.capsule(scx - S(96), -S(24), scx - S(28), base - S(28), S(17), [188, 228, 208], 0.12);
+            g.capsule(scx - S(70), -S(12), scx - S(20), base - S(44), S(9), [188, 228, 208], 0.09);
+            /* 前景：地面雾 + 萤火虫 */
+            for (let i = 0; i < 3; i++) g.glow(scx + S(-100 + i * 100), base - S(4), S(30), [182, 216, 198], 0.16);
+            for (let i = 0; i < 12; i++) g.glow(scx + S(R(-145, 145)), headCY + S(R(-50, 170)), S(R(1.6, 3.4)), [196, 255, 220], R(0.4, 0.7));
+        } else if (p.cat === 'neon') {
+            /* 天光：地平城市辉光（品红 + 青） */
+            g.glow(scx, base - S(36), S(160), [172, 92, 148], 0.26);
+            g.glow(scx - S(64), base - S(60), S(70), [104, 88, 176], 0.2);
+            g.glow(scx + S(88), base - S(46), S(64), [76, 102, 164], 0.2);
+            g.ell(scx, base - S(8), S(204), S(26), 0, [98, 78, 122], [64, 58, 88], 0.5);
+            /* 远景：整幅天际线（连绵楼墙 + 密集窗格点阵） */
+            for (let i = 0; i < 13; i++) {
+                const bx = scx + S(-168 + i * 26), bw = S(R(16, 24)), bh = S(R(44, 96));
+                g.rect(bx, base - bh, bw, bh + S(8), shade(p.bg1, -62), 0.85);
+                for (let wy = 0; wy < Math.floor(bh / S(14)); wy++) for (let wx2 = 0; wx2 < 2; wx2++) {
+                    if (rand() < 0.55) g.rect(bx + S(3 + wx2 * 7), base - bh + S(6 + wy * 13), S(2.6), S(4), rand() < 0.6 ? C.warm : C.tealSoft, 0.8);
+                }
+            }
+            /* 中景：左右双塔 + 霓虹笔画 */
+            for (const side of [-1, 1]) {
+                const bx = scx + side * S(R(106, 128)), bw = S(R(36, 46)), bh = S(R(140, 184));
+                g.rect(bx - bw / 2, base - bh, bw, bh + S(8), shade(p.bg1, -80), 0.95);
+                for (let wy = 0; wy < 6; wy++) for (let wx2 = 0; wx2 < 3; wx2++) {
+                    if (rand() < 0.5) g.rect(bx - bw / 2 + S(6 + wx2 * 11), base - bh + S(12 + wy * 24), S(3.2), S(6), rand() < 0.55 ? C.warm : C.tealSoft, 0.85);
+                }
+                const nc = side < 0 ? hexRGB(TEAL) : hexRGB(AMBER);
+                g.polyline([[bx - bw / 2 + S(4), base - bh + S(10)], [bx - bw / 2 + S(4), base - S(30)]], Math.max(1, S(2)), nc, 0.85);
+                g.polyline([[bx + bw / 2 - S(4), base - bh + S(10)], [bx + bw / 2 - S(4), base - S(46)]], Math.max(1, S(2)), nc, 0.7);
+                g.glow(bx, base - bh + S(8), S(14), nc, 0.4);
+            }
+            /* 雨丝 */
+            for (let i = 0; i < 13; i++) {
+                const rx = scx + S(R(-150, 150)), ry = S(R(-10, 380));
+                g.capsule(rx, ry, rx + S(3), ry + S(12), Math.max(0.4, S(0.55)), [158, 194, 216], 0.2);
+            }
+        } else if (p.cat === 'history') {
+            /* 天光：殿顶后的暖霞 */
+            g.glow(scx, base - S(120), S(140), [214, 132, 84], 0.18);
+            g.glow(scx - S(96), headCY - S(40), S(52), [255, 176, 104], 0.16);
+            /* 檐梁剪影：横贯上部的屋檐，给宫灯依附 */
+            g.rect(0, headCY - S(106), 340 * S(1), S(7), shade(p.bg1, -68), 0.62);
+            g.rect(0, headCY - S(99), 340 * S(1), S(2), shade(p.bg1, -52), 0.5);
+            /* 远景飞檐：角上两片弧脊剪影 */
+            for (const side of [-1, 1]) {
+                const px = scx + side * S(118);
+                g.band(px, base - S(84), S(56), side > 0 ? Math.PI * 1.12 : Math.PI * 1.42, side > 0 ? Math.PI * 1.58 : Math.PI * 1.88, Math.max(1.6, S(3.4)), shade(p.bg1, -68), 0.72);
+                g.rect(px + side * S(4) - S(20), base - S(84), S(40), S(44), shade(p.bg1, -62), 0.62);
+            }
+            /* 中景宫灯：檐梁下垂挂，左右各一盏 */
+            for (const side of [-1, 1]) {
+                const lx = scx + side * S(118), ly = headCY - S(R(56, 76));
+                g.capsule(lx, headCY - S(99), lx, ly - S(11), Math.max(0.7, S(1)), [116, 82, 54], 0.85);
+                g.ell(lx, ly, S(8.5), S(11), 0, [238, 146, 82], [156, 76, 44], 0.95);
+                g.glow(lx, ly, S(22), [255, 176, 96], 0.4);
+            }
+            /* 近景飘落花瓣 */
+            for (let i = 0; i < 9; i++) {
+                const fx = scx + S(R(-140, 140)), fy = headCY + S(R(-60, 180));
+                g.ell(fx, fy, S(2.4), S(1.4), R(0, 3), [255, 190, 200], [228, 150, 160], 0.42);
+            }
+        } else if (p.cat === 'mystery') {
+            /* 天光：窗外冷月 */
+            g.glow(scx - S(40), headCY - S(90), S(80), [128, 158, 196], 0.22);
+            g.glow(scx - S(40), headCY - S(90), S(22), [214, 230, 246], 0.4);
+            /* 两侧书架 + 书脊 */
+            for (const side of [-1, 1]) {
+                const shx = scx + side * S(122);
+                g.rect(shx - S(26), headCY - S(92), S(52), S(230), [16, 20, 28], 0.82);
+                for (let row = 0; row < 4; row++) {
+                    const ry = headCY - S(78) + row * S(56);
+                    g.rect(shx - S(26), ry, S(52), S(2.4), [70, 82, 98], 0.7);
+                    for (let b = 0; b < 5; b++) {
+                        if (rand() < 0.78) {
+                            const bh2 = S(R(12, 19));
+                            g.rect(shx - S(22) + b * S(9.6), ry - bh2, S(7.4), bh2, [96 + b * 12, 62 + ((b * 23) % 40), 54], 0.72);
+                        }
+                    }
+                }
+            }
+            /* 月光斜窗 */
+            g.capsule(scx + S(-76), -S(16), scx + S(4), base - S(40), S(17), [198, 220, 238], 0.1);
+            g.capsule(scx + S(-50), -S(8), scx + S(20), base - S(56), S(8), [198, 220, 238], 0.08);
+            /* 浮尘 */
+            for (let i = 0; i < 14; i++) g.glow(scx + S(R(-140, 140)), headCY + S(R(-90, 170)), S(R(0.8, 1.8)), [226, 226, 214], R(0.2, 0.4));
+        } else if (p.cat === 'quiet') {
+            /* 天光：室内暖灯（右上） */
+            g.glow(scx + S(94), headCY - S(24), S(56), C.warm, 0.2);
+            /* 右侧窗：暖光 + 窗棂 */
+            const wx0 = scx + S(66);
+            g.rect(wx0 - S(3), headCY - S(81), S(64), S(102), [30, 38, 50], 0.7);
+            g.glow(wx0 + S(29), headCY - S(30), S(26), C.warm, 0.42);
+            g.rect(wx0, headCY - S(78), S(58), S(96), [242, 196, 130], 0.3);
+            g.rect(wx0 + S(27), headCY - S(78), S(4), S(96), [36, 46, 58], 0.85);
+            g.rect(wx0, headCY - S(36), S(58), S(4), [36, 46, 58], 0.85);
+            /* 左侧盆栽剪影 */
+            const plx = scx - S(116);
+            g.capsule(plx, base - S(6), plx + S(7), base - S(52), Math.max(0.8, S(1.5)), [46, 66, 54], 0.75);
+            g.ell(plx + S(10), base - S(64), S(15), S(22), 0.3, [40, 60, 48], [28, 46, 38], 0.78);
+            g.ell(plx - S(6), base - S(56), S(12), S(18), -0.4, [40, 60, 48], [28, 46, 38], 0.74);
+            /* 暖尘 */
+            for (let i = 0; i < 8; i++) g.glow(scx + S(R(-130, 130)), headCY + S(R(-70, 150)), S(R(0.8, 1.6)), C.warm, R(0.16, 0.32));
         } else if (p.cat === 'odyssey') {
-            g.band(wx, headCY + S(40), S(180), Math.PI * 1.15, Math.PI * 1.75, Math.max(1.2, S(2)), [150, 170, 210], 0.4);
-            g.glow(wx + S(120), headCY - S(90), S(20), [190, 200, 240], 0.35);
+            /* 天光：星云辉光 */
+            g.glow(scx - S(80), headCY - S(60), S(90), [96, 88, 158], 0.2);
+            g.glow(scx + S(90), headCY + S(30), S(70), [72, 108, 158], 0.16);
+            /* 星系带：两道弧 */
+            g.band(scx, headCY + S(46), S(170), Math.PI * 1.14, Math.PI * 1.78, Math.max(1.4, S(2.4)), [162, 184, 224], 0.45);
+            g.band(scx, headCY + S(46), S(146), Math.PI * 1.2, Math.PI * 1.72, Math.max(1.1, S(1.7)), [206, 218, 244], 0.3);
+            /* 远处星球 + 光环（避开弧带与画框交汇区） */
+            const px = scx + S(88), py = headCY - S(64);
+            g.ell(px, py, S(13), S(13), 0, [222, 228, 248], [172, 186, 220], 0.5);
+            g.band(px, py, S(18), Math.PI * 1.06, Math.PI * 1.9, Math.max(0.9, S(1.2)), [196, 208, 238], 0.42);
+            g.glow(px, py, S(22), [198, 208, 246], 0.36);
+            /* 小月亮 */
+            g.ell(scx - S(112), headCY - S(58), S(6.5), S(6.5), 0, [240, 242, 250], [214, 220, 236], 0.6);
+            /* 星尘 */
+            for (let i = 0; i < 18; i++) g.glow(scx + S(R(-150, 150)), headCY + S(R(-110, 170)), S(R(0.7, 1.6)), [255, 255, 255], R(0.18, 0.4));
         }
     }
 
@@ -212,8 +340,8 @@
                 g.glow(bx, by, br * 2.4, rand() > 0.7 ? [255, 255, 255] : [102, 212, 190], 0.32 + rand() * 0.4);
             }
             sceneProps(g, S, headCX, headCY, base, p, rand);
-            g.band(W / 2, headCY + S(30), S(152), Math.PI * 1.12, Math.PI * 1.88, Math.max(1.2, S(2.4)), tealC, 0.42);
-            g.band(W / 2, headCY + S(30), S(174), Math.PI * 1.18, Math.PI * 1.82, Math.max(1, S(1.6)), amberC, 0.22);
+            g.band(W / 2, headCY + S(30), S(148), Math.PI * 1.16, Math.PI * 1.84, Math.max(1.2, S(2.4)), tealC, 0.42);
+            g.band(W / 2, headCY + S(30), S(158), Math.PI * 1.22, Math.PI * 1.78, Math.max(1, S(1.6)), amberC, 0.22);
         }
 
         /* ===== 轮廓底影（暗色描边，让人物从背景里立出来） ===== */
@@ -265,8 +393,6 @@
         g.glow(headCX + S(2), shY + S(42), S(2.6), trimC, 0.85);
         g.glow(headCX + S(2), shY + S(60), S(2.6), trimC, 0.7);
         g.glow(headCX, shY + S(2), S(15), skinDD, 0.5);
-        g.capsule(headCX - S(96), shY + S(44), headCX - S(50), shY + S(12), Math.max(0.8, S(1.4)), trimC, 0.26);
-        g.capsule(headCX + S(96), shY + S(44), headCX + S(50), shY + S(12), Math.max(0.8, S(1.4)), trimC, 0.26);
         g.glow(headCX - S(52), shY + S(52), S(3.4), trimC, 0.9);
         /* 布纹斜线 */
         g.polyline([[headCX - S(90), shY + S(110)], [headCX - S(40), shY + S(150)]], Math.max(0.6, S(1)), shade(p.bg1, 14), 0.3);
@@ -361,8 +487,8 @@
                 g.glow(headCX, headCY - S(10), S(44), hairD, 0.18);
             } else if (p.bangs === 'side') {
                 g.ell(headCX - S(22), headCY - S(20), S(36), S(15), -0.16, hairD, hairDD, 1);
-                g.ell(headCX + S(30), headCY - S(13), S(20), S(12), 0.2, hairD, hairDD, 0.9);
-                g.ell(headCX - S(30), headCY - S(5), S(26), S(6), -0.1, hairDD, hairDD, 0.75);
+                g.ell(headCX + S(30), headCY - S(16), S(20), S(10), 0.2, hairD, hairDD, 0.9);
+                g.ell(headCX - S(32), headCY - S(12), S(26), S(5), -0.1, hairDD, hairDD, 0.7);
             } else if (p.bangs === 'center') {
                 for (const side of [-1, 1]) g.ell(headCX + side * S(28), headCY - S(21), S(28), S(14), side * 0.14, hairD, hairDD, 1);
                 g.glow(headCX, headCY - S(8), S(14), skinDD, 0.3);
@@ -375,10 +501,10 @@
         /* 刘海投影 AO（顶光下眼窝上方的一线暗） */
         if (!p.hat) g.glow(headCX, headCY - S(4), S(46), shade(p.hair, -70), 0.18);
         /* 发丝簇：渐变丝线（暗底+亮芯） */
-        g.polyline([[headCX - S(44), headCY - S(26)], [headCX - S(30), headCY - S(10)], [headCX - S(24), headCY + S(6)]], Math.max(0.8, S(1.8)), hairDD, 0.4);
+        g.polyline([[headCX - S(44), headCY - S(26)], [headCX - S(34), headCY - S(16)], [headCX - S(28), headCY - S(8)]], Math.max(0.8, S(1.8)), hairDD, 0.4);
         g.polyline([[headCX - S(42), headCY - S(28)], [headCX - S(30), headCY - S(12)]], Math.max(0.5, S(1.1)), hairL, 0.65);
         g.polyline([[headCX + S(40), headCY - S(28)], [headCX + S(28), headCY - S(12)]], Math.max(0.5, S(1.1)), hairL, 0.58);
-        g.polyline([[headCX + S(44), headCY - S(26)], [headCX + S(30), headCY + S(2)]], Math.max(0.8, S(1.6)), hairDD, 0.35);
+        g.polyline([[headCX + S(44), headCY - S(26)], [headCX + S(36), headCY - S(17)], [headCX + S(30), headCY - S(7)]], Math.max(0.8, S(1.6)), hairDD, 0.35);
         if (p.hairStyle === 'long' || p.hairStyle === 'bob') {
             g.polyline([[headCX - S(66), headCY + S(16)], [headCX - S(70), headCY + S(56)]], Math.max(0.7, S(1.4)), hairL, 0.42);
             g.polyline([[headCX + S(66), headCY + S(18)], [headCX + S(70), headCY + S(58)]], Math.max(0.7, S(1.4)), hairL, 0.4);

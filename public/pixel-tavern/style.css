@@ -2634,3 +2634,26 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     background: #f59e0b;
     color: #1a1206;
 }
+
+/* R25d：设定集阅读性（段落切分 + 暗色滚动条） */
+.lore-text p {
+    margin: 0 0 10px;
+    line-height: 1.85;
+}
+.lore-text p:last-child {
+    margin-bottom: 0;
+}
+#detail-lore-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 209, 178, 0.28) transparent;
+}
+#detail-lore-list::-webkit-scrollbar {
+    width: 8px;
+}
+#detail-lore-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 209, 178, 0.28);
+    border-radius: 4px;
+}
+#detail-lore-list::-webkit-scrollbar-track {
+    background: transparent;
+}
