@@ -1508,3 +1508,4 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **出厂主题链修正（真缺陷）**：app.js 默认 accent:'gold'（琥珀）与设置界面『萤青 (默认)』标签矛盾——修正为 'echo'（无 CSS 规则=回退根默认 #00d1b2）；色板 data-accent jade→echo（原 jade 实际是 #10b981 第三色）。新访客出厂即品牌主色。
 - **镜环虚边**：band() 步进 48/r*2 → 64/r*3，环线边缘台阶消除。
 - **验证**：smoke 130/130；本地核验 --accent=#00d1b2、data-accent=echo。
+- **R27 追加（critic R26 复验新发现 P1×2）**：①顾星辞开场白 -menu 泄漏记号→『菜单撕掉之前』（make-demo-cards 源头修复，全链路重编译）；②行内台词竖条——.quote 行内 span 误用块级 border-left，句中读作游离光标，改纯色高亮。critic 附带微调（光渍 alpha +0.05）一并落地。双修复经打字机流式完成后 DOM 直读核验（hasMenu:false / hasMenuFix:true / quoteBar:false）。
