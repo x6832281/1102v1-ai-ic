@@ -284,6 +284,7 @@
             g.rect(wx0, headCY - S(78), S(58), S(96), [242, 196, 130], 0.3);
             g.rect(wx0 + S(27), headCY - S(78), S(4), S(96), [36, 46, 58], 0.85);
             g.rect(wx0, headCY - S(36), S(58), S(4), [36, 46, 58], 0.85);
+            g.rect(wx0 - S(3), headCY + S(14), S(64), S(4), [46, 56, 68], 0.72); /* 窗台（R28）：垂线元素落地锚 */
             /* 左侧盆栽剪影 */
             const plx = scx - S(116);
             g.capsule(plx, base - S(6), plx + S(7), base - S(52), Math.max(0.8, S(1.5)), [46, 66, 54], 0.75);
@@ -397,6 +398,9 @@
         g.capsule(headCX + S(10), shY + S(2), headCX + S(2), shY + S(16), Math.max(0.8, S(1.6)), skinHi, 0.85);
         g.capsule(headCX - S(30), shY + S(6), headCX - S(8), shY + S(30), Math.max(1.2, S(2.4)), bodyBot, 0.9);
         g.capsule(headCX + S(30), shY + S(6), headCX + S(8), shY + S(30), Math.max(1.2, S(2.4)), bodyBot, 0.9);
+        /* 领褶（R28）：翻领下沿的短褶皱，锚定领口走势 */
+        g.capsule(headCX - S(18), shY + S(34), headCX - S(6), shY + S(40), Math.max(0.8, S(1.4)), shade(p.bg1, -22), 0.5);
+        g.capsule(headCX + S(6), shY + S(36), headCX + S(18), shY + S(42), Math.max(0.8, S(1.4)), shade(p.bg1, -22), 0.5);
         /* 扣子两枚 */
         g.glow(headCX + S(2), shY + S(42), S(2.6), trimC, 0.85);
         g.glow(headCX + S(2), shY + S(60), S(2.6), trimC, 0.7);
@@ -409,6 +413,9 @@
         /* ===== 颈 ===== */
         g.ell(headCX, headCY + S(62), S(17), S(26), 0, skinC, skinD, 1);
         g.glow(headCX, headCY + S(56), S(19), skinDD, 0.5);
+        /* 颈侧反弹光（R28）：衣领反光 onto 颈部两侧，体积感 */
+        g.glow(headCX - S(12), headCY + S(66), S(12), shade(p.bg1, 26), 0.26);
+        g.glow(headCX + S(12), headCY + S(66), S(12), shade(p.bg1, 26), 0.22);
 
         /* ===== 脸 ===== */
         g.ell(headCX, headCY, S(58 * (p.faceW || 1)), S(70), 0, skinHi, skinD, 1);
@@ -520,6 +527,9 @@
         /* 发丝光泽线 */
         g.polyline([[headCX - S(34), headCY - S(40)], [headCX - S(20), headCY - S(30)]], Math.max(0.8, S(1.5)), hairL, 0.55);
         g.polyline([[headCX + S(12), headCY - S(42)], [headCX + S(30), headCY - S(34)]], Math.max(0.8, S(1.3)), hairL, 0.45);
+        /* 发丝层次增补（R28）：三四道弱高光，全部落在发冠安全区（眉线以上） */
+        g.polyline([[headCX - S(24), headCY - S(44)], [headCX - S(6), headCY - S(36)]], Math.max(0.7, S(1.3)), hairL, 0.38);
+        g.polyline([[headCX + S(36), headCY - S(40)], [headCX + S(52), headCY - S(30)]], Math.max(0.7, S(1.3)), hairL, 0.34);
         if (p.hairStyle === 'long') {
             g.polyline([[headCX - S(66), headCY + S(30)], [headCX - S(62), headCY + S(76)]], Math.max(0.8, S(1.6)), hairL, 0.5);
             g.polyline([[headCX + S(66), headCY + S(34)], [headCX + S(64), headCY + S(80)]], Math.max(0.8, S(1.6)), hairL, 0.45);
