@@ -1477,3 +1477,9 @@ Build、设置（7 行全控件）、历史、更新通知（V1.1+V1.0 双日志
 - **电光收口**：full 刘海时跳过眉弧（刘海自然遮盖眉区，消除层序冲突）；额带渐隐（软 glow 双层替代硬分界）；jawW 拉档（0.88/1/1.12）。
 - **审核**：电光 3.2 倍镜下眉弧落皮肤、额区零直边 ✓；与白澈同机位无带状残留 ✓。九张此前已毕业，本轮电光收口后十张全绿 → 插画级专项 DELIVER。
 - **提交**：已推送（见 R21）。
+
+## 决策轮 R24（2026.11.16，持续优化）
+
+- **实施**：①SEO 修复——og:image 改绝对路径（社交爬虫需要）、twitter:description 同步 og:description V2.2 文案、sitemap 从 1 条扩展到 3 条 URL（根/门户/web）、og:url 添加；②性能优化——预加载关键资源（portrait-painter.js/bg-echo.png/zpix-subset.woff2）、dns-prefetch；③vercel.json HTML 入口显式 must-revalidate 头（根治边缘缓存锁旧）。
+- **验证**：smoke 130/130（新增页脚/快照断言）；线上验证 sitemap 3 URL、og:image 绝对路径、preload 3 条。
+- **提交**：已推送（a72e19421）。
