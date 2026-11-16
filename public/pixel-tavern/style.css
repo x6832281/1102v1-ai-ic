@@ -943,6 +943,9 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 }
 
 .card-cat {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
     font-size: 11.5px;
     color: rgba(196, 210, 222, 0.82);
     margin-top: 3px;
@@ -1617,14 +1620,39 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     margin-top: 6px;
 }
 
+#modal-detail {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.detail-body {
+    overflow-y: auto;
+    min-height: 0;
+    margin: 0 -8px;
+    padding: 0 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 209, 178, 0.28) transparent;
+}
+.detail-body::-webkit-scrollbar {
+    width: 8px;
+}
+.detail-body::-webkit-scrollbar-thumb {
+    background: rgba(0, 209, 178, 0.28);
+    border-radius: 4px;
+}
+.detail-body::-webkit-scrollbar-track {
+    background: transparent;
+}
 .detail-desc {
+    white-space: pre-line;
     font-size: 13.5px;
     color: var(--text-dim);
-    line-height: 1.65;
+    line-height: 1.85;
     margin-bottom: 16px;
 }
 
 .detail-greet {
+    white-space: pre-line;
     background: var(--panel-2);
     border: 1px solid var(--line);
     border-radius: var(--radius-s);
@@ -2668,4 +2696,20 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
         -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), rgba(0, 0, 0, 0) 100%);
         mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 26px), rgba(0, 0, 0, 0) 100%);
     }
+}
+
+/* R25f：卡片副题——标题截断保中、分类名保尾 */
+.cc-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cc-sep {
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+.cc-cat {
+    flex-shrink: 0;
+    color: rgba(0, 209, 178, 0.85);
 }

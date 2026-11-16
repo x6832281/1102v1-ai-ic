@@ -234,8 +234,8 @@
             for (const side of [-1, 1]) {
                 const lx = scx + side * S(118), ly = headCY - S(R(56, 76));
                 g.capsule(lx, headCY - S(99), lx, ly - S(11), Math.max(0.7, S(1)), [116, 82, 54], 0.85);
-                g.ell(lx, ly, S(8.5), S(11), 0, [238, 146, 82], [156, 76, 44], 0.95);
-                g.glow(lx, ly, S(22), [255, 176, 96], 0.4);
+                g.ell(lx, ly, S(10.5), S(13.5), 0, [244, 158, 88], [168, 84, 48], 0.97);
+                g.glow(lx, ly, S(27), [255, 182, 102], 0.5);
             }
             /* 近景飘落花瓣 */
             for (let i = 0; i < 9; i++) {
@@ -291,12 +291,12 @@
             g.band(scx, headCY + S(46), S(170), Math.PI * 1.14, Math.PI * 1.78, Math.max(1.4, S(2.4)), [162, 184, 224], 0.45);
             g.band(scx, headCY + S(46), S(146), Math.PI * 1.2, Math.PI * 1.72, Math.max(1.1, S(1.7)), [206, 218, 244], 0.3);
             /* 远处星球 + 光环（避开弧带与画框交汇区） */
-            const px = scx + S(88), py = headCY - S(64);
+            const px = scx + S(120), py = headCY - S(104);
             g.ell(px, py, S(13), S(13), 0, [222, 228, 248], [172, 186, 220], 0.5);
             g.band(px, py, S(18), Math.PI * 1.06, Math.PI * 1.9, Math.max(0.9, S(1.2)), [196, 208, 238], 0.42);
             g.glow(px, py, S(22), [198, 208, 246], 0.36);
             /* 小月亮 */
-            g.ell(scx - S(112), headCY - S(58), S(6.5), S(6.5), 0, [240, 242, 250], [214, 220, 236], 0.6);
+            g.ell(scx - S(124), headCY - S(84), S(6.5), S(6.5), 0, [240, 242, 250], [214, 220, 236], 0.6);
             /* 星尘 */
             for (let i = 0; i < 18; i++) g.glow(scx + S(R(-150, 150)), headCY + S(R(-110, 170)), S(R(0.7, 1.6)), [255, 255, 255], R(0.18, 0.4));
         }
@@ -496,7 +496,7 @@
                 for (const side of [-1, 1]) g.ell(headCX + side * S(30), headCY - S(19), S(22), S(12), side * 0.18, hairD, hairDD, 0.96);
                 g.ell(headCX, headCY - S(8), S(14), S(5), 0, hairDD, hairDD, 0.7);
             }
-            for (const side of [-1, 1]) g.ell(headCX + side * S(52), headCY - S(2), S(14), S(21), side * 0.08, hairC, hairDD, 0.95);
+            for (const side of [-1, 1]) g.ell(headCX + side * S(62), headCY - S(4), S(14), S(20), side * 0.05, hairC, hairDD, 0.95);
         }
         /* 刘海投影 AO（顶光下眼窝上方的一线暗） */
         if (!p.hat) g.glow(headCX, headCY - S(4), S(46), shade(p.hair, -70), 0.18);
@@ -531,14 +531,6 @@
         if (p.earring) {
             g.glow(headCX - S(56), headCY + S(16), S(3.8), amberC, 0.95);
             g.glow(headCX + S(56), headCY + S(16), S(3.8), amberC, 0.95);
-        }
-
-        /* ===== 青琥珀双缘光 ===== */
-        if (!tiny) {
-            g.band(headCX - S(10), headCY - S(6), S(90), Math.PI * 0.62, Math.PI * 1.0, Math.max(1.6, S(3.2)), tealC, 0.36);
-            g.band(headCX + S(10), headCY - S(6), S(90), Math.PI * 0.14, Math.PI * 0.44, Math.max(1.4, S(2.8)), amberC, 0.28);
-            g.band(headCX, shY + S(60), S(130), Math.PI * 0.78, Math.PI * 1.02, Math.max(1.6, S(3.4)), tealC, 0.28);
-            g.band(headCX, shY + S(60), S(130), Math.PI * 0.12, Math.PI * 0.3, Math.max(1.4, S(2.8)), amberC, 0.22);
         }
 
         /* ===== 底部收束 ===== */

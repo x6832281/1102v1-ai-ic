@@ -113,7 +113,7 @@ function makeCardEl(char, opts = {}) {
     }
     const info = document.createElement('div');
     info.className = 'card-info';
-    info.innerHTML = `<div class="card-name">${highlight(char.name, searchQ)}</div><div class="card-cat">${highlight(char.title || '', searchQ)} · ${esc(catName(char.category))}</div>`;
+    info.innerHTML = `<div class="card-name">${highlight(char.name, searchQ)}</div><div class="card-cat"><span class="cc-title">${highlight(char.title || '', searchQ)}</span><span class="cc-sep"> · </span><span class="cc-cat">${esc(catName(char.category))}</span></div>`;
     cover.appendChild(info); /* 信息层内嵌封面底部（渐变压字） */
     el.appendChild(cover);
     el.addEventListener('click', () => openDetail(char.id));
