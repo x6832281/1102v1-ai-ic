@@ -163,7 +163,7 @@ function renderSpotlight() {
         el.innerHTML =
             `<div class="spot-avatar"><img src="${PTAvatar.toDataURL(c, 112)}" alt=""></div>` +
             `<div class="spot-meta"><div class="spot-name">${highlight(c.name, searchQ)}</div>` +
-            `<div class="spot-title">${esc(c.title || '')} · ${esc(catName(c.category))}</div>` +
+            `<div class="spot-title"><span class="cc-title">${esc(c.title || '')}</span><span class="cc-sep"> · </span><span class="cc-cat">${esc(catName(c.category))}</span></div>` +
             (quote ? `<div class="spot-quote">${esc(quote)}</div>` : '') +
             `</div>`;
         el.addEventListener('click', () => openDetail(c.id));

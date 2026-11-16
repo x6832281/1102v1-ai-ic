@@ -769,6 +769,9 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 }
 
 .spot-title {
+    display: flex;
+    align-items: baseline;
+    min-width: 0;
     font-size: 11px;
     color: var(--text-dim);
     margin-top: 1px;
