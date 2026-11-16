@@ -21,7 +21,7 @@ const store = {
 
 const state = {
     view: 'market',
-    settings: Object.assign({ volume: 40, tts: false, typewriter: true, immersive: true, accent: 'gold', chatFont: 'm', skin: 'clean', aiEnabled: true, aiApi: { base: '', key: '', model: '' } }, store.get('settings', {})),
+    settings: Object.assign({ volume: 40, tts: false, typewriter: true, immersive: true, accent: 'echo', chatFont: 'm', skin: 'clean', aiEnabled: true, aiApi: { base: '', key: '', model: '' } }, store.get('settings', {})),
     favs: store.get('favs', []),
     history: store.get('history', []),
     custom: store.get('custom_cards', []),

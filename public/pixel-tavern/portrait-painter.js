@@ -100,7 +100,7 @@
                 }
             },
             band(cx, cy, r, a0, a1, w, col, a) {
-                const steps = Math.max(48, Math.round(r * 2));
+                const steps = Math.max(64, Math.round(r * 3)); /* R27：步进加密，环线边缘不再有台阶虚边 */
                 for (let s = 0; s <= steps; s++) {
                     const ang = a0 + (a1 - a0) * (s / steps);
                     const x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r;
