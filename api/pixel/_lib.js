@@ -249,7 +249,10 @@ export function sendSitemap(req, res) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=3600');
+    const base = publicBase(req);
     res.end('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        + ' <url><loc>' + publicBase(req) + '/</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n'
+        + ' <url><loc>' + base + '/</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n'
+        + ' <url><loc>' + base + '/pixel-tavern/</loc><lastmod>' + today + '</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>\n'
+        + ' <url><loc>' + base + '/web/</loc><lastmod>' + today + '</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>\n'
         + '</urlset>');
 }
