@@ -196,8 +196,8 @@
             for (const side of [-1, 1]) {
                 const rx = scx + side * S(R(96, 126));
                 const rc = side < 0 ? hexRGB(TEAL) : hexRGB(AMBER);
-                g.capsule(rx, base - S(18), rx + S(side * 2), base + S(2), S(3.2), rc, 0.3);
-                g.capsule(rx + S(side * 10), base - S(12), rx + S(side * 12), base + S(3), S(2.2), rc, 0.22);
+                g.capsule(rx, base - S(18), rx + S(side * 2), base + S(2), S(3.2), rc, 0.35);
+                g.capsule(rx + S(side * 10), base - S(12), rx + S(side * 12), base + S(3), S(2.2), rc, 0.27);
             }
             g.glow(scx, base - S(4), S(60), [124, 96, 140], 0.22);
             /* 远景：整幅天际线（连绵楼墙 + 密集窗格点阵） */

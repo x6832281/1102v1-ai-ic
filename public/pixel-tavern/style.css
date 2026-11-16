@@ -1253,9 +1253,6 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 
 .msg-body .quote {
     color: var(--border-lt);
-    border-left: 2px solid var(--accent);
-    padding-left: 8px;
-    margin: 4px 0;
 }
 
 .msg-name {
