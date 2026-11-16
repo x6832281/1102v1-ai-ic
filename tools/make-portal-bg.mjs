@@ -123,19 +123,19 @@ for (let i = 0; i < 560; i++) {
 }
 
 /* 4. 巨月 */
-const moonX = W * 0.78, moonY = H * 0.26, moonR = 178;
-cv.glow(moonX, moonY, moonR * 2.3, [210, 224, 218], 58);
-cv.glow(moonX, moonY, moonR * 1.4, [228, 236, 230], 78);
-cv.ell(moonX, moonY, moonR, moonR, [228, 234, 226], [198, 208, 200], 240);
+const moonX = W * 0.78, moonY = H * 0.105, moonR = 168;
+cv.glow(moonX, moonY, moonR * 2.3, [210, 224, 218], 40);
+cv.glow(moonX, moonY, moonR * 1.4, [228, 236, 230], 56);
+cv.ell(moonX, moonY, moonR, moonR, [210, 218, 210], [186, 196, 188], 215);
 for (let i = 0; i < 5; i++) {
     const cx2 = moonX - moonR * 0.45 + (i % 3) * moonR * 0.44;
     const cy2 = moonY - moonR * 0.35 + Math.floor(i / 3) * moonR * 0.52 + 18;
     cv.ell(cx2, cy2, 13 + (i % 3) * 8, 10 + (i % 3) * 6, [204, 212, 202], [186, 196, 188], 120);
 }
-cv.glow(moonX - moonR * 0.3, moonY - moonR * 0.3, moonR * 0.7, [255, 255, 250], 46);
+cv.glow(moonX - moonR * 0.3, moonY - moonR * 0.3, moonR * 0.7, [255, 255, 250], 34);
 /* 月晕双环 + 边缘光 */
-cv.glow(moonX, moonY, moonR + 34, [214, 226, 222], 34);
-cv.glow(moonX, moonY, moonR + 58, [214, 226, 222], 18);
+cv.glow(moonX, moonY, moonR + 34, [214, 226, 222], 24);
+cv.glow(moonX, moonY, moonR + 58, [214, 226, 222], 13);
 cv.arc(moonX, moonY, moonR + 2, Math.PI * 1.15, Math.PI * 1.85, [255, 255, 250], 2.6, 130);
 
 /* 5. 垂藤（顶部两角） */

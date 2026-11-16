@@ -192,6 +192,14 @@
             g.glow(scx - S(64), base - S(60), S(70), [104, 88, 176], 0.2);
             g.glow(scx + S(88), base - S(46), S(64), [76, 102, 164], 0.2);
             g.ell(scx, base - S(8), S(204), S(26), 0, [98, 78, 122], [64, 58, 88], 0.5);
+            /* 湿街霓虹倒影：双塔霓虹色的竖向光渍 */
+            for (const side of [-1, 1]) {
+                const rx = scx + side * S(R(96, 126));
+                const rc = side < 0 ? hexRGB(TEAL) : hexRGB(AMBER);
+                g.capsule(rx, base - S(18), rx + S(side * 2), base + S(2), S(3.2), rc, 0.3);
+                g.capsule(rx + S(side * 10), base - S(12), rx + S(side * 12), base + S(3), S(2.2), rc, 0.22);
+            }
+            g.glow(scx, base - S(4), S(60), [124, 96, 140], 0.22);
             /* 远景：整幅天际线（连绵楼墙 + 密集窗格点阵） */
             for (let i = 0; i < 13; i++) {
                 const bx = scx + S(-168 + i * 26), bw = S(R(16, 24)), bh = S(R(44, 96));
@@ -341,7 +349,7 @@
             }
             sceneProps(g, S, headCX, headCY, base, p, rand);
             g.band(W / 2, headCY + S(30), S(148), Math.PI * 1.16, Math.PI * 1.84, Math.max(1.2, S(2.4)), tealC, 0.42);
-            g.band(W / 2, headCY + S(30), S(158), Math.PI * 1.22, Math.PI * 1.78, Math.max(1, S(1.6)), amberC, 0.22);
+            g.band(W / 2, headCY + S(30), S(158), Math.PI * 1.22, Math.PI * 1.74, Math.max(1, S(1.6)), amberC, 0.22);
         }
 
         /* ===== 轮廓底影（暗色描边，让人物从背景里立出来） ===== */

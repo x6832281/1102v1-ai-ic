@@ -73,7 +73,7 @@ body {
     /* 深空回声场景（tools/make-portal-bg.mjs 生成）+ 压暗叠加层保证正文对比度 */
     background-image:
         linear-gradient(180deg, rgba(8, 12, 19, 0.24) 0%, rgba(8, 12, 19, 0.36) 100%),
-        url('bg-echo.png');
+        url('bg-echo.png?v=2137');
     background-size: cover, cover;
     background-position: center, center;
     background-attachment: fixed, fixed;
@@ -1066,6 +1066,18 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 /* ============================================================
  * 对话交互空间
  * ============================================================ */
+.view[data-view="chat"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(62% 44% at 50% 0%, var(--scene-glow, transparent), transparent 74%);
+    pointer-events: none;
+    z-index: 0;
+}
+.view[data-view="chat"] > * {
+    position: relative;
+    z-index: 1;
+}
 .view[data-view="chat"] {
     display: flex;
     flex-direction: column;

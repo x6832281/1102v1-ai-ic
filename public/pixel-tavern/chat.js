@@ -158,6 +158,16 @@ function openChat(id, greetOverride) {
     const n = parseInt(hx.length === 3 ? hx.split('').map(x=>x+x).join('') : hx, 16);
     document.documentElement.style.setProperty('--chat-accent', acc);
     document.documentElement.style.setProperty('--chat-accent-soft', 'rgba(' + ((n>>16)&255) + ',' + ((n>>8)&255) + ',' + (n&255) + ', 0.16)');
+    /* 场景母题辉光（R26）：聊天背景按角色分类染上环境色 */
+    const SCENE_GLOWS = {
+        fantasy: 'rgba(96, 190, 160, 0.12)',
+        neon: 'rgba(150, 96, 190, 0.12)',
+        history: 'rgba(255, 168, 96, 0.12)',
+        mystery: 'rgba(110, 140, 205, 0.12)',
+        quiet: 'rgba(255, 186, 110, 0.12)',
+        odyssey: 'rgba(120, 118, 210, 0.12)',
+    };
+    document.documentElement.style.setProperty('--scene-glow', SCENE_GLOWS[c.category] || 'rgba(0, 209, 178, 0.10)');
     $('#chat-char-name').textContent = c.name;
     $('#chat-char-title').textContent = c.title ? c.title + ' · ' + catName(c.category) : catName(c.category);
     PTAvatar.draw($('#chat-avatar'), c);
