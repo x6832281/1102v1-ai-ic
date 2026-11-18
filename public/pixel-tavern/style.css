@@ -2247,11 +2247,11 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     /* 对称双列卡片网格 */
     .card-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 12px;
     }
 
     .card {
-        border-radius: 10px;
+        border-radius: 12px;
     }
 
     .card-info {
@@ -2389,20 +2389,23 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     #chat-form {
         padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 8px));
         gap: 8px;
-        border-top: 1px solid var(--line);
+        background: rgba(7, 9, 14, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--panel-border);
     }
 
     #chat-input {
         font-size: 16px !important; /* 关键：防止 iOS Safari 放大屏幕 */
-        padding: 9px 12px;
-        min-height: 42px;
+        padding: 10px 14px;
+        min-height: 44px;
         max-height: 96px;
-        border-radius: 8px;
+        border-radius: 10px;
     }
 
     #btn-send {
         padding: 0 14px;
-        height: 42px;
+        height: 44px;
         font-size: 13.5px;
         min-width: 58px;
     }
@@ -2441,16 +2444,16 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
         bottom: 0;
         left: 0;
         right: 0;
-        height: calc(54px + env(safe-area-inset-bottom, 0px));
+        height: calc(56px + env(safe-area-inset-bottom, 0px));
         padding-bottom: env(safe-area-inset-bottom, 0px);
-        background: rgba(12, 15, 20, 0.94);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid var(--line);
+        background: rgba(7, 9, 14, 0.90);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
         z-index: 60;
         justify-content: space-around;
         align-items: center;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45);
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
     body:has(.view[data-view="chat"]:not(.hidden)) #mobile-nav,
@@ -2472,7 +2475,7 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
         font-weight: 500;
         padding: 6px 0 4px;
         cursor: pointer;
-        transition: color 0.15s ease;
+        transition: color 0.15s ease, text-shadow 0.15s ease;
         -webkit-tap-highlight-color: transparent;
         gap: 3px;
         height: 100%;
@@ -2481,6 +2484,7 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     .mob-nav-item.active {
         color: var(--accent);
         font-weight: 600;
+        text-shadow: 0 0 12px rgba(0, 209, 178, 0.4);
     }
 
     .mob-nav-item i.pi {
