@@ -7,26 +7,41 @@
    萤青 #00d1b2 = 一级动作与品牌主 CTA（开始对话 / 发送 / 随机连线 / 主链接）
    琥珀 #f59e0b = 次级强调与荣誉状态（徽章 / 收起互动 / 共鸣计数 / 焦点描边） */
 :root {
-    /* 核心色彩系统（深曜夜墨 + 冷萃萤青 + 琥珀微光） */
-    --bg: #0c0f14;
-    --bg-2: #10141d;
-    --panel: #151b26;
-    --panel-2: #1b2332;
-    --panel-3: #222d40;
+    /* 核心色彩系统（深渊黑曜石 + 冷萃萤青 + 琥珀微光） */
+    --bg: #07090e;
+    --bg-elevated: #0d1117;
+    --bg-surface: #121822;
+    --bg-2: #0e131d;
+    --panel: #131924;
+    --panel-2: #18202e;
+    --panel-3: #1e283a;
     --line: rgba(255, 255, 255, 0.08);
     --line-focus: rgba(0, 209, 178, 0.45);
     --border: #00d1b2;
     --border-lt: #5eead4;
     --accent: #00d1b2;
+    --accent-glow: rgba(0, 209, 178, 0.18);
     --accent-2: #f59e0b;
+    --gold: #f59e0b;
+    --gold-glow: rgba(245, 158, 11, 0.22);
+    --gold-border: rgba(245, 158, 11, 0.4);
     --text: #f1f5f9;
-    --text-dim: #8c9ba8;
+    --text-dim: #94a3b8;
     --green: #10b981;
     --red: #f43f5e;
-    --shadow: rgba(0, 0, 0, 0.45);
-    --radius: 12px;
+    --shadow: rgba(0, 0, 0, 0.55);
+    --radius: 14px;
     --radius-s: 8px;
     --radius-pill: 9999px;
+
+    /* Glassmorphism 2.0 高透磨砂琉璃设计令牌 */
+    --panel-glass: rgba(14, 19, 28, 0.78);
+    --panel-glass-deep: rgba(9, 13, 20, 0.88);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-border-hover: rgba(0, 209, 178, 0.35);
+    --shadow-card: 0 16px 36px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--panel-border);
+    --shadow-card-hover: 0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 24px var(--accent-glow);
+    --glass-blur: blur(20px);
 
     /* 字体系统：现代高清晰度人文排版 */
     --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
@@ -304,9 +319,11 @@ canvas {
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-    background: rgba(12, 15, 20, 0.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--line);
+    background: var(--panel-glass);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--panel-border);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .tb-left {
@@ -1560,11 +1577,13 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 }
 
 .modal-window {
-    background: var(--panel);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    max-width: 560px;
+    background: var(--panel-glass-deep);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    max-width: 580px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
