@@ -1158,17 +1158,20 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 }
 
 #chat-header {
-    border-bottom: 2px solid var(--chat-accent-soft, rgba(0, 209, 178, 0.25));
     display: flex;
     align-items: center;
     gap: 14px;
-    background: var(--panel);
-    border: 1px solid var(--line);
+    background: var(--panel-glass);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--panel-border);
+    border-bottom: 2px solid var(--chat-accent-soft, rgba(0, 209, 178, 0.25));
     border-radius: var(--radius);
     padding: 12px 18px;
     position: relative;
     z-index: 10;
     flex-shrink: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 #chat-avatar {
@@ -1276,41 +1279,48 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 }
 
 .msg .bubble {
-    max-width: 76%;
-    padding: 12px 16px;
-    border-radius: 14px;
-    background: var(--panel);
-    border: 1px solid var(--line);
+    max-width: 78%;
+    padding: 13px 18px;
+    border-radius: 16px;
     position: relative;
-    line-height: 1.65;
+    line-height: 1.7;
 }
 
 .msg.char .bubble {
-    background: var(--panel-2);
-    border-color: rgba(255, 255, 255, 0.1);
-    border-left: 2px solid var(--chat-accent-soft, rgba(0, 209, 178, 0.3));
+    background: var(--panel-glass-deep);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--chat-accent-soft, var(--accent));
     border-top-left-radius: 4px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
 }
 
 .msg.user .bubble {
-    background: rgba(0, 209, 178, 0.15);
-    border-color: rgba(0, 209, 178, 0.3);
+    background: rgba(0, 209, 178, 0.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(0, 209, 178, 0.35);
     border-top-right-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .msg .msg-body {
     white-space: pre-wrap;
     word-break: break-word;
-    font-size: 14px;
+    font-size: 14.5px;
 }
 
 .msg-body .act {
-    color: var(--text-dim);
+    color: #94a3b8;
     font-style: italic;
+    opacity: 0.92;
 }
 
 .msg-body .quote {
-    color: var(--border-lt);
+    color: #ffe6a3;
+    font-weight: 500;
+    text-shadow: 0 0 12px rgba(245, 158, 11, 0.22);
 }
 
 .msg-name {
@@ -1531,7 +1541,7 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 #chat-options {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .option-chip {
@@ -1539,19 +1549,23 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     font-size: 13px;
     text-align: left;
     color: var(--text);
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-s);
-    padding: 10px 14px;
+    background: var(--panel-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 11px 16px;
     cursor: pointer;
-    transition: all 0.16s ease;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .option-chip:hover {
     color: #ffffff;
-    border-color: var(--accent);
-    background: var(--panel-3);
-    transform: translateX(2px);
+    border-color: rgba(0, 209, 178, 0.5);
+    background: rgba(0, 209, 178, 0.14);
+    box-shadow: 0 6px 20px rgba(0, 209, 178, 0.18);
+    transform: translateX(4px);
 }
 
 .option-chip:disabled {
@@ -1563,7 +1577,8 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
 .option-chip.chosen {
     color: var(--accent);
     border-color: var(--accent);
-    background: rgba(0, 209, 178, 0.12);
+    background: rgba(0, 209, 178, 0.2);
+    box-shadow: 0 0 14px rgba(0, 209, 178, 0.3);
     opacity: 1;
 }
 
@@ -1574,7 +1589,7 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     margin: 0 auto;
     width: 100%;
     padding: 14px 8px calc(14px + env(safe-area-inset-bottom, 0px));
-    background: var(--bg);
+    background: transparent;
     flex-shrink: 0;
 }
 
@@ -1584,22 +1599,25 @@ body:has(.view[data-view="chat"]:not(.hidden)) #tavern-ticker {
     font-family: var(--font-main);
     font-size: 14px;
     color: var(--text);
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-s);
-    padding: 12px 16px;
+    background: var(--panel-glass-deep);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 12px 18px;
     outline: none;
     resize: none;
     overflow-y: auto;
     max-height: 120px;
     min-height: 48px;
     line-height: 1.6;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #chat-input:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0, 209, 178, 0.12);
+    box-shadow: 0 0 0 3px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 /* ============================================================

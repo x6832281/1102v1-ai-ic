@@ -263,6 +263,6 @@ async function main() {
         console.log('\n失败项：');
         failures.forEach(f => console.log('  - ' + f));
     }
-    process.exit(fail ? 1 : 0);
+    process.exitCode = fail ? 1 : 0;
 }
 await main();

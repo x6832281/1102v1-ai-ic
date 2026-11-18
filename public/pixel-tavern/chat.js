@@ -383,6 +383,13 @@ function updateImmersive(replyText) {
     $('#bar-favor').style.width = state.chat.favor + '%';
     renderTrack();
 
+    /* 角色头像光晕随好感度/心情流动 */
+    const avEl = $('#chat-avatar');
+    if (avEl) {
+        const glowColor = state.chat.favor >= 60 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(0, 209, 178, 0.35)';
+        avEl.style.boxShadow = `0 0 16px ${glowColor}, inset 0 0 0 1px ${glowColor}`;
+    }
+
     /* 行动选项 */
     const optsBox = $('#chat-options');
     optsBox.innerHTML = '';
